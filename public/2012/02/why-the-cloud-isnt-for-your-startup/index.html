@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Why the Cloud isn&#39;t for your Startup" />
+<meta property="og:description" content="The Lure You&rsquo;re a new startup, you&rsquo;re tight on funds and don&rsquo;t have the server knowledge to run your own servers, but you plan on growing exponentially very quickly. You have three choices:
+ Suck it up and learn some sysadmin skills (or hire one) Use a PaaS provider (such as EngineYard, Heroku, or EC2) Use a mix of both  But how do you know which path to take?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2012/02/why-the-cloud-isnt-for-your-startup/" />
+
+
+
+<meta property="article:published_time" content="2012-02-28T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2012-02-28T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Why the Cloud isn&#39;t for your Startup"/>
+<meta name="twitter:title" content="Why the Cloud isn&#39;t for your Startup"/>
+<meta name="twitter:description" content="The Lure You&rsquo;re a new startup, you&rsquo;re tight on funds and don&rsquo;t have the server knowledge to run your own servers, but you plan on growing exponentially very quickly. You have three choices:
+ Suck it up and learn some sysadmin skills (or hire one) Use a PaaS provider (such as EngineYard, Heroku, or EC2) Use a mix of both  But how do you know which path to take?"/>
+
+
+
+
+<meta itemprop="name" content="Why the Cloud isn&#39;t for your Startup">
+<meta itemprop="description" content="The Lure You&rsquo;re a new startup, you&rsquo;re tight on funds and don&rsquo;t have the server knowledge to run your own servers, but you plan on growing exponentially very quickly. You have three choices:
+ Suck it up and learn some sysadmin skills (or hire one) Use a PaaS provider (such as EngineYard, Heroku, or EC2) Use a mix of both  But how do you know which path to take?">
+
+
+<meta itemprop="dateModified" content="2012-02-28T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="1128">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Why the Cloud isn&#39;t for your Startup 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Feb 28, 2012 - 6 minutes</div>
+      <h1 class="title"> Why the Cloud isn&#39;t for your Startup </h1>
+      <div class="content"> 
+
+<h3 id="the-lure">The Lure</h3>
+
+<p>You&rsquo;re a new startup, you&rsquo;re tight on funds and don&rsquo;t have the server knowledge to run your own servers, but you plan on growing exponentially very quickly. You have three choices:</p>
+
+<ul>
+<li>Suck it up and learn some sysadmin skills (or hire one)</li>
+<li>Use a PaaS provider (such as EngineYard, Heroku, or EC2)</li>
+<li>Use a mix of both</li>
+</ul>
+
+<p>But how do you know which path to take?</p>
+
+<p>I&rsquo;ll be using my experience running Servly for most of this article. I&rsquo;ve been using dedicated servers and virtual machines and the cloud for over 6 years with Servly and other business ventures.</p>
+
+<h3 id="how-valuable-is-your-time-when-shit-hits-the-fan">How valuable is your time when shit hits the fan?</h3>
+
+<p>When using services like EC2 and Amazon, you need to be aware that the support levels are different versus a regular dedicated hosting provider. The last time I had a ticket in with Heroku it had taken well over 4 hours to even get a response.</p>
+
+<p>Support with a dedicated server is different. Of the two hosting providers that I&rsquo;ve been using (<a href="http://wooservers.com">WooServers</a> and <a href="http://voxel.net/">Voxel</a>), I have been given top notch support. Tickets are answered in minutes, and 911&rsquo;s are answered in seconds. Large conglomerate cloud providers just can&rsquo;t beat that service.</p>
+
+<p>There are other considerations to make as well. With traditional cloud offerings (EC2, Rackspace, EngineYard) and dedicated servers you are given root access to the servers, but with Heroku you&rsquo;re locked in to their read-only file system and configuration. You miss out on the ability to tweak your configuration for maximum performance.</p>
+
+<p>With dedicated hardware you can control your infastructure in a much more fine grained way than with a PaaS offering. All of this ties back into support; support that is familiar with the hardware and support that isn&rsquo;t just working for the lowest common denominator in terms of performance based across a massive cloud. With dedicated hardware you get the control and support that one would expect from a paid service, while still being able to customize your system to YOUR needs, and not the needs of the baseline.</p>
+
+<h3 id="benchmark-like-crazy">Benchmark like crazy</h3>
+
+<p>Besides knowing how your application&rsquo;s innards look you also need to know how it performs. Find bottlenecks, memory leaks, optmizations you can make, database indexes you might be missing, etc.</p>
+
+<p>Servly&rsquo;s main focus is the dashboard, and the API server&rsquo;s use to communicate their status updates. Every ~5 minutes the server gets bombarded with hundreds of concurrent requests all vying for database access.</p>
+
+<p>One of the issues I noticed was the occasional 502 Gateway error. There were two problems:</p>
+
+<ul>
+<li>Not enough nginx workers</li>
+<li>Not enough unicorn works with a high timeout</li>
+</ul>
+
+<p>There is no magic formula to find out what the right balance is without running your own tests. When I started testing a simple</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="lineno">1 </span>ab -c <span class="m">100</span> -n <span class="m">1000</span> http://foobar.servly.com/
+</code></pre></div>
+
+
+<p>was returning about 78 failed requests out of 1000. Good, but not good enough.</p>
+
+<p>Editing the nginx configuration several more times I got rid of the writev() failed (107: Transport endpoint is not connected) while sending request to upstream error.  The nginx worker count is now at 16.</p>
+
+<p>The next error was a upstream timeout that would ocassionally happen during that 5 minute burst period. Modifying the number of unicorn slaves to 24, upping the backlog, and tweaking the timeout has reduced all of the gateway errors.</p>
+
+<p>I was now able to scale up from 100-1000 concurrent requests without any failures being reported from ab.</p>
+
+<h3 id="scaling-on-the-cloud-vs-bare-metal">Scaling on the cloud vs bare metal</h3>
+
+<p>For very small projects, or throwaway prototypes, Heroku and other free services are great. However once you&rsquo;re project starts growing, the costs can grow exponentially.</p>
+
+<p>Currently Servly runs on:</p>
+
+<ul>
+<li>2.6Ghz Quadcore i5</li>
+<li>8GB of RAM</li>
+<li>Intel X25 SSD. This provides excellent throughput for both the database and the workers. I also have a spare drive to do backups to (as well as offsite backups).</li>
+<li>Server is hosted at <a href="http://wooservers.com/">WooServer</a></li>
+</ul>
+
+<p>I also have a MySQL slave for backups in addition to S3 and several spare VM&rsquo;s running as a standby.</p>
+
+<p>Software wise there are:</p>
+
+<ul>
+<li>24 Unicorn slaves</li>
+<li>10 Background workers</li>
+<li>About 3GB of data is being stored in memory from the database cache</li>
+</ul>
+
+<h3 id="cost-comparisons">Cost Comparisons</h3>
+
+<h3 id="heroku">Heroku</h3>
+
+<ul>
+<li>24 Dynos: $827</li>
+<li>10 Workers: $323</li>
+<li>Fugu Database: $400</li>
+</ul>
+
+<p>Total: $1,587/mo</p>
+
+<h3 id="engine-yard">Engine Yard</h3>
+
+<ul>
+<li>1 Extra Large instance</li>
+</ul>
+
+<p>Total: $959</p>
+
+<p>I could&rsquo;ve gone with a smaller medium instance, however I need the IO to be as high as possible. Even on this it&rsquo;s still going to be pretty terrible, this also applies to Heroku&rsquo;s offerings as well, since the Fugu database is on the very conservative side and both are layers ontop of Amazon&rsquo;s EC2. [1]</p>
+
+<h3 id="dedicated">Dedicated</h3>
+
+<ul>
+<li>2.6ghz Quadcore i5</li>
+<li>8GB RAM</li>
+<li>80GB Intexl X-25 SSD</li>
+<li>80GB Secondary drive</li>
+<li>5TB of bandwidth</li>
+</ul>
+
+<p>Total: $145/mo</p>
+
+<p>For the price of running Heroku relatively maxed out on dyno&rsquo;s, I could get 11 dedicated servers. Thats roughly:</p>
+
+<ul>
+<li>28Ghz on 44 cores</li>
+<li>88GB of RAM</li>
+<li>880GB of SSD storage</li>
+<li>880GB of backup storage</li>
+<li>55TB of transfer</li>
+</ul>
+
+<h3 id="but-i-don-t-know-anything-about-servers">But I don&rsquo;t know anything about servers</h3>
+
+<p>Learn. You may stumble at first, but there are plenty of outlets to get help at. You can go on Freenode&rsquo;s IRC, Mailing lists, and Stack Exchange. You could even hire a part time sysadmin. Once you really start scaling the cost of using Heroku versus what you could get with bare metal becomes so great that you could eventually just hire a full time sysadmin to manage your dedicated servers.</p>
+
+<h3 id="what-are-others-doing">What are others doing?</h3>
+
+<p>GitHub was a large player to move from the cloud at EngineYard to a more mixed infastructure of bare metal and spot instances to Rackspace. [2] They were able to get nearly 6x the RAM and nearly 4x the CPU cores; one of their main focal points was cost in addition to control, flexibility, capacity.</p>
+
+<p>There are also plenty of success stories over at Heroku&rsquo;s success page: <a href="http://success.heroku.com/">http://success.heroku.com/</a></p>
+
+<h3 id="what-the-cloud-is-good-for">What the cloud is good for</h3>
+
+<p>Temporary data crunching. Have a sudden spike in your job queue? Crank up some more virtual machines to plow through them, then turn them off to save money. All of this can be automated with tools like Blueprint, Puppet, and Chef.</p>
+
+<p>Backups. With the price of S3 being around 8 cents per  GB, its entirely feasable to back everything up off site for disaster recovery to the cloud.</p>
+
+<h3 id="bottom-line">Bottom Line</h3>
+
+<p>You and your team need to evaluate your business needs and decide on what option is best for your company. If you already have a competent sysadmin or a developer who has played both roles before, it would make much more sense to use bare metal. If no one in your team has the experience, or time, to learn devops, then a PaaS solution like Heroku would be a more logical choice.</p>
+
+<p>[1] <a href="http://www.krenger.ch/blog/amazon-ec2-io-performance/">http://www.krenger.ch/blog/amazon-ec2-io-performance/</a></p>
+
+<p>[2] <a href="https://github.com/blog/493-github-is-moving-to-rackspace">https://github.com/blog/493-github-is-moving-to-rackspace</a></p>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

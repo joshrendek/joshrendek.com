@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Golang Elasticsearch on Josh Rendek</title>
+    <link>https://joshrendek.com/categories/golang-elasticsearch/</link>
+    <description>Recent content in Golang Elasticsearch on Josh Rendek</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Copyright 2008-2017 Josh Rendek</copyright>
+    <lastBuildDate>Thu, 26 Nov 2015 12:05:13 +0000</lastBuildDate>
+    
+	<atom:link href="https://joshrendek.com/categories/golang-elasticsearch/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Understanding ElasticSearch Performance</title>
+      <link>https://joshrendek.com/2015/11/understanding-elasticsearch-performance/</link>
+      <pubDate>Thu, 26 Nov 2015 12:05:13 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2015/11/understanding-elasticsearch-performance/</guid>
+      <description>Performance before and after Optimizations When working with billions of documents in your Elasticsearch cluster, there are a few important things to keep in mind:
+ Look at what the big players do (Elasticsearch/Kibana) for organization and planning Experiment with index sizes that make sense for your business, don&amp;rsquo;t just assume 1 index for a billion documents is a good idea (even if you N shards) Understand which metrics to monitor when you are performance testing your cluster Monitor all points of ingestion: Elasticsearch, Load balancers (ELB, HAProxy, etc), and your application code that is inserting  What do the big players do?</description>
+    </item>
+    
+  </channel>
+</rss>

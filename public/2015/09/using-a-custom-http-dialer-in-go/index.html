@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Using a custom HTTP Dialer in Go" />
+<meta property="og:description" content="Let&rsquo;s make a function to generate an HTTP client for us using a custom dialer:
+1 var DefaultDialer = &amp;net.Dialer{} 2  3 func GetHttpClient() http.Client { 4 	tr := &amp;http.Transport{ 5 	Dial: DefaultDialer.Dial, 6 	} 7  8 	client := http.Client{Transport: tr} 9 	return client 10 }  Can you spot the bug?
+By omitting the Timeout, KeepAlive timeouts in the first example, we&rsquo;ve introduced a very subtle bug." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2015/09/using-a-custom-http-dialer-in-go/" />
+
+
+
+<meta property="article:published_time" content="2015-09-19T21:30:07&#43;00:00"/>
+<meta property="article:modified_time" content="2015-09-19T21:30:07&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Using a custom HTTP Dialer in Go"/>
+<meta name="twitter:title" content="Using a custom HTTP Dialer in Go"/>
+<meta name="twitter:description" content="Let&rsquo;s make a function to generate an HTTP client for us using a custom dialer:
+1 var DefaultDialer = &amp;net.Dialer{} 2  3 func GetHttpClient() http.Client { 4 	tr := &amp;http.Transport{ 5 	Dial: DefaultDialer.Dial, 6 	} 7  8 	client := http.Client{Transport: tr} 9 	return client 10 }  Can you spot the bug?
+By omitting the Timeout, KeepAlive timeouts in the first example, we&rsquo;ve introduced a very subtle bug."/>
+
+
+
+
+<meta itemprop="name" content="Using a custom HTTP Dialer in Go">
+<meta itemprop="description" content="Let&rsquo;s make a function to generate an HTTP client for us using a custom dialer:
+1 var DefaultDialer = &amp;net.Dialer{} 2  3 func GetHttpClient() http.Client { 4 	tr := &amp;http.Transport{ 5 	Dial: DefaultDialer.Dial, 6 	} 7  8 	client := http.Client{Transport: tr} 9 	return client 10 }  Can you spot the bug?
+By omitting the Timeout, KeepAlive timeouts in the first example, we&rsquo;ve introduced a very subtle bug.">
+
+
+<meta itemprop="dateModified" content="2015-09-19T21:30:07&#43;00:00" />
+<meta itemprop="wordCount" content="215">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Using a custom HTTP Dialer in Go 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Sep 19, 2015 - 2 minutes</div>
+      <h1 class="title"> Using a custom HTTP Dialer in Go </h1>
+      <div class="content"> <p>Let&rsquo;s make a function to generate an HTTP client for us using a custom dialer:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="lineno"> 1 </span><span class="kd">var</span> <span class="nx">DefaultDialer</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">net</span><span class="p">.</span><span class="nx">Dialer</span><span class="p">{}</span>
+<span class="lineno"> 2 </span>
+<span class="lineno"> 3 </span><span class="kd">func</span> <span class="nx">GetHttpClient</span><span class="p">()</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Client</span> <span class="p">{</span>
+<span class="lineno"> 4 </span>	<span class="nx">tr</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Transport</span><span class="p">{</span>
+<span class="lineno"> 5 </span>		<span class="nx">Dial</span><span class="p">:</span>                <span class="nx">DefaultDialer</span><span class="p">.</span><span class="nx">Dial</span><span class="p">,</span>
+<span class="lineno"> 6 </span>	<span class="p">}</span>
+<span class="lineno"> 7 </span>
+<span class="lineno"> 8 </span>	<span class="nx">client</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Client</span><span class="p">{</span><span class="nx">Transport</span><span class="p">:</span> <span class="nx">tr</span><span class="p">}</span>
+<span class="lineno"> 9 </span>	<span class="k">return</span> <span class="nx">client</span>
+<span class="lineno">10 </span><span class="p">}</span>
+</code></pre></div>
+
+
+<p>Can you spot the bug?</p>
+
+<p>By omitting the Timeout, KeepAlive timeouts in the first example, we&rsquo;ve introduced a very subtle bug.</p>
+
+<p>There is also another bug if you don&rsquo;t handle TLS timeouts as well.</p>
+
+<p><a href="http://golang.org/pkg/net/#Dialer">net/Dialer</a> has some documentation on this.</p>
+
+<p>Without providing a KeepAlive and a Timeout value, you could end up with connections that hang indefinitely. By omitting the TLS handshake timeout, the daemon would also hang trying to re-negotiate the SSL connection.</p>
+
+<p>In my case this was causing a very random and hard to reproduce issue where the program would hang indefinitely.</p>
+
+<p>Some good debugging tips are using <code>strace</code> to see what syscall its stuck in, and if your daemon is running in the foreground, using a <code>SIGQUIT</code> signal.</p>
+
+<p>Here is a working version:</p>
+
+<p><div class="highlight"><pre><code class="language-go" data-lang="go"><span class="lineno"> 1 </span><span class="kd">var</span> <span class="nx">DefaultDialer</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">net</span><span class="p">.</span><span class="nx">Dialer</span><span class="p">{</span><span class="nx">Timeout</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span> <span class="nx">KeepAlive</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">}</span>
+<span class="lineno"> 2 </span>
+<span class="lineno"> 3 </span><span class="kd">func</span> <span class="nx">GetHttpClient</span><span class="p">()</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Client</span> <span class="p">{</span>
+<span class="lineno"> 4 </span>	<span class="nx">tr</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Transport</span><span class="p">{</span>
+<span class="lineno"> 5 </span>		<span class="nx">Dial</span><span class="p">:</span>                <span class="nx">DefaultDialer</span><span class="p">.</span><span class="nx">Dial</span><span class="p">,</span>
+<span class="lineno"> 6 </span>		<span class="nx">TLSHandshakeTimeout</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+<span class="lineno"> 7 </span><span class="p">}</span>
+<span class="lineno"> 8 </span>
+<span class="lineno"> 9 </span>	<span class="nx">client</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Client</span><span class="p">{</span><span class="nx">Transport</span><span class="p">:</span> <span class="nx">tr</span><span class="p">}</span>
+<span class="lineno">10 </span>	<span class="k">return</span> <span class="nx">client</span>
+<span class="lineno">11 </span><span class="p">}</span>
+</code></pre></div>
+</p>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

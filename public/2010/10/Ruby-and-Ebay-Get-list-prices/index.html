@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Ruby and Ebay: Get list prices" />
+<meta property="og:description" content="I&rsquo;ll eventually be turning my ruby ebay work into a gem, but for now here are little snippets:
+Please note that this code automagically takes care of things like 4x SOMETHING &ndash; it&rsquo;ll take the current list price and divide by four, if you don&rsquo;t want that functionality, remove the divider. You also need rest-open-uri and hpricot for gems.
+To get a list of prices:
+1 def self.get_search_results(query) 2  # API request variables 3  endpoint = &#39;http://svcs." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2010/10/ruby-and-ebay-get-list-prices/" />
+
+
+
+<meta property="article:published_time" content="2010-10-03T10:45:49&#43;00:00"/>
+<meta property="article:modified_time" content="2010-10-03T10:45:49&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Ruby and Ebay: Get list prices"/>
+<meta name="twitter:title" content="Ruby and Ebay: Get list prices"/>
+<meta name="twitter:description" content="I&rsquo;ll eventually be turning my ruby ebay work into a gem, but for now here are little snippets:
+Please note that this code automagically takes care of things like 4x SOMETHING &ndash; it&rsquo;ll take the current list price and divide by four, if you don&rsquo;t want that functionality, remove the divider. You also need rest-open-uri and hpricot for gems.
+To get a list of prices:
+1 def self.get_search_results(query) 2  # API request variables 3  endpoint = &#39;http://svcs."/>
+
+
+
+
+<meta itemprop="name" content="Ruby and Ebay: Get list prices">
+<meta itemprop="description" content="I&rsquo;ll eventually be turning my ruby ebay work into a gem, but for now here are little snippets:
+Please note that this code automagically takes care of things like 4x SOMETHING &ndash; it&rsquo;ll take the current list price and divide by four, if you don&rsquo;t want that functionality, remove the divider. You also need rest-open-uri and hpricot for gems.
+To get a list of prices:
+1 def self.get_search_results(query) 2  # API request variables 3  endpoint = &#39;http://svcs.">
+
+
+<meta itemprop="dateModified" content="2010-10-03T10:45:49&#43;00:00" />
+<meta itemprop="wordCount" content="229">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Ruby and Ebay: Get list prices 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Oct 3, 2010 - 2 minutes</div>
+      <h1 class="title"> Ruby and Ebay: Get list prices </h1>
+      <div class="content"> <p>I&rsquo;ll eventually be turning my ruby ebay work into a gem, but for now here are little snippets:</p>
+
+<p>Please note that this code automagically takes care of things like 4x SOMETHING &ndash; it&rsquo;ll take the current list price and divide by four, if you don&rsquo;t want that functionality, remove the divider. You also need rest-open-uri and hpricot for gems.</p>
+
+<p>To get a list of prices:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1 </span><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">get_search_results</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+<span class="lineno"> 2 </span>            <span class="c1"># API request variables</span>
+<span class="lineno"> 3 </span>            <span class="n">endpoint</span> <span class="o">=</span> <span class="s1">&#39;http://svcs.ebay.com/services/search/FindingService/v1&#39;</span><span class="p">;</span>  <span class="c1"># URL to call</span>
+<span class="lineno"> 4 </span>            <span class="n">version</span> <span class="o">=</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">;</span>  <span class="c1"># API version supported by your application</span>
+<span class="lineno"> 5 </span>            <span class="n">appid</span> <span class="o">=</span> <span class="s1">&#39;YOUR APP ID&#39;</span><span class="p">;</span>  <span class="c1"># Replace with your own AppID</span>
+<span class="lineno"> 6 </span>            <span class="n">globalid</span> <span class="o">=</span> <span class="s1">&#39;EBAY-US&#39;</span><span class="p">;</span>  <span class="c1"># Global ID of the eBay site you want to search (e.g., EBAY-DE)</span>
+<span class="lineno"> 7 </span>            <span class="n">safequery</span> <span class="o">=</span> <span class="no">URI</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">query</span><span class="p">);</span>  <span class="c1"># Make the query URL-friendly</span>
+<span class="lineno"> 8 </span>
+<span class="lineno"> 9 </span>            <span class="c1"># Construct the findItemsByKeywords HTTP GET call</span>
+<span class="lineno">10 </span>            <span class="n">apicall</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">?&quot;</span><span class="p">;</span>
+<span class="lineno">11 </span>            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;OPERATION-NAME=findItemsByKeywords&quot;</span><span class="p">;</span>
+<span class="lineno">12 </span>            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;SERVICE-VERSION=</span><span class="si">#{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="lineno">13 </span>            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;SECURITY-APPNAME=</span><span class="si">#{</span><span class="n">appid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="lineno">14 </span>            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;GLOBAL-ID=</span><span class="si">#{</span><span class="n">globalid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="lineno">15 </span>            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;keywords=</span><span class="si">#{</span><span class="n">safequery</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="lineno">16 </span>            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;paginationInput.entriesPerPage=25&quot;</span><span class="p">;</span>
+<span class="lineno">17 </span>
+<span class="lineno">18 </span>            <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="lineno">19 </span>
+<span class="lineno">20 </span>            <span class="nb">open</span><span class="p">(</span> <span class="n">apicall</span> <span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span> <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="n">s</span> <span class="p">}</span>
+<span class="lineno">21 </span>            <span class="n">prices</span> <span class="o">=</span> <span class="o">[]</span>
+<span class="lineno">22 </span>
+<span class="lineno">23 </span>
+<span class="lineno">24 </span>            <span class="n">doc</span> <span class="o">=</span> <span class="no">Hpricot</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="lineno">25 </span>            <span class="p">(</span><span class="n">doc</span><span class="o">/</span><span class="ss">:item</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
+<span class="lineno">26 </span>
+<span class="lineno">27 </span>                <span class="n">divider</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="lineno">28 </span>                <span class="n">get_count</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="ss">:title</span><span class="p">)</span><span class="o">.</span><span class="n">inner_html</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[0-9]/</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
+<span class="lineno">29 </span>                <span class="nb">p</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="ss">:title</span><span class="p">)</span><span class="o">.</span><span class="n">inner_html</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="lineno">30 </span>                <span class="k">if</span> <span class="o">!</span><span class="n">get_count</span><span class="o">.</span><span class="n">nil?</span>
+<span class="lineno">31 </span>                    <span class="n">divider</span> <span class="o">=</span> <span class="n">get_count</span><span class="o">.</span><span class="n">to_i</span>
+<span class="lineno">32 </span>                <span class="k">end</span>
+<span class="lineno">33 </span>                <span class="n">prices</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="ss">:sellingstatus</span><span class="o">/</span><span class="ss">:currentprice</span><span class="p">)</span><span class="o">.</span><span class="n">inner_html</span><span class="o">.</span><span class="n">to_f</span><span class="o">/</span><span class="n">divider</span>
+<span class="lineno">34 </span>            <span class="k">end</span>
+<span class="lineno">35 </span>
+<span class="lineno">36 </span>            <span class="n">prices</span>
+<span class="lineno">37 </span><span class="k">end</span>
+</code></pre></div>
+
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

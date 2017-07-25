@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Scala on Josh Rendek</title>
+    <link>https://joshrendek.com/categories/scala/</link>
+    <description>Recent content in Scala on Josh Rendek</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Copyright 2008-2017 Josh Rendek</copyright>
+    <lastBuildDate>Thu, 31 Oct 2013 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://joshrendek.com/categories/scala/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Parsing HTML in Scala</title>
+      <link>https://joshrendek.com/2013/10/parsing-html-in-scala/</link>
+      <pubDate>Thu, 31 Oct 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2013/10/parsing-html-in-scala/</guid>
+      <description>Is there ever a confusing amount of information out there on parsing HTML in Scala. Here is the list of possible ways I ran across:
+ Hope the document is valid XHTML and use scala.xml.XML to parse it If the document isn&amp;rsquo;t valid XHTML use something like TagSoup and hope it parses again Still think its valid XHTML? Try using scalaz&amp;rsquo;s XML parser  All of the answers I found on Google pointed to some type of XML parsing, which won&amp;rsquo;t always work.</description>
+    </item>
+    
+    <item>
+      <title>Getting started with Scala</title>
+      <link>https://joshrendek.com/2013/10/getting-started-with-scala/</link>
+      <pubDate>Mon, 28 Oct 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2013/10/getting-started-with-scala/</guid>
+      <description>Recently I&amp;rsquo;ve been getting into more Java and (attempting to) Scala development. I always got annoyed with the Scala ecosystem for development and would get fed up and just go back to writing straight Java (*cough*sbtcough). Today I decided to write down everything I did and get a sane process going for Scala development with SBT.
+I decided to write a small Scala client for OpenWeatherMap - here is what I went through.</description>
+    </item>
+    
+  </channel>
+</rss>

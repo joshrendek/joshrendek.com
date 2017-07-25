@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Influx Alert" />
+<meta property="og:description" content="I&rsquo;ve been very happy using InfluxDB with Grafana &#43; StatsD but always wanted a nice way to alert on some of the data being fed into statsd/grafana so I wrote a little tool in Go to accomplish that:
+Github: https://github.com/joshrendek/influx-alert
+I hope someone finds this useful! It&rsquo;s got a few simple functions/comparisons done already and support for HipChat and Slack notifications.
+Documentation Influx Alert This is a tool to alert on data that is fed into InfluxDB (for example, via statsd) so you can get alerted on it." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2015/10/influx-alert/" />
+
+
+
+<meta property="article:published_time" content="2015-10-12T21:30:07&#43;00:00"/>
+<meta property="article:modified_time" content="2015-10-12T21:30:07&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Influx Alert"/>
+<meta name="twitter:title" content="Influx Alert"/>
+<meta name="twitter:description" content="I&rsquo;ve been very happy using InfluxDB with Grafana &#43; StatsD but always wanted a nice way to alert on some of the data being fed into statsd/grafana so I wrote a little tool in Go to accomplish that:
+Github: https://github.com/joshrendek/influx-alert
+I hope someone finds this useful! It&rsquo;s got a few simple functions/comparisons done already and support for HipChat and Slack notifications.
+Documentation Influx Alert This is a tool to alert on data that is fed into InfluxDB (for example, via statsd) so you can get alerted on it."/>
+
+
+
+
+<meta itemprop="name" content="Influx Alert">
+<meta itemprop="description" content="I&rsquo;ve been very happy using InfluxDB with Grafana &#43; StatsD but always wanted a nice way to alert on some of the data being fed into statsd/grafana so I wrote a little tool in Go to accomplish that:
+Github: https://github.com/joshrendek/influx-alert
+I hope someone finds this useful! It&rsquo;s got a few simple functions/comparisons done already and support for HipChat and Slack notifications.
+Documentation Influx Alert This is a tool to alert on data that is fed into InfluxDB (for example, via statsd) so you can get alerted on it.">
+
+
+<meta itemprop="dateModified" content="2015-10-12T21:30:07&#43;00:00" />
+<meta itemprop="wordCount" content="302">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Influx Alert 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Oct 12, 2015 - 2 minutes</div>
+      <h1 class="title"> Influx Alert </h1>
+      <div class="content"> 
+
+<p>I&rsquo;ve been very happy using InfluxDB with Grafana + StatsD but always wanted a nice way to alert on some of the data being fed into statsd/grafana so I wrote a little tool in Go to accomplish that:</p>
+
+<p>Github: <a href="https://github.com/joshrendek/influx-alert">https://github.com/joshrendek/influx-alert</a></p>
+
+<p>I hope someone finds this useful! It&rsquo;s got a few simple functions/comparisons done already and support for HipChat and Slack notifications.</p>
+
+<h1 id="documentation">Documentation</h1>
+
+<h2 id="influx-alert">Influx Alert</h2>
+
+<p>This is a tool to alert on data that is fed into
+InfluxDB (for example, via statsd) so you can get alerted on it.</p>
+
+<h2 id="how-to-get-it">How to get it</h2>
+
+<p>Go to releases, or download the latest here: <a href="https://github.com/joshrendek/influx-alert/releases/download/0.1/influx-alert">v0.1</a></p>
+
+<h2 id="how-to-use">How to Use</h2>
+
+<ul>
+<li><code>name</code>: the name of the alert ( will be used in notifier )</li>
+<li><code>interval</code>: how often to check influxdb (in seconds)</li>
+<li><code>timeshift</code>: how far back to go (query is like: <code>where time &gt; now() - TIMESHIFT</code></li>
+<li><code>limit</code>: the max number of results to return</li>
+<li><code>type</code>: influxdb (the only option for now)</li>
+<li><code>function</code>: min/max/average are the only supported functions for now</li>
+<li><code>query</code>: the influxdb query to run (omit any limit or where clause on the time)</li>
+<li><code>trigger</code>: the type of trigger and value that would trigger it
+
+<ul>
+<li><code>operator</code>: gt/lt</li>
+<li><code>value</code>: value to compare against (note all values are floats internally)</li>
+</ul></li>
+<li><code>notifiers</code>: an array of notifiers, possible options are slack and hipchat</li>
+</ul>
+
+<p>Example: ( see example.yml for more )</p>
+
+<pre><code class="language-yaml">- name: Not Enough Foo
+  type: influxdb
+  function: average
+  timeshift: 1h
+  limit: 10
+  interval: 10
+  query: select * from &quot;foo.counter&quot;
+  notifiers:
+      - slack
+      - hipchat
+      - foobar
+  trigger:
+    operator: lt
+    value: 10
+</code></pre>
+
+<h2 id="environment-variables">Environment Variables</h2>
+
+<pre><code class="language-bash">  * INFLUX_HOST
+  * INFLUX_PORT (8086 is default)
+  * INFLUX_DB
+  * INFLUX_USER
+  * INFLUX_PASS
+  * SLACK_API_TOKEN
+  * SLACK_ROOM
+  * HIPCHAT_API_TOKEN
+  * HIPCHAT_ROOM_ID
+  * HIPCHAT_SERVER (optional)
+  * DEBUG (optional)
+</code></pre>
+
+<h2 id="supported-notifiers">Supported Notifiers</h2>
+
+<ul>
+<li>HipChat ( hosted and private servers )</li>
+<li>Slack ( Generate slack token: <a href="https://api.slack.com/web">https://api.slack.com/web</a> )</li>
+</ul>
+
+<h2 id="supported-backends">Supported Backends</h2>
+
+<ul>
+<li>InfluxDB v0.9</li>
+</ul>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

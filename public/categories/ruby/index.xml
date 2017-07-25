@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ruby on Josh Rendek</title>
+    <link>https://joshrendek.com/categories/ruby/</link>
+    <description>Recent content in Ruby on Josh Rendek</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Copyright 2008-2017 Josh Rendek</copyright>
+    <lastBuildDate>Thu, 04 Jul 2013 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://joshrendek.com/categories/ruby/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>A simple ruby plugin system</title>
+      <link>https://joshrendek.com/2013/07/a-simple-ruby-plugin-system/</link>
+      <pubDate>Thu, 04 Jul 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2013/07/a-simple-ruby-plugin-system/</guid>
+      <description>Let&amp;rsquo;s start out with a simple directory structure:
+. ├── plugin.rb ├── main.rb └── plugins ├── cat.rb └── dog.rb 1 directory, 3 files  All the plugins we will use for our library will be loaded from plugins. Now lets make a simple Plugin class and register our plugins.
+class Plugin # Keep the plugin list inside a set so we don&#39;t double-load plugins @plugins = Set.new def self.plugins @plugins end def self.</description>
+    </item>
+    
+    <item>
+      <title>Rb RFO Status: A Simple System Status Page in Ruby</title>
+      <link>https://joshrendek.com/2012/12/rb-rfo-status-simple-system-status-page-in-ruby/</link>
+      <pubDate>Tue, 25 Dec 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2012/12/rb-rfo-status-simple-system-status-page-in-ruby/</guid>
+      <description>Rb RFO Status is a simple system to post status updates to your team or customers in a easy to understand format so there is no delay in reporting a reason for outage. It is modeled slightly after the Heroku Status Page.
+Source: https://github.com/bluescripts/rb_rfo_status
+Download: https://s3.amazonaws.com/josh-opensource/rb_rfo_status-0.1.war
+It is licensed under the MIT License so do whatever you want with it!
+I&amp;rsquo;ve already opened up a few issues on Github that are enhancements, but this serves as a super simple application to deploy to keep your customers and team informed of system states.</description>
+    </item>
+    
+    <item>
+      <title>Preventing a ruby class from being reopened</title>
+      <link>https://joshrendek.com/2012/08/preventing-a-ruby-class-from-being-reopened/</link>
+      <pubDate>Tue, 28 Aug 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2012/08/preventing-a-ruby-class-from-being-reopened/</guid>
+      <description>I saw the question of &amp;ldquo;How can I prevent a class from being reopened again in Ruby?&amp;rdquo; pop up on the Ruby mailing list. While this is somewhat against the nature of ruby, it can be accomplished:
+{% codeblock lang:ruby %} class Foo def Foo.method_added(name) raise &amp;ldquo;This class is closed for modification&amp;rdquo; end end
+class Foo def testing p &amp;ldquo;test&amp;rdquo; end end {% endcodeblock %}
+This will raise an exception anytime someone tries to reopen the class.</description>
+    </item>
+    
+    <item>
+      <title>Writing Dependable Ruby &amp; a Reddit CLI</title>
+      <link>https://joshrendek.com/2012/08/writing-dependable-ruby-and-a-reddit-cli/</link>
+      <pubDate>Mon, 20 Aug 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2012/08/writing-dependable-ruby-and-a-reddit-cli/</guid>
+      <description>View Source on Github 
+When you work on your code and are finished for the day, is what you have committed worry free? If another developer were to push your code in the middle of the night, would they be calling you at 3am?
+Let&amp;rsquo;s see how we can improve our development cycle with testing so we can avoid those early morning calls. We&amp;rsquo;ll go over some of the basics with a simple project to start.</description>
+    </item>
+    
+    <item>
+      <title>Never Set Instance Variables Again</title>
+      <link>https://joshrendek.com/2012/08/never-set-instance-variables-again/</link>
+      <pubDate>Thu, 16 Aug 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2012/08/never-set-instance-variables-again/</guid>
+      <description>Tired of doing this on every method in ruby? {% codeblock lang:ruby %} class Person def initialize(name) @name = name end end {% endcodeblock %}
+Use the awesome power of ruby and metaprogramming to auto set method paramters to instance variables:
+{% codeblock lang:ruby %} class Person def initialize(name) method(method).parameters.collect {|x| instance_variable_set(&amp;ldquo;@#{x[1]}&amp;ldquo;, eval(x[1].to_s)) } end end {% endcodeblock %}
+Now you can access your parameters being passed in as instance variables for an object.</description>
+    </item>
+    
+  </channel>
+</rss>

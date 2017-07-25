@@ -1,0 +1,408 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>CentOS GCC Not Found + Other Weird Errors After Hdd Cloned - Josh Rendek</title>
+  <meta name="author" content="Josh Rendek">
+
+  
+  <meta name="description" content="A week or so ago the HDD started failing on my web server, so I had the DC clone the HDD for me. Some files however got lost in transit (bad sectors &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://joshrendek.com/2010/09/centos-gcc-not-found-other-weird-errors-after-hdd-cloned">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Josh Rendek" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3754808-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">
+      <span class="blue-brace">{</span>Josh Rendek<span class="blue-brace">}</span>
+  </a></h1>
+  
+  <div class="subtitle">
+  <h2>
+    <span class="heart"><3</span> Ruby &amp; Go
+  </h2>
+  </div>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:joshrendek.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects/">Projects</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://devopsbyvideo.com/">Screen Casts</a></li>
+  <li><a href="/categories">Categories</a></li>
+  <li><a href="/resume/">Resumé</a></li>
+  <li><a href="/about/">About</a></li>
+  <li><a href="https://github.com/joshrendek">Github</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">CentOS GCC Not Found + Other Weird Errors After Hdd Cloned</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-05T22:01:34-04:00" pubdate data-updated="true">Sep 5<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>A week or so ago the HDD started failing on my web server, so I had the DC clone the HDD for me. Some files however got lost in transit (bad sectors) and when I was trying to install nginx to get some testing done, I kept getting this error:</p>
+
+<pre>./configure
+C compiler not found
+</pre>
+
+
+<p>Apparently it wasn&rsquo;t finding GCC, even though it was definitely installed. After looking around a bit at the system and talking with a few people on IRC #linux, found out that some header files and other files were missing from /usr/include. Here is an example of some of the errors  I got with a simple hello world C++ program:</p>
+
+<pre lang="cpp">
+[root@dispersion ~]# cat test.cpp 
+#include <iostream>
+
+using namespace std;
+
+int main(){ cout << "hello wolrd " << endl;  return 0; }
+[root@dispersion ~]# gcc test.cpp 
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/x86_64-redhat-linux/bits/os_defines.h:39,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/x86_64-redhat-linux/bits/c++config.h:1202,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/iostream:43,
+                 from test.cpp:1:
+/usr/include/features.h:329:25: error: sys/cdefs.h: No such file or directory
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/cstdlib:71,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/stl_algobase.h:67,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/char_traits.h:46,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/ios:45,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/ostream:44,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/iostream:44,
+                 from test.cpp:1:
+/usr/include/stdlib.h:438:49: error: sys/types.h: No such file or directory
+/usr/include/string.h:28: error: â€˜__BEGIN_DECLSâ€™ does not name a type
+/usr/include/string.h:44: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:51: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:59: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:63: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:67: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:73: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:78: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:84: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:89: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:93: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:96: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:100: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:103: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:107: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:111: error: expected initializer before â€˜__THROWâ€™
+/usr/include/xlocale.h:28: error: expected constructor, destructor, or type conversion before â€˜typedefâ€™
+/usr/include/xlocale.h:40: error: expected constructor, destructor, or type conversion before â€˜;â€™ token
+/usr/include/string.h:121: error: â€˜__locale_tâ€™ has not been declared
+/usr/include/string.h:122: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:125: error: â€˜__locale_tâ€™ has not been declared
+/usr/include/string.h:125: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:131: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:139: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:167: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:171: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:177: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:184: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:189: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:192: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:195: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:200: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:205: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:212: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:218: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:227: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:233: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:236: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:242: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:249: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:256: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:281: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:288: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:293: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:296: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:300: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:304: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:308: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:312: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:317: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:320: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:326: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:330: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:337: error: â€˜__locale_tâ€™ has not been declared
+/usr/include/string.h:338: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:341: error: â€˜__locale_tâ€™ has not been declared
+/usr/include/string.h:342: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:350: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:356: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:359: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:363: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:365: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:371: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:374: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:377: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:380: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:387: error: expected initializer before â€˜__THROWâ€™
+/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/cstring:78: error: expected constructor, destructor, or type conversion before â€˜namespaceâ€™
+/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/x86_64-redhat-linux/bits/gthr.h:33: error: expected declaration before end of line
+[root@dispersion ~]#
+</pre>
+
+
+<p>The solution was to go to another server (which I have several) of the same architecture, and SCP (or rsync, take your pick) the /usr/include directory over.</p>
+
+<p>Problem solved.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Josh Rendek</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-05T22:01:34-04:00" pubdate data-updated="true">Sep 5<sup>th</sup>, 2010</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://joshrendek.com/2010/09/centos-gcc-not-found-other-weird-errors-after-hdd-cloned/" data-via="" data-counturl="http://joshrendek.com/2010/09/centos-gcc-not-found-other-weird-errors-after-hdd-cloned/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2010/09/servly-is-now-free/" title="Previous Post: Servly is now free!">&laquo; Servly is now free!</a>
+      
+      
+        <a class="basic-alignment right" href="/2010/09/ruby-random-stat/" title="Next Post: Ruby: random stat">Ruby: random stat &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Projects & Software</h1>
+  <ul>
+    <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+    <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+    <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+    <li><a href="/projects/">View More</a>
+
+    <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+    <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+  </ul>
+</section>
+
+<section>
+  <h1>Other Blogs</h1>
+  <ul>
+    <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+    <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2016/06/building-honeypots-and-analyzing-linux-malware/">Building Honeypots and Analyzing Linux Malware</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a Distributed WaitGroup With Go and Redis</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and Ping: Sendmsg: Operation Not Permitted</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/10/influx-alert/">Influx Alert</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/getting-upstart-to-log-to-syslog-with-tags/">Getting Upstart to Log to Syslog With Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/golang-performance-tips/">Golang Performance Tips</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Josh Rendek -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bluescripts';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

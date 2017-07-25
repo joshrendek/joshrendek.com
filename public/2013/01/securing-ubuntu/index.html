@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Securing Ubuntu" />
+<meta property="og:description" content="Table of Contents Initial Setup Setting up iptables and Fail2Ban Fail2Ban iptables rules Make shared memory read-only Setting up Bastille Linux Configuring Bastille sysctl hardening Setting up a chroot environment Securing nginx inside the chroot Extras 
+Initial Setup Let&rsquo;s login to our new machine and take some initial steps to secure our system. For this article I&rsquo;m going to assume your username is ubuntu.
+If you need to, setup your sudoers file by adding the following lines to /etc/sudoers:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2013/01/securing-ubuntu/" />
+
+
+
+<meta property="article:published_time" content="2013-01-17T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2013-01-17T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Securing Ubuntu"/>
+<meta name="twitter:title" content="Securing Ubuntu"/>
+<meta name="twitter:description" content="Table of Contents Initial Setup Setting up iptables and Fail2Ban Fail2Ban iptables rules Make shared memory read-only Setting up Bastille Linux Configuring Bastille sysctl hardening Setting up a chroot environment Securing nginx inside the chroot Extras 
+Initial Setup Let&rsquo;s login to our new machine and take some initial steps to secure our system. For this article I&rsquo;m going to assume your username is ubuntu.
+If you need to, setup your sudoers file by adding the following lines to /etc/sudoers:"/>
+
+
+
+
+<meta itemprop="name" content="Securing Ubuntu">
+<meta itemprop="description" content="Table of Contents Initial Setup Setting up iptables and Fail2Ban Fail2Ban iptables rules Make shared memory read-only Setting up Bastille Linux Configuring Bastille sysctl hardening Setting up a chroot environment Securing nginx inside the chroot Extras 
+Initial Setup Let&rsquo;s login to our new machine and take some initial steps to secure our system. For this article I&rsquo;m going to assume your username is ubuntu.
+If you need to, setup your sudoers file by adding the following lines to /etc/sudoers:">
+
+
+<meta itemprop="dateModified" content="2013-01-17T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2025">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Securing Ubuntu 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Jan 17, 2013 - 10 minutes</div>
+      <h1 class="title"> Securing Ubuntu </h1>
+      <div class="content"> 
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<h4 id="initial-setup-initial-setup"><a href="#initial_setup">Initial Setup</a></h4>
+
+<h4 id="setting-up-iptables-and-fail2ban-iptables-fail2ban"><a href="#iptables_fail2ban">Setting up iptables and Fail2Ban</a></h4>
+
+<h5 id="span-style-padding-left-20px-span-fail2ban-fail2ban"><span style='padding-left: 20px;'></span><a href="#fail2ban">Fail2Ban</a></h5>
+
+<h5 id="span-style-padding-left-20px-span-iptables-rules-iptables-rules"><span style='padding-left: 20px;'></span><a href="#iptables_rules">iptables rules</a></h5>
+
+<h4 id="make-shared-memory-read-only-shared-memory"><a href="#shared_memory">Make shared memory read-only</a></h4>
+
+<h4 id="setting-up-bastille-linux-bastille"><a href="#bastille">Setting up Bastille Linux</a></h4>
+
+<h5 id="span-style-padding-left-20px-span-configuring-bastille-bastille-config"><span style='padding-left: 20px;'></span><a href="#bastille_config">Configuring Bastille</a></h5>
+
+<h4 id="sysctl-hardening-sysctl"><a href="#sysctl">sysctl hardening</a></h4>
+
+<h4 id="setting-up-a-chroot-environment-chroot"><a href="#chroot">Setting up a chroot environment</a></h4>
+
+<h4 id="securing-nginx-inside-the-chroot-nginx"><a href="#nginx">Securing nginx inside the chroot</a></h4>
+
+<h4 id="extras-extras"><a href="#extras">Extras</a></h4>
+
+<p><a name="initial_setup"></a></p>
+
+<h2 id="initial-setup">Initial Setup</h2>
+
+<p>Let&rsquo;s login to our new machine and take some initial steps to secure our system. For this article I&rsquo;m going to assume your username is <code>ubuntu</code>.</p>
+
+<p>If you need to, setup your sudoers file by adding the following lines to <code>/etc/sudoers</code>:</p>
+
+<pre><code class="language-bash">ubuntu ALL=(ALL:ALL) ALL # put this in the &quot;User privilege specification&quot; section
+</code></pre>
+
+<p>Edit your <code>~/.ssh/authorized_keys</code> and put your public key inside it. Make sure you can login without a password now once your key is in place.</p>
+
+<p>Open up <code>/etc/ssh/sshd_config</code> and make sure these lines exist to secure SSH:</p>
+
+<pre><code class="language-bash"># Only allow version 2 communications, version 1 has known vulnerabilities
+Protocol 2
+# Disable root login over ssh
+PermitRootLogin no
+# Load authorized keys files from a users home directory
+AuthorizedKeysFile  %h/.ssh/authorized_keys
+# Don't allow empty passwords to be used to authenticate
+PermitEmptyPasswords no
+# Disable password auth, you must use ssh keys
+PasswordAuthentication no
+</code></pre>
+
+<p>Keep your current session open and restart sshd:</p>
+
+<pre><code>sudo service ssh restart
+</code></pre>
+
+<p>Make sure you can login from another terminal. If you can, move on.</p>
+
+<p>Now we need to update and upgrade to make sure all of our packages are up to date and install two pre-requisites for later in the article: build-essential and ntp.</p>
+
+<pre><code class="language-bash">sudo apt-get update
+sudo apt-get install build-essential ntp
+sudo apt-get upgrade
+sudo reboot
+</code></pre>
+
+<p><a name="iptables_fail2ban"></a></p>
+
+<h2 id="setting-up-iptables-and-fail2ban">Setting up iptables and Fail2Ban</h2>
+
+<p><a name="fail2ban"></a></p>
+
+<h3 id="fail2ban">Fail2Ban</h3>
+
+<pre><code>sudo apt-get install fail2ban
+</code></pre>
+
+<p>Open up the fail2ban config and change the ban time, destemail, and maxretry <code>/etc/fail2ban/jail.conf</code>:</p>
+
+<pre><code class="language-bash">[DEFAULT]
+ignoreip = 127.0.0.1/8
+bantime  = 3600
+maxretry = 2
+destemail = ubuntu@yourdomain.com
+action = %(action_mw)s
+
+[ssh]
+
+enabled  = true
+port     = ssh
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 2
+</code></pre>
+
+<p>Now restart fail2ban.</p>
+
+<pre><code>sudo service fail2ban restart
+</code></pre>
+
+<p>If you try and login from another machine and fail, you should see the ip in iptables.</p>
+
+<pre><code># sudo iptables -L
+Chain fail2ban-ssh (1 references)
+target     prot opt source               destination
+DROP       all  --  li203-XX.members.linode.com  anywhere
+RETURN     all  --  anywhere             anywhere
+</code></pre>
+
+<p><a name="iptables_rules"></a></p>
+
+<h3 id="iptables-rules">iptables Rules</h3>
+
+<p>Here are my default iptables rules, it opens up port 80 and 443 for HTTP/HTTPS communication, and allows port 22.
+We also allow ping and then log all denied calls and then reject everything else. If you have other services you need to run, such as a game server or something else, you&rsquo;ll have to add the rules to open up the ports in the iptables config.</p>
+
+<p><code>/etc/iptables.up.rules</code></p>
+
+<pre><code class="language-text">*filter
+
+# Accepts all established inbound connections
+ -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allows all outbound traffic
+# You could modify this to only allow certain traffic
+ -A OUTPUT -j ACCEPT
+
+# Allows HTTP and HTTPS connections from anywhere (the normal ports for websites)
+ -A INPUT -p tcp --dport 443 -j ACCEPT
+ -A INPUT -p tcp --dport 80 -j ACCEPT
+# Allows SSH connections for script kiddies
+# THE -dport NUMBER IS THE SAME ONE YOU SET UP IN THE SSHD_CONFIG FILE
+ -A INPUT -p tcp -m state --state NEW --dport 22 -j ACCEPT
+
+# Now you should read up on iptables rules and consider whether ssh access
+# for everyone is really desired. Most likely you will only allow access from certain IPs.
+
+# Allow ping
+ -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
+
+# log iptables denied calls (access via 'dmesg' command)
+ -A INPUT -m limit --limit 5/min -j LOG --log-prefix &quot;iptables denied: &quot; --log-level 7
+
+# Reject all other inbound - default deny unless explicitly allowed policy:
+ -A INPUT -j REJECT
+ -A FORWARD -j REJECT
+
+COMMIT
+</code></pre>
+
+<p>We can load that up into iptables:</p>
+
+<pre><code class="language-bash">sudo iptables-restore &lt; /etc/iptables.up.rules
+</code></pre>
+
+<p>Make sure it loads on boot by putting it into the if-up scripts:
+<code>/etc/network/if-up.d/iptables</code></p>
+
+<pre><code class="language-bash">#!/bin/sh
+iptables-restore /etc/iptables.up.rules
+</code></pre>
+
+<p>Now make it executable:</p>
+
+<pre><code class="language-bash">chmod +x /etc/network/if-up.d/iptables
+</code></pre>
+
+<p>Rebooting here is optional, I usually reboot after major changes to make sure everything boots up properly.</p>
+
+<p>If you&rsquo;re getting hit by scanners or brute-force attacks, you&rsquo;ll see a line similar to this in your <code>/var/log/syslog</code>:</p>
+
+<pre><code>Jan 18 03:30:37 localhost kernel: [   79.631680] iptables denied: IN=eth0 OUT= MAC=04:01:01:40:70:01:00:12:f2:c6:e8:00:08:00 SRC=87.13.110.30 DST=192.34.XX.XX LEN=64 TOS=0x00 PREC=0x00 TTL=34 ID=57021 DF PROTO=TCP SPT=1253 DPT=135 WINDOW=53760 RES=0x00 SYN URGP=0
+</code></pre>
+
+<p><a name="shared_memory"></a></p>
+
+<h2 id="read-only-shared-memory">Read only shared memory</h2>
+
+<p>A common exploit vector is going through shared memory (which can let you change the UID of running programs and other malicious actions). It can also be used as a place to drop files once an initial breakin has been made. An example of one such exploit is available <a href="http://www.juniper.net/security/auto/vulnerabilities/vuln17587.html">here</a>.</p>
+
+<p>Open <code>/etc/fstab/</code>:</p>
+
+<pre><code class="language-bash">tmpfs     /dev/shm     tmpfs     defaults,ro     0     0
+</code></pre>
+
+<p>Once you do this you need to reboot.</p>
+
+<p><a name="bastille"></a></p>
+
+<h2 id="setting-up-bastille-linux">Setting up Bastille Linux</h2>
+
+<blockquote>
+<p>The Bastille Hardening program &ldquo;locks down&rdquo; an operating system, proactively configuring the system for increased security and decreasing its susceptibility to compromise. Bastille can also assess a system&rsquo;s current state of hardening, granularly reporting on each of the security settings with which it works.</p>
+</blockquote>
+
+<p><code>Bastille: Installation and Setup</code></p>
+
+<pre><code class="language-bash">sudo apt-get install bastille # choose Internet site for postfix
+# configure bastille
+sudo bastille
+</code></pre>
+
+<p>After you run that command you&rsquo;ll be prompted to configure your system, here are the options I chose:</p>
+
+<p><a name="bastille_config"></a></p>
+
+<h3 id="configuring-bastille">Configuring Bastille</h3>
+
+<ul>
+<li>File permissions module: Yes (suid)</li>
+<li>Disable SUID for mount/umount: Yes</li>
+<li>Disable SUID on ping: Yes</li>
+<li>Disable clear-text r-protocols that use IP-based authentication? Yes</li>
+<li>Enforce password aging? No (situation dependent, I have no users accessing my machines except me, and I only allow ssh keys)</li>
+<li>Default umask: Yes</li>
+<li>Umask: 077</li>
+<li>Disable root login on tty&rsquo;s 1-6: No</li>
+<li>Password protect GRUB prompt: No (situation dependent, I&rsquo;m on a VPS and would like to get support in case I need it)</li>
+<li>Password protect su mode: Yes</li>
+<li>default-deny on tcp-wrappers and xinetd? No</li>
+<li>Ensure telnet doesn&rsquo;t run? Yes</li>
+<li>Ensure FTP does not run? Yes</li>
+<li>display authorized use message? No (situation dependent, if you had other users, Yes)</li>
+<li>Put limits on system resource usage? Yes</li>
+<li>Restrict console access to group of users? Yes (then choose root)</li>
+<li>Add additional logging? Yes</li>
+<li>Setup remote logging if you have a remote log host, I don&rsquo;t so I answered No</li>
+<li>Setup process accounting? Yes</li>
+<li>Disable acpid? Yes</li>
+<li>Deactivate nfs + samba? Yes (situation dependent)</li>
+<li>Stop sendmail from running in daemon mode? No (I have this firewalled off, so I&rsquo;m not concerned)</li>
+<li>Deactivate apache? Yes</li>
+<li>Disable printing? Yes</li>
+<li>TMPDIR/TMP scripts? No (if a multi-user system, yes)</li>
+<li>Packet filtering script? No (we configured the firewall previously)</li>
+<li>Finished? YES! &amp; reboot</li>
+</ul>
+
+<p>You can verify some of these changes by testing them out, for instance, the SUID change on ping:</p>
+
+<p><code>Bastille: Verifying changes</code></p>
+
+<pre><code class="language-bash">ubuntu@app1:~$ ping google.com
+ping: icmp open socket: Operation not permitted
+ubuntu@app1:~$ sudo ping google.com
+PING google.com (74.125.228.72) 56(84) bytes of data.
+64 bytes from iad23s07-in-f8.1e100.net (74.125.228.72): icmp_req=1 ttl=55 time=9.06 ms
+^C
+--- google.com ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 9.067/9.067/9.067/0.000 ms
+</code></pre>
+
+<p><a name="sysctl"></a></p>
+
+<h2 id="sysctl-hardening">Sysctl hardening</h2>
+
+<p>Since our machine isn&rsquo;t running as a router and is going to be running as an application/web server, there are additional
+steps we can take to secure the machine. Many of these are from the NSA&rsquo;s security guide, which you can read in its entirety
+<a href="http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf">here</a>.</p>
+
+<p><code>/etc/sysctl.conf http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf Source</code></p>
+
+<pre><code class="language-bash"># Protect ICMP attacks
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+
+# Turn on protection for bad icmp error messages
+net.ipv4.icmp_ignore_bogus_error_responses = 1
+
+# Turn on syncookies for SYN flood attack protection
+net.ipv4.tcp_syncookies = 1
+
+# Log suspcicious packets, such as spoofed, source-routed, and redirect
+net.ipv4.conf.all.log_martians = 1
+net.ipv4.conf.default.log_martians = 1
+
+# Disables these ipv4 features, not very legitimate uses
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+
+# Enables RFC-reccomended source validation (dont use on a router)
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+
+# Make sure no one can alter the routing tables
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.all.secure_redirects = 0
+net.ipv4.conf.default.secure_redirects = 0
+
+# Host only (we're not a router)
+net.ipv4.ip_forward = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+
+
+# Turn on execshild
+kernel.exec-shield = 1
+kernel.randomize_va_space = 1
+
+# Tune IPv6
+net.ipv6.conf.default.router_solicitations = 0
+net.ipv6.conf.default.accept_ra_rtr_pref = 0
+net.ipv6.conf.default.accept_ra_pinfo = 0
+net.ipv6.conf.default.accept_ra_defrtr = 0
+net.ipv6.conf.default.autoconf = 0
+net.ipv6.conf.default.dad_transmits = 0
+net.ipv6.conf.default.max_addresses = 1
+
+# Optimization for port usefor LBs
+# Increase system file descriptor limit
+fs.file-max = 65535
+
+# Allow for more PIDs (to reduce rollover problems); may break some programs 32768
+kernel.pid_max = 65536
+
+# Increase system IP port limits
+net.ipv4.ip_local_port_range = 2000 65000
+
+# Increase TCP max buffer size setable using setsockopt()
+net.ipv4.tcp_rmem = 4096 87380 8388608
+net.ipv4.tcp_wmem = 4096 87380 8388608
+
+# Increase Linux auto tuning TCP buffer limits
+# min, default, and max number of bytes to use
+# set max to at least 4MB, or higher if you use very high BDP paths
+net.core.rmem_max = 8388608
+net.core.wmem_max = 8388608
+net.core.netdev_max_backlog = 5000
+net.ipv4.tcp_window_scaling = 1
+</code></pre>
+
+<p>After making these changes you should reboot.</p>
+
+<p><a name="chroot"></a></p>
+
+<h2 id="setting-up-a-chroot-environment">Setting up a chroot environment</h2>
+
+<p>We&rsquo;ll be setting up a chroot environment to run our web server and applications in. Chroot&rsquo;s provide isolation from the rest of the operating system, so even in the event of a application compromise, damage can be mitigated.</p>
+
+<p><code>chroot: Installation and Setup</code></p>
+
+<pre><code class="language-bash">sudo apt-get install debootstrap dchroot
+</code></pre>
+
+<p>Now add this to your <code>/etc/schroot/schroot.conf</code> file, precise is the release of Ubuntu I&rsquo;m using, so change it if you need to:</p>
+
+<p><code>/etc/schroot/schroot.conf</code></p>
+
+<pre><code class="language-bash">[precise]
+description=Ubuntu Precise LTS
+location=/var/chroot
+priority=3
+users=ubuntu
+groups=sbuild
+root-groups=root
+</code></pre>
+
+<p>Now bootstrap the chroot with a minimal Ubuntu installation:</p>
+
+<pre><code class="language-bash">sudo debootstrap --variant=buildd --arch amd64 precise /var/chroot/ http://mirror.anl.gov/pub/ubuntu/
+sudo cp /etc/resolv.conf /var/chroot/etc/resolv.conf
+sudo mount -o bind /proc /var/chroot/proc
+sudo chroot /var/chroot/
+apt-get install ubuntu-minimal
+apt-get update
+
+</code></pre>
+
+<p>Add the following to <code>/etc/apt/sources.list</code> inside the chroot:</p>
+
+<pre><code class="language-bash">deb http://archive.ubuntu.com/ubuntu precise main
+deb http://archive.ubuntu.com/ubuntu precise-updates main
+deb http://security.ubuntu.com/ubuntu precise-security main
+deb http://archive.ubuntu.com/ubuntu precise universe
+deb http://archive.ubuntu.com/ubuntu precise-updates universe
+</code></pre>
+
+<p>Let&rsquo;s test out our chroot and install nginx inside of it:</p>
+
+<pre><code class="language-bash">apt-get update
+apt-get install nginx
+</code></pre>
+
+<p><a name="nginx"></a></p>
+
+<h2 id="securing-nginx-inside-the-chroot">Securing nginx inside the chroot</h2>
+
+<p>First thing we will do is add a www user for nginx to run under:
+<code>Adding a application user</code></p>
+
+<pre><code class="language-bash">sudo chroot /var/chroot
+useradd www -d /home/www
+mkdir /home/www
+chown -R www.www /home/www
+</code></pre>
+
+<p>Open up <code>/etc/nginx/nginx.conf</code> and make sure you change user to www inside the chroot:</p>
+
+<pre><code class="language-bash">user www;
+</code></pre>
+
+<p>We can now start nginx inside the chroot:</p>
+
+<pre><code class="language-bash">sudo chroot /var/chroot
+service nginx start
+</code></pre>
+
+<p>Now if you go to <a href="http://your_vm_ip/">http://your_vm_ip/</a> you should see &ldquo;Welcome to nginx!&rdquo; running inside your fancy new chroot.</p>
+
+<p>We also need to setup ssh to run inside the chroot so we can deploy our applications more easily.</p>
+
+<p><code>Chroot: sshd</code></p>
+
+<pre><code class="language-bash">sudo chroot /var/chroot
+apt-get install openssh-server udev
+</code></pre>
+
+<p>Since we already have SSH for the main host running on 22, we&rsquo;re going to run SSH for the chroot on port 2222. We&rsquo;ll copy over our config from outside the chroot to the chroot.</p>
+
+<p><code>sshd config</code></p>
+
+<pre><code class="language-bash">sudo cp /etc/ssh/sshd_config /var/chroot/etc/ssh/sshd_config
+</code></pre>
+
+<p>Now open the config and change the bind port to 2222.</p>
+
+<p>We also need to add the rules to our firewall script:
+<code>/etc/iptables.up.rules</code></p>
+
+<pre><code class="language-bash"># Chroot ssh
+ -A INPUT -p tcp -m state --state NEW --dport 2222 -j ACCEPT
+</code></pre>
+
+<p>Now make a startup script for chroot-precise in <code>/etc/init.d/chroot-precise:
+</code>/etc/init.d/chroot-precise`</p>
+
+<pre><code class="language-bash">mount -o bind /proc /var/chroot/proc
+mount -o bind /dev /var/chroot/dev
+mount -o bind /sys /var/chroot/sys
+mount -o bind /dev/pts /var/chroot/dev/pts
+chroot /var/chroot service nginx start
+chroot /var/chroot service ssh start
+</code></pre>
+
+<p>Set it to executable and to start at boot:</p>
+
+<pre><code class="language-bash">sudo chmod +x /etc/init.d/chroot-precise
+sudo update-rc.d chroot-precise defaults
+</code></pre>
+
+<p>Next is to put your public key inside the <code>.ssh/authorized_keys</code> file for the www user inside the chroot so you can ssh and deploy your applications.</p>
+
+<p>If you want, you can test your server and reboot it now to ensure nginx and ssh boot up properly. If it&rsquo;s not running right now, you start it: <code>sudo /etc/init.d/chroot-precise</code>.</p>
+
+<p>You should now be able to ssh into your chroot and main server without a password.</p>
+
+<p><a name="extras"></a></p>
+
+<h2 id="extras">Extras</h2>
+
+<p>I would like to also mention the <a href="http://grsecurity.net/">GRSecurity kernel patch</a>. I had tried several times to install this (two different versions were released while I was writing this) and both make the kernel unable to compile. Hopefully they&rsquo;ll fix these bugs and I&rsquo;ll be able to update this article with notes on setting GRSecurity up as well.</p>
+
+<p>I hope this article proved useful to anyone trying to secure a Ubuntu system, and if you liked it please share it!</p>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

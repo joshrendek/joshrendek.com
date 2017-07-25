@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://joshrendek.com/about/</loc>
+    <lastmod>2017-07-23T23:44:09-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/projects/</loc>
+    <lastmod>2017-07-23T23:39:39-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/</loc>
+    <lastmod>2016-06-30T21:53:08+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2015/11/understanding-elasticsearch-performance/</loc>
+    <lastmod>2015-11-26T12:05:13+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/</loc>
+    <lastmod>2015-11-08T21:30:07+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/</loc>
+    <lastmod>2015-11-02T21:30:07+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2015/10/influx-alert/</loc>
+    <lastmod>2015-10-12T21:30:07+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2015/09/getting-upstart-to-log-to-syslog-with-tags/</loc>
+    <lastmod>2015-09-23T21:30:07+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2015/09/golang-performance-tips/</loc>
+    <lastmod>2015-09-20T21:30:07+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2015/09/using-a-custom-http-dialer-in-go/</loc>
+    <lastmod>2015-09-19T21:30:07+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2015/06/faster-docker-builds-using-a-cache/</loc>
+    <lastmod>2015-06-17T21:30:07+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2015/02/communication-between-react-components-using-events/</loc>
+    <lastmod>2015-02-21T10:20:39+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2014/09/starting-out-with-hydroponics/</loc>
+    <lastmod>2014-09-14T12:02:21+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2014/08/rails-force-https-for-your-application/</loc>
+    <lastmod>2014-08-22T10:57:37+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2014/07/go-lang-compare-star-ssh-dot-request-dot-type-against-a-string/</loc>
+    <lastmod>2014-07-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2014/06/go-lang-mocking-exec-dot-command-using-interfaces/</loc>
+    <lastmod>2014-06-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2014/06/a-useful-logger-in-go/</loc>
+    <lastmod>2014-06-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2014/04/motivation-to-work-on-new-projects/</loc>
+    <lastmod>2014-04-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2013/11/2-patterns-for-refactoring-with-your-ruby-application/</loc>
+    <lastmod>2013-11-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2013/10/parsing-html-in-scala/</loc>
+    <lastmod>2013-10-31T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2013/10/getting-started-with-scala/</loc>
+    <lastmod>2013-10-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2013/07/from-0-to-testing-on-windows-with-jruby/</loc>
+    <lastmod>2013-07-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2013/07/a-simple-ruby-plugin-system/</loc>
+    <lastmod>2013-07-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2013/02/why-setuid-is-bad-and-what-you-can-do/</loc>
+    <lastmod>2013-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2013/01/securing-ubuntu/</loc>
+    <lastmod>2013-01-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/12/rb-rfo-status-simple-system-status-page-in-ruby/</loc>
+    <lastmod>2012-12-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/12/dealing-with-cascading-failures-with-chef-server/</loc>
+    <lastmod>2012-12-05T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/11/sidekiq-vs-resque/</loc>
+    <lastmod>2012-11-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/08/preventing-a-ruby-class-from-being-reopened/</loc>
+    <lastmod>2012-08-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/08/writing-dependable-ruby-and-a-reddit-cli/</loc>
+    <lastmod>2012-08-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/08/fixing-psych-syntaxerror-when-using-jekyll/</loc>
+    <lastmod>2012-08-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/08/moved-domains-to-my-name/</loc>
+    <lastmod>2012-08-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/08/never-set-instance-variables-again/</loc>
+    <lastmod>2012-08-16T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/07/upgrading/</loc>
+    <lastmod>2012-07-31T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/07/deploying-rails-with-rvm-in-a-production-environment/</loc>
+    <lastmod>2012-07-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/07/the-problem-with-pingdom/</loc>
+    <lastmod>2012-07-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/04/mysql-performance-tuning-constant-references-vs-index-merges-and-intersects/</loc>
+    <lastmod>2012-04-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/02/why-the-cloud-isnt-for-your-startup/</loc>
+    <lastmod>2012-02-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2012/02/using-rspec-to-test-c-code/</loc>
+    <lastmod>2012-02-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/11/osx-vim-ctags-exuberant-for-fast-context-switching-in-large-projects/</loc>
+    <lastmod>2011-11-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/11/cucumber-and-mysql2-error-lock-when-deleting-records/</loc>
+    <lastmod>2011-11-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/11/coffeescript-onclick-referencing-this-not-working/</loc>
+    <lastmod>2011-11-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/11/rails-bundler-installing-into-a-directory/</loc>
+    <lastmod>2011-11-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/11/rails-rendering-a-view-in-a-model-to-generate-a-pdf/</loc>
+    <lastmod>2011-11-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/08/mysql-slave-not-syncing-after-reboot/</loc>
+    <lastmod>2011-08-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/08/jekyll-static-vs-old-wordpress-site-quite-amazing/</loc>
+    <lastmod>2011-08-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/08/migration-from-wordpress-to-jekyll/</loc>
+    <lastmod>2011-08-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/08/ruby-rails-delayed-job-issues/</loc>
+    <lastmod>2011-08-10T01:48:12+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/06/random-pandora-rant/</loc>
+    <lastmod>2011-06-17T00:26:32+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2011/06/ruby-on-rails-averaging-large-data-sets/</loc>
+    <lastmod>2011-06-15T00:27:20+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/12/rails-implementing-fine-grained-acls-while-staying-dry/</loc>
+    <lastmod>2010-12-25T13:02:11+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/12/rails-polymorphic-routes-models-and-forms/</loc>
+    <lastmod>2010-12-24T16:54:36+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/11/backups-gone-bad-site-may-have-been-downunresponsive-past-few-days/</loc>
+    <lastmod>2010-11-25T14:20:27+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/10/mac-it-just-works-unless-you-have-a-mac-book-pro-with-a-slot-load-dvd-drive/</loc>
+    <lastmod>2010-10-29T19:36:04+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/10/starcraft-2-freezing-when-loading-map/</loc>
+    <lastmod>2010-10-16T10:31:04+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/10/ruby-and-ebay-get-list-prices/</loc>
+    <lastmod>2010-10-03T10:45:49+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/ruby-on-rails-nginx-and-passenger-setting-up-the-ultimate-development-environment/</loc>
+    <lastmod>2010-09-15T12:14:01+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/mac-im-an-ide-whore/</loc>
+    <lastmod>2010-09-10T21:37:27+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/just-launched-a-starcraft-video/strat-site/</loc>
+    <lastmod>2010-09-09T14:19:03+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/ruby-random-stat/</loc>
+    <lastmod>2010-09-08T12:24:40+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/centos-gcc-not-found---other-weird-errors-after-hdd-cloned/</loc>
+    <lastmod>2010-09-05T22:01:34+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/servly-is-now-free/</loc>
+    <lastmod>2010-09-04T19:27:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/starcraft-ii-terran--zerg-build-order/</loc>
+    <lastmod>2010-09-04T15:45:11+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/ruby-4-chan-download-script/</loc>
+    <lastmod>2010-09-04T15:37:14+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/windows-7-installing-codewarrior-on-64-bit-windows/</loc>
+    <lastmod>2010-09-04T15:05:29+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/mac-pro-windows-7-64-bit-boot-camp/</loc>
+    <lastmod>2010-09-04T15:00:14+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/09/mac-pro-improving-performance-with-ssd-and-disabling-swap-usage/</loc>
+    <lastmod>2010-09-04T14:53:34+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/08/quickly-compress-git-repository-folders-to-save-space/</loc>
+    <lastmod>2010-08-26T19:51:13+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/08/starcraft-ii-login-screen-not-showing-up/</loc>
+    <lastmod>2010-08-25T23:10:36+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/08/mac-syncing-calendars-between-macs/</loc>
+    <lastmod>2010-08-22T12:45:16+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/08/random-error/</loc>
+    <lastmod>2010-08-10T14:14:14+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/07/puppies/</loc>
+    <lastmod>2010-07-07T01:59:59+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/05/simple-alias-for-.bash_rc-and-script/generate/</loc>
+    <lastmod>2010-05-29T03:40:39+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/05/servly-launching-soon-check-out-this-demo-video/</loc>
+    <lastmod>2010-05-07T07:56:34+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/05/mongrel-vs-thin-performance/</loc>
+    <lastmod>2010-05-01T14:58:08+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/04/bluebug-1.6-released/</loc>
+    <lastmod>2010-04-16T20:03:48+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/04/bluefault---error-dump-for-random-problems-http/bluefault.com/</loc>
+    <lastmod>2010-04-14T06:53:11+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/02/boolean-aglebra-/-canonical-sop-form/</loc>
+    <lastmod>2010-02-16T09:43:45+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/01/epic-magic-the-gathering-online-game/</loc>
+    <lastmod>2010-01-09T18:14:36+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2010/01/random-stuff/</loc>
+    <lastmod>2010-01-03T14:08:46+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/11/c---not-reading-in-integers-windows-vs-mac-error/</loc>
+    <lastmod>2009-11-06T13:08:55+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/10/small-updates/</loc>
+    <lastmod>2009-10-16T15:20:59+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/09/servly---what-ive-been-busy-with.../</loc>
+    <lastmod>2009-09-30T15:50:15+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/09/apple-jokes.../</loc>
+    <lastmod>2009-09-07T17:01:40+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/09/leapord---snow-leapord-mysql-issue/</loc>
+    <lastmod>2009-09-05T18:28:13+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/08/xpm-not-being-found-on-php-configure/</loc>
+    <lastmod>2009-08-29T19:48:14+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/08/lighttpd---mod_magnet-on-centos-64-bit/</loc>
+    <lastmod>2009-08-18T11:20:17+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/08/quote-of-the-day-tweeter/</loc>
+    <lastmod>2009-08-15T22:05:04+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/08/interesting-loopback-device-issue-on-centos/</loc>
+    <lastmod>2009-08-03T19:03:17+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/07/gem/rails-crc-error/</loc>
+    <lastmod>2009-07-14T21:03:40+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/07/random-rumblings/</loc>
+    <lastmod>2009-07-11T00:59:21+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/04/free-server-monitoring/</loc>
+    <lastmod>2009-04-14T10:24:28+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/03/rails-remote-ip-address-from-behind-a-proxy/</loc>
+    <lastmod>2009-03-31T15:54:54+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/03/lighttpd-mongrel-ruby-on-rails-and-lighttpd-proxy-backend-performance-comparison/</loc>
+    <lastmod>2009-03-18T21:37:27+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/03/random-ruby-rumblings/</loc>
+    <lastmod>2009-03-03T22:02:16+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/03/ruby--ruby-on-rails/</loc>
+    <lastmod>2009-03-02T23:04:41+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/02/firefox-tunnel---mac--paneras-fail/</loc>
+    <lastmod>2009-02-22T14:29:50+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/02/bluebug-v1.5-released/</loc>
+    <lastmod>2009-02-19T11:23:19+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/02/follow-me-on-twitter/</loc>
+    <lastmod>2009-02-18T07:35:19+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/02/new-project-notecardapp.com/</loc>
+    <lastmod>2009-02-17T18:06:10+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/02/wow.-no-pun-intended./</loc>
+    <lastmod>2009-02-08T00:56:43+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/02/setting-up-a-development-machine-with-php-lighty-ruby-and-python/</loc>
+    <lastmod>2009-02-06T12:13:42+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/01/bluebug-features---integration/</loc>
+    <lastmod>2009-01-29T23:32:32+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/01/bluesocket-wifi-auto-login/</loc>
+    <lastmod>2009-01-28T14:03:34+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2009/01/tinymce-and-flash/</loc>
+    <lastmod>2009-01-23T19:30:28+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/12/sad-story-comcast-vs-road-runner-/-time-warner/</loc>
+    <lastmod>2008-12-24T22:27:49+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/12/buying-a-macbook-pro/</loc>
+    <lastmod>2008-12-19T11:33:04+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/12/svn-and-websvn-epic/</loc>
+    <lastmod>2008-12-02T14:15:42+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/10/new-script---server-monitor/</loc>
+    <lastmod>2008-10-29T16:45:50+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/10/bluebug-1.2-released/</loc>
+    <lastmod>2008-10-27T16:47:51+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/09/bluebug-update/</loc>
+    <lastmod>2008-09-09T11:50:50+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/09/google-chrome/</loc>
+    <lastmod>2008-09-05T22:31:06+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/09/centos-w/out-yum/</loc>
+    <lastmod>2008-09-05T11:34:26+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/09/sar-command/</loc>
+    <lastmod>2008-09-04T08:34:52+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/08/new-design/</loc>
+    <lastmod>2008-08-31T19:38:17+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/08/bluebug-demo/</loc>
+    <lastmod>2008-08-27T14:02:45+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/08/bluebug-almost-ready-for-release/</loc>
+    <lastmod>2008-08-03T21:43:23+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/07/sketches/</loc>
+    <lastmod>2008-07-29T08:39:49+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/07/ifconfig--netmasks/</loc>
+    <lastmod>2008-07-29T08:27:55+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/07/php-easy-timezone-set/</loc>
+    <lastmod>2008-07-28T21:09:04+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/2008/07/welcome/</loc>
+    <lastmod>2008-07-28T17:14:50+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/archives/</loc>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/archives/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/chef-ruby/</loc>
+    <lastmod>2012-12-05T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/go-golang/</loc>
+    <lastmod>2014-06-18T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/go-golang-security/</loc>
+    <lastmod>2014-07-08T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/golang/</loc>
+    <lastmod>2015-11-08T21:30:07+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/golang-elasticsearch/</loc>
+    <lastmod>2015-11-26T12:05:13+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/</loc>
+    <lastmod>2017-07-23T23:44:09-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/post/</loc>
+    <lastmod>2016-06-30T21:53:08+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/rants/</loc>
+    <lastmod>2014-04-26T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/ruby/</loc>
+    <lastmod>2013-07-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/ruby-jekyll/</loc>
+    <lastmod>2012-08-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/ruby-jruby-testing/</loc>
+    <lastmod>2013-07-17T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/ruby-performance-jruby-ruby-mri-jvm/</loc>
+    <lastmod>2012-11-03T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/ruby-refactoring/</loc>
+    <lastmod>2013-11-15T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/scala/</loc>
+    <lastmod>2013-10-31T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/security-linux/</loc>
+    <lastmod>2013-02-26T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/security-linux-ubuntu/</loc>
+    <lastmod>2013-01-17T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://joshrendek.com/categories/uptime/</loc>
+    <lastmod>2012-07-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

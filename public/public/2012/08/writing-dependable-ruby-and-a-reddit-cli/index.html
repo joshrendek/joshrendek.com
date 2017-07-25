@@ -1,0 +1,859 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Writing Dependable Ruby & a Reddit CLI - Josh Rendek</title>
+  <meta name="author" content="Josh Rendek">
+
+  
+  <meta name="description" content="View Source on Github When you work on your code and are finished for the day, is what you have committed worry free? If another developer were to &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://joshrendek.com/2012/08/writing-dependable-ruby-and-a-reddit-cli">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Josh Rendek" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3754808-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">
+      <span class="blue-brace">{</span>Josh Rendek<span class="blue-brace">}</span>
+  </a></h1>
+  
+  <div class="subtitle">
+  <h2>
+    <span class="heart"><3</span> Ruby &amp; Go
+  </h2>
+  </div>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:joshrendek.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects/">Projects</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://devopsbyvideo.com/">Screen Casts</a></li>
+  <li><a href="/categories">Categories</a></li>
+  <li><a href="/resume/">Resumé</a></li>
+  <li><a href="/about/">About</a></li>
+  <li><a href="https://github.com/joshrendek">Github</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Writing Dependable Ruby & a Reddit CLI</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-20T21:36:00-04:00" pubdate data-updated="true">Aug 20<sup>th</sup>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><center>
+    <a href="https://github.com/bluescripts/reddit-cli">View Source on Github</a>
+</center>
+
+
+<p>When you work on your code and are finished for the day, is what you have committed worry free? If another developer were to push your code in the middle of the night, would they be calling you at 3am?</p>
+
+<p>Let&rsquo;s see how we can improve our development cycle with testing so we can avoid those early morning calls. We&rsquo;ll go over some of the basics with a simple project to start.</p>
+
+<p>The most important part about TDD is getting quick feedback based on our desired design (the feedback loop).</p>
+
+<p>Here is an example of how fast the tests run:</p>
+
+<object width="640" height="480"><param name="movie" value="http://www.youtube.com/v/GFQMT246FOg?version=3&amp;hl=en_US&hd=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/GFQMT246FOg?version=3&amp;hl=en_US&hd=1" type="application/x-shockwave-flash" width="640" height="480" allowscriptaccess="always" allowfullscreen="true"></embed></object>
+
+
+<p>While this is a somewhat contrived example for the reddit cli we&rsquo;re making, this can be applied equally as well when writing Rails applications. Only load the parts you need (ActionMailer, ActiveSupport, etc), usually you don&rsquo;t need to load the entire rails stack. This can make your tests run in milliseconds instead of seconds. This lets you get feedback right away.</p>
+
+<p>Before we go further into the testing discussion, lets setup a spec helper.</p>
+
+<figure class='code'><figcaption><span>spec/spec_helper.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;rspec&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;vcr&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;pry&#39;</span>
+</span><span class='line'><span class="no">VCR</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">c</span><span class="o">.</span><span class="n">cassette_library_dir</span> <span class="o">=</span> <span class="s1">&#39;fixtures/vcr_cassettes&#39;</span>
+</span><span class='line'>  <span class="n">c</span><span class="o">.</span><span class="n">hook_into</span> <span class="ss">:fakeweb</span><span class="c1"># or :fakeweb</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now how do we start doing TDD? We first start with a failing test.</p>
+
+<figure class='code'><figcaption><span>Reddit API Spec (Pass 1) - spec/lib/reddit_api_spec </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">RedditApi</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:reddit</span><span class="p">)</span> <span class="p">{</span> <span class="no">RedditApi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;ProgrammerHumor&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#initializing&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should form the correct endpoint&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="n">reddit</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span> <span class="s2">&quot;http://reddit.com/r/ProgrammerHumor/.json?after=&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When we create a new instance of the Reddit API we want to pass it a subreddit, and then we want to make sure it builds the URL properly.</p>
+
+<figure class='code'><figcaption><span>Reddit API (Pass 1) - lib/reddit_api.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;rest-client&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">RedditApi</span>
+</span><span class='line'>    <span class="no">REDDIT_URL</span> <span class="o">=</span> <span class="s2">&quot;http://reddit.com/r/&quot;</span>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:url</span><span class="p">,</span> <span class="ss">:stories</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">subreddit</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@subreddit</span> <span class="o">=</span> <span class="n">subreddit</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>        <span class="vi">@url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">REDDIT_URL</span><span class="si">}#{</span><span class="n">subreddit</span><span class="si">}</span><span class="s2">/.json?after=</span><span class="si">#{</span><span class="vi">@after</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next we want to make the actual HTTP request to the Reddit api and process it.</p>
+
+<figure class='code'><figcaption><span>Reddit API Spec (Pass 2) - spec/lib/reddit_api_spec </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">RedditApi</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:reddit</span><span class="p">)</span> <span class="p">{</span> <span class="no">RedditApi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;ProgrammerHumor&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#initializing&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should form the correct endpoint&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span> <span class="s2">&quot;http://reddit.com/r/ProgrammerHumor/.json?after=&quot;</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#fetching&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should fetch the first page of stories&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">stories</span><span class="o">.</span><span class="n">count</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;ve now added a VCR wrapper and added an expectation that the reddit api will return a list of stories. We use VCR here to again ensure that our tests run fast. Once we make the first request, future runs will take milliseconds and will hit our VCR tape instead of the API.</p>
+
+<p>Now we need to introduce three new areas: requesting, processing, and a Story object class.</p>
+
+<figure class='code'><figcaption><span>Story - lib/story.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Story</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:title</span><span class="p">,</span> <span class="ss">:score</span><span class="p">,</span> <span class="ss">:comments</span><span class="p">,</span> <span class="ss">:url</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Reddit API (Pass 2) - lib/reddit_api.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;rest-client&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/story&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">RedditApi</span>
+</span><span class='line'>    <span class="no">REDDIT_URL</span> <span class="o">=</span> <span class="s2">&quot;http://reddit.com/r/&quot;</span>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:url</span><span class="p">,</span> <span class="ss">:stories</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">subreddit</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@subreddit</span> <span class="o">=</span> <span class="n">subreddit</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>        <span class="vi">@url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">REDDIT_URL</span><span class="si">}#{</span><span class="n">subreddit</span><span class="si">}</span><span class="s2">/.json?after=</span><span class="si">#{</span><span class="vi">@after</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="n">request</span>
+</span><span class='line'>        <span class="n">process_request</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">request</span>
+</span><span class='line'>        <span class="vi">@request_response</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="no">RestClient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="vi">@url</span><span class="p">))</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">process_request</span>
+</span><span class='line'>        <span class="vi">@stories</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>        <span class="vi">@request_response</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">][</span><span class="s1">&#39;children&#39;</span><span class="o">].</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">red</span><span class="o">|</span>
+</span><span class='line'>            <span class="n">d</span> <span class="o">=</span> <span class="n">red</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">]</span>
+</span><span class='line'>            <span class="vi">@stories</span> <span class="o">&lt;&lt;</span> <span class="no">Story</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">d</span><span class="o">[</span><span class="s1">&#39;title&#39;</span><span class="o">]</span><span class="p">,</span> <span class="n">d</span><span class="o">[</span><span class="s1">&#39;score&#39;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                                  <span class="n">d</span><span class="o">[</span><span class="s1">&#39;num_comments&#39;</span><span class="o">]</span><span class="p">,</span> <span class="n">d</span><span class="o">[</span><span class="s1">&#39;url&#39;</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="vi">@request_response</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">][</span><span class="s1">&#39;after&#39;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What can we do now? The API lets us make a full request and get a list of Story struct objects back. We&rsquo;ll be using this array of structs later on to build the CLi.</p>
+
+<p>The only thing left for this simple CLI a way to get to the next page. Let&rsquo;s add our failing spec:</p>
+
+<figure class='code'><figcaption><span>Reddit API Spec (Pass 3) - spec/lib/reddit_api_spec </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">RedditApi</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:reddit</span><span class="p">)</span> <span class="p">{</span> <span class="no">RedditApi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;ProgrammerHumor&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#initializing&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should form the correct endpoint&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span> <span class="s2">&quot;http://reddit.com/r/ProgrammerHumor/.json?after=&quot;</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#fetching&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should fetch the first page of stories&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">stories</span><span class="o">.</span><span class="n">count</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should fetch the second page of stories&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor_p2&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">stories</span><span class="o">.</span><span class="n">count</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And let&rsquo;s make the test pass:</p>
+
+<figure class='code'><figcaption><span>Reddit API (Pass 3) - lib/reddit_api.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;rest-client&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/story&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">RedditApi</span>
+</span><span class='line'>    <span class="no">REDDIT_URL</span> <span class="o">=</span> <span class="s2">&quot;http://reddit.com/r/&quot;</span>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:url</span><span class="p">,</span> <span class="ss">:stories</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">subreddit</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@subreddit</span> <span class="o">=</span> <span class="n">subreddit</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>        <span class="vi">@url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">REDDIT_URL</span><span class="si">}#{</span><span class="n">subreddit</span><span class="si">}</span><span class="s2">/.json?after=</span><span class="si">#{</span><span class="vi">@after</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="n">request</span>
+</span><span class='line'>        <span class="n">process_request</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">next</span>
+</span><span class='line'>        <span class="vi">@url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">REDDIT_URL</span><span class="si">}#{</span><span class="vi">@subreddit</span><span class="si">}</span><span class="s2">/.json?after=</span><span class="si">#{</span><span class="vi">@after</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="n">request</span>
+</span><span class='line'>        <span class="n">process_request</span>
+</span><span class='line'>        <span class="nb">self</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">request</span>
+</span><span class='line'>        <span class="vi">@request_response</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="no">RestClient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="vi">@url</span><span class="p">))</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">process_request</span>
+</span><span class='line'>        <span class="vi">@stories</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>        <span class="vi">@request_response</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">][</span><span class="s1">&#39;children&#39;</span><span class="o">].</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">red</span><span class="o">|</span>
+</span><span class='line'>            <span class="n">d</span> <span class="o">=</span> <span class="n">red</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">]</span>
+</span><span class='line'>            <span class="vi">@stories</span> <span class="o">&lt;&lt;</span> <span class="no">Story</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">d</span><span class="o">[</span><span class="s1">&#39;title&#39;</span><span class="o">]</span><span class="p">,</span> <span class="n">d</span><span class="o">[</span><span class="s1">&#39;score&#39;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                                  <span class="n">d</span><span class="o">[</span><span class="s1">&#39;num_comments&#39;</span><span class="o">]</span><span class="p">,</span> <span class="n">d</span><span class="o">[</span><span class="s1">&#39;url&#39;</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="vi">@request_response</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">][</span><span class="s1">&#39;after&#39;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We also allow method chaining since we return self after calling next (so you could chain next&rsquo;s for instance).</p>
+
+<p>Another important principal to keep in mind is the &ldquo;Tell, Dont Ask&rdquo; rule. Without tests, we might have gone this route:</p>
+
+<figure class='code'><figcaption><span>bad_example.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vi">@reddit</span> <span class="o">=</span> <span class="no">Reddit</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;ProgrammerHumor&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="c1"># User presses next </span>
+</span><span class='line'><span class="vi">@reddit</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://reddit.com/r/ProgrammerHumor/.json?after=sometoken&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Not only would we not be telling the object what we want, we would be modifying the internal state of an object as well. By implementing a <code>next</code> method we abstract the idea of a URL and any tokens we may need to keep track of away from the consumer. Doing TDD adds a little extra step of &ldquo;Thinking&rdquo; more about what we want our interfaces to be. What&rsquo;s easier? Calling <code>next</code> or modifying the internal state?</p>
+
+<p>I&rsquo;m kind of cheating a bit here. I found a nice &ldquo;table&rdquo; gem that outputs what you send in as a formatted table (think MySQL console output). Let&rsquo;s just make sure everything is being sent around properly and STDOUT is printing the correct contents:</p>
+
+<figure class='code'><figcaption><span>Reddit CLI Spec (Pass 1) - spec/lib/reddit-cli.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;stringio&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit-cli&#39;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">RedditCli</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:subreddit</span><span class="p">)</span> <span class="p">{</span> <span class="s2">&quot;ProgrammerHumor&quot;</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#initializing&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">before</span><span class="p">(</span><span class="ss">:all</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>            <span class="vg">$stdout</span> <span class="o">=</span> <span class="vi">@fakeout</span> <span class="o">=</span> <span class="no">StringIO</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should print out a story&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="n">api_response</span> <span class="o">=</span> <span class="n">double</span><span class="p">(</span><span class="no">RedditApi</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">api_response</span><span class="o">.</span><span class="n">stub!</span><span class="p">(</span><span class="ss">:stories</span> <span class="o">=&gt;</span>
+</span><span class='line'>                               <span class="o">[</span><span class="no">Story</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;StoryTitle&quot;</span><span class="p">,</span> <span class="s2">&quot;Score&quot;</span><span class="p">,</span>
+</span><span class='line'>                                          <span class="s2">&quot;Comments&quot;</span><span class="p">,</span> <span class="s2">&quot;URL&quot;</span><span class="p">)</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>            <span class="vg">$stdin</span><span class="o">.</span><span class="n">should_receive</span><span class="p">(</span><span class="ss">:gets</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">cli</span> <span class="o">=</span> <span class="no">RedditCli</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">api_response</span><span class="p">)</span>
+</span><span class='line'>            <span class="vg">$stdout</span> <span class="o">=</span> <span class="no">STDOUT</span>
+</span><span class='line'>            <span class="vi">@fakeout</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="s1">&#39;StoryTitle&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">should</span> <span class="n">be_true</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;re doing several things here. First we&rsquo;re taking <code>$stdout</code> and putting it (temporarily) into a instance variable so we can see what gets outputted. Next we&rsquo;re mocking out the <code>RedditApi</code> since we dont actually need to hit that class or the VCR tapes, we just need to stub out the expected results (stories) and pass the response object along to the CLI class. And finally once we&rsquo;re finished we set <code>$stdout</code> back to the proper constant.</p>
+
+<p>And the class for output:</p>
+
+<figure class='code'><figcaption><span>Reddit CLI (Pass 1) - lib/reddit-cli.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;terminal-table&#39;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">RedditCli</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@rows</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>        <span class="vi">@api</span> <span class="o">=</span> <span class="n">api</span>
+</span><span class='line'>        <span class="vi">@stories</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">stories</span>
+</span><span class='line'>        <span class="n">print_stories</span>
+</span><span class='line'>        <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Type ? for help</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="n">prompt</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">print_stories</span>
+</span><span class='line'>        <span class="vi">@stories</span><span class="o">.</span><span class="n">each_with_index</span> <span class="p">{</span><span class="o">|</span><span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="o">|</span> <span class="vi">@rows</span> <span class="o">&lt;&lt;</span> <span class="o">[</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">score</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">comments</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">title</span><span class="o">[</span><span class="mi">0</span><span class="o">.</span><span class="n">.</span><span class="mi">79</span><span class="o">]</span> <span class="o">]</span> <span class="p">}</span>
+</span><span class='line'>        <span class="nb">puts</span> <span class="no">Terminal</span><span class="o">::</span><span class="no">Table</span><span class="o">.</span><span class="n">new</span> <span class="ss">:headings</span><span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;Score&#39;</span><span class="p">,</span> <span class="s1">&#39;Comments&#39;</span><span class="p">,</span> <span class="s1">&#39;Title&#39;</span><span class="o">]</span><span class="p">,</span> <span class="ss">:rows</span> <span class="o">=&gt;</span> <span class="vi">@rows</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">prompt</span>
+</span><span class='line'>        <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">?&gt; &quot;</span>
+</span><span class='line'>        <span class="n">input</span> <span class="o">=</span> <span class="no">STDIN</span><span class="o">.</span><span class="n">gets</span><span class="o">.</span><span class="n">chomp</span>
+</span><span class='line'>        <span class="k">case</span> <span class="n">input</span>
+</span><span class='line'>        <span class="k">when</span> <span class="s2">&quot;?&quot;</span>
+</span><span class='line'>            <span class="nb">p</span> <span class="s2">&quot;Type the # of a story to open it in your browser&quot;</span>
+</span><span class='line'>            <span class="nb">p</span> <span class="s2">&quot;Type n to go to the next page&quot;</span>
+</span><span class='line'>            <span class="n">prompt</span>
+</span><span class='line'>        <span class="k">when</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span>
+</span><span class='line'>        <span class="k">when</span> <span class="s2">&quot;n&quot;</span>
+</span><span class='line'>            <span class="vi">@rows</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>            <span class="vi">@stories</span> <span class="o">=</span> <span class="vi">@api</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">stories</span>
+</span><span class='line'>            <span class="n">print_stories</span>
+</span><span class='line'>            <span class="n">prompt</span>
+</span><span class='line'>        <span class="k">else</span>
+</span><span class='line'>            <span class="nb">print</span> <span class="s2">&quot;#=&gt; Oepning: </span><span class="si">#{</span><span class="vi">@stories</span><span class="o">[</span><span class="n">input</span><span class="o">.</span><span class="n">to_i</span><span class="o">].</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>            <span class="sb">`open </span><span class="si">#{</span><span class="vi">@stories</span><span class="o">[</span><span class="n">input</span><span class="o">.</span><span class="n">to_i</span><span class="o">].</span><span class="n">url</span><span class="si">}</span><span class="sb">`</span>
+</span><span class='line'>            <span class="n">prompt</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And finally, a little wrapper in the root directory:</p>
+
+<figure class='code'><figcaption><span>Wrapper - reddit-cli.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit-cli&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">subreddit</span> <span class="o">=</span> <span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="no">RedditCli</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">RedditApi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">subreddit</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>An Important Note</h2>
+
+<p>When working with external resources, whether it be a gem or a remote API, it&rsquo;s important to wrap those endpoints in your own abstraction. For instance, with our Reddit CLI we could have avoided those first 2 classes entirely, written everything in the CLI display class, and worked with the raw JSON. But what happens when Reddit changes their API? If this CLI class was huge or incoporated many other components, this could be quite a big code change. Instead, what we wrote encapsulates the API inside a <code>RedditApi</code> class that returns a generic <code>Story</code> struct we can work with and pass around. We don&rsquo;t care if the API changes in the CLI, or in any other code. If the API changes, we only have to update the one API class to mold the new API to the output we were already generating.</p>
+
+<h2>End Result  &amp; Source Code</h2>
+
+<p><img src="https://img.skitch.com/20120821-bc2b49nued2e38tt3cekppeq1i.jpg"></p>
+
+<center>
+    <a href="https://github.com/bluescripts/reddit-cli">View Source on Github</a>
+</center>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Josh Rendek</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-20T21:36:00-04:00" pubdate data-updated="true">Aug 20<sup>th</sup>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/categories/ruby/'>ruby</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://joshrendek.com/2012/08/writing-dependable-ruby-and-a-reddit-cli/" data-via="" data-counturl="http://joshrendek.com/2012/08/writing-dependable-ruby-and-a-reddit-cli/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2012/08/moved-domains-to-my-name/" title="Previous Post: Moved domains to my name">&laquo; Moved domains to my name</a>
+      
+      
+        <a class="basic-alignment right" href="/2012/08/preventing-a-ruby-class-from-being-reopened/" title="Next Post: Preventing a ruby class from being reopened">Preventing a ruby class from being reopened &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Projects & Software</h1>
+  <ul>
+    <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+    <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+    <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+    <li><a href="/projects/">View More</a>
+
+    <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+    <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+  </ul>
+</section>
+
+<section>
+  <h1>Other Blogs</h1>
+  <ul>
+    <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+    <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2016/06/building-honeypots-and-analyzing-linux-malware/">Building Honeypots and Analyzing Linux Malware</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a Distributed WaitGroup With Go and Redis</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and Ping: Sendmsg: Operation Not Permitted</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/10/influx-alert/">Influx Alert</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/getting-upstart-to-log-to-syslog-with-tags/">Getting Upstart to Log to Syslog With Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/golang-performance-tips/">Golang Performance Tips</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Josh Rendek -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bluescripts';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://joshrendek.com/2012/08/writing-dependable-ruby-and-a-reddit-cli/';
+        var disqus_url = 'http://joshrendek.com/2012/08/writing-dependable-ruby-and-a-reddit-cli/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

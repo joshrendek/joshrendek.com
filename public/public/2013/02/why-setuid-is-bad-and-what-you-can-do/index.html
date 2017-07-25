@@ -1,0 +1,798 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Why Setuid Is Bad and What You Can Do - Josh Rendek</title>
+  <meta name="author" content="Josh Rendek">
+
+  
+  <meta name="description" content="Why setuid is Bad setuid allows a binary to be run as a different user then the one invoking it. For example, ping needs to use low level system &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://joshrendek.com/2013/02/why-setuid-is-bad-and-what-you-can-do">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Josh Rendek" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3754808-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">
+      <span class="blue-brace">{</span>Josh Rendek<span class="blue-brace">}</span>
+  </a></h1>
+  
+  <div class="subtitle">
+  <h2>
+    <span class="heart"><3</span> Ruby &amp; Go
+  </h2>
+  </div>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:joshrendek.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects/">Projects</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://devopsbyvideo.com/">Screen Casts</a></li>
+  <li><a href="/categories">Categories</a></li>
+  <li><a href="/resume/">Resumé</a></li>
+  <li><a href="/about/">About</a></li>
+  <li><a href="https://github.com/joshrendek">Github</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Why Setuid Is Bad and What You Can Do</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-26T22:28:00-05:00" pubdate data-updated="true">Feb 26<sup>th</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Why <code>setuid</code> is Bad</h2>
+
+<p><code>setuid</code> allows a binary to be run as a different user then the one invoking it. For example, ping needs to use low level system interfaces (<code>socket</code>, <code>PF_INET</code>, <code>SOCK_RAW</code>, etc) in order to function properly. We can watch this in action by starting ping in another terminal window ( <code>ping google.com</code> ) and then using <code>strace</code> to see the syscall&rsquo;s being made:</p>
+
+<p><code>sudo strace -p PID</code> and we get the following:</p>
+
+<figure class='code'><figcaption><span>strace output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>munmap<span class="o">(</span>0x7f329e7ea000, 4096<span class="o">)</span>            <span class="o">=</span> 0stat<span class="o">(</span><span class="s2">&quot;/etc/resolv.conf&quot;</span>, <span class="o">{</span><span class="nv">st_mode</span><span class="o">=</span>S_IFREG|0644, <span class="nv">st_size</span><span class="o">=</span>185, ...<span class="o">})</span> <span class="o">=</span> 0
+</span><span class='line'>socket<span class="o">(</span>PF_INET, SOCK_DGRAM|SOCK_NONBLOCK, IPPROTO_IP<span class="o">)</span> <span class="o">=</span> 4
+</span><span class='line'>connect<span class="o">(</span>4, <span class="o">{</span><span class="nv">sa_family</span><span class="o">=</span>AF_INET, <span class="nv">sin_port</span><span class="o">=</span>htons<span class="o">(</span>53<span class="o">)</span>, <span class="nv">sin_addr</span><span class="o">=</span>inet_addr<span class="o">(</span><span class="s2">&quot;8.8.8.8&quot;</span><span class="o">)}</span>, 16<span class="o">)</span> <span class="o">=</span> 0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can find all setuid programs installed by issuing the command:</p>
+
+<figure class='code'><figcaption><span>How to find all setuid programs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo find / -xdev <span class="se">\(</span> -perm -4000 <span class="se">\)</span> -type f -print0 -exec ls -l <span class="o">{}</span> <span class="se">\;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will find all commands that have the root setuid bit set in their permission bit.</p>
+
+<p><a name="top"></a></p>
+
+<h4><code>setuid</code> list for a few popular operating systems:</h4>
+
+<p>Of particular interest in OpenBSD, where a lot of work was done to remove and switch programs from needing to use setuid/gid permissions. OpenIndiana is the worst offender and has the widest vector for attack.</p>
+
+<ul>
+<li><a href="#ubuntu">Ubuntu</a> (22 binaries)</li>
+<li><a href="#centos">CentOS</a> (21 binaries)</li>
+<li><a href="#openbsd">OpenBSD</a> (3 binaries)</li>
+<li><a href="#openindiana">OpenIndiana</a> (53 binaries)</li>
+</ul>
+
+
+<p><code>setuid</code> escalation is a common attack vector and can allow unprivileged code to be executed by a regular user, and then escalate itself to root and drop you in on the root shell.</p>
+
+<p><strong><em>Here are a few examples:</em></strong></p>
+
+<h4>CVE-2012-0056: Exploiting /proc/pid/mem</h4>
+
+<p><a href="http://blog.zx2c4.com/749">http://blog.zx2c4.com/749</a> - C code that uses a bug in the way the Linux kernel checked permissions on /proc/pid/mem and then uses that to exploit the su binary to give a root shell.</p>
+
+<h4>CVE-2010-3847: Exploiting via $ORIGIN and file descriptors</h4>
+
+<p><a href="http://www.exploit-db.com/exploits/15274/">http://www.exploit-db.com/exploits/15274/</a> - By exploiting a hole in the way the $ORIGIN is checked, a symlink can be made to a program that uses <code>setuid</code> and <code>exec</code>&rsquo;d &lsquo;to obtain the file descriptors which then lets arbitrary code injection (in this case a call to <code>system("/bin/bash")</code>).</p>
+
+<p>More of these can be found at <a href="http://www.exploit-db.com/shellcode/">http://www.exploit-db.com/shellcode/</a> and just <a href="https://www.google.com/search?q=setuid+exploits">searching google for <code>setuid</code> exploits</a>.</p>
+
+<p>So you may not want to completely disable the <code>setuid</code> flag on all the binaries for your distribution, but we can turn on some logging to watch when they&rsquo;re getting called and install a kernel patch that will secure the OS and help prevent 0-days that may prey on <code>setuid</code> vulnerabilities.</p>
+
+<h2>How to log setuid calls</h2>
+
+<p>I will detail the steps to do this on Ubuntu, but they should apply to the other audit daemons on CentOS.</p>
+
+<p>Let&rsquo;s first install auditd: <code>sudo apt-get install auditd</code></p>
+
+<p>Let&rsquo;s open up <code>/etc/audit/audit.rules</code>, and with a few tweaks with vim, we can insert the list we generated with find into the audit rule set (explanation of each flag after the jump):</p>
+
+<figure class='code'><figcaption><span>/etc/audit/audit.rules </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># This file contains the auditctl rules that are loaded# whenever the audit daemon is started via the initscripts.</span>
+</span><span class='line'><span class="c"># The rules are simply the parameters that would be passed</span>
+</span><span class='line'><span class="c"># to auditctl.</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># First rule - delete all</span>
+</span><span class='line'>-D
+</span><span class='line'>
+</span><span class='line'><span class="c"># Increase the buffers to survive stress events.</span>
+</span><span class='line'><span class="c"># Make this bigger for busy systems</span>
+</span><span class='line'>-b 320
+</span><span class='line'>
+</span><span class='line'><span class="c"># Feel free to add below this line. See auditctl man page</span>
+</span><span class='line'>
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/lib/pt_chown -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/lib/eject/dmcrypt-get-device -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/lib/dbus-1.0/dbus-daemon-launch-helper -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/lib/openssh/ssh-keysign -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/sbin/uuidd -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/sbin/pppd -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/at -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/passwd -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/mtr -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/sudoedit -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/traceroute6.iputils -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/chsh -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/sudo -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/chfn -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/gpasswd -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/newgrp -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/fusermount -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/umount -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/ping -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/ping6 -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/su -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/mount -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>audtid Options Explained</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>-a: appends the always, and exit rules. This says to always make a log at syscall entry and syscall exit.
+</span><span class='line'>-F
+</span><span class='line'>     path= says filter to the executable being called
+</span><span class='line'>     perm=x says filter on the program being executable
+</span><span class='line'>     auid&gt;= says log all calls for users who have a UID above 500 (regular user accounts start at 1000 generally)
+</span><span class='line'>     auid!=4294967295 sometimes a process may start before the auditd, in which case it will get a auid of 4294967295
+</span><span class='line'>-k passes a filter key that will be put into the record log, in this case its &quot;privileged&quot;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So now when we run ping google.com we can see a full audit trail in <code>/var/log/audit/audit.log</code>:</p>
+
+<figure class='code'><figcaption><span>auditd output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">type</span><span class="o">=</span>SYSCALL <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">arch</span><span class="o">=</span>c000003e <span class="nv">syscall</span><span class="o">=</span>59 <span class="nv">success</span><span class="o">=</span>yes <span class="nb">exit</span><span class="o">=</span>0 <span class="nv">a0</span><span class="o">=</span>f43de8 <span class="nv">a1</span><span class="o">=</span>d40488 <span class="nv">a2</span><span class="o">=</span>ed8008 <span class="nv">a3</span><span class="o">=</span>7fffc9c9a150 <span class="nv">items</span><span class="o">=</span>2 <span class="nv">ppid</span><span class="o">=</span>1464 <span class="nv">pid</span><span class="o">=</span>1631 <span class="nv">auid</span><span class="o">=</span>1000 <span class="nv">uid</span><span class="o">=</span>1000 <span class="nv">gid</span><span class="o">=</span>1000 <span class="nv">euid</span><span class="o">=</span>0 <span class="nv">suid</span><span class="o">=</span>0 <span class="nv">fsuid</span><span class="o">=</span>0 <span class="nv">egid</span><span class="o">=</span>1000 <span class="nv">sgid</span><span class="o">=</span>1000 <span class="nv">fsgid</span><span class="o">=</span>1000 <span class="nv">tty</span><span class="o">=</span>pts1 <span class="nv">ses</span><span class="o">=</span>6 <span class="nv">comm</span><span class="o">=</span><span class="s2">&quot;ping&quot;</span> <span class="nv">exe</span><span class="o">=</span><span class="s2">&quot;/bin/ping&quot;</span> <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;privileged&quot;</span><span class="nb">type</span><span class="o">=</span>EXECVE <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">argc</span><span class="o">=</span>2 <span class="nv">a0</span><span class="o">=</span><span class="s2">&quot;ping&quot;</span> <span class="nv">a1</span><span class="o">=</span><span class="s2">&quot;google.com&quot;</span>
+</span><span class='line'><span class="nb">type</span><span class="o">=</span>BPRM_FCAPS <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">fver</span><span class="o">=</span>0 <span class="nv">fp</span><span class="o">=</span>0000000000000000 <span class="k">fi</span><span class="o">=</span>0000000000000000 <span class="nv">fe</span><span class="o">=</span>0 <span class="nv">old_pp</span><span class="o">=</span>0000000000000000 <span class="nv">old_pi</span><span class="o">=</span>0000000000000000 <span class="nv">old_pe</span><span class="o">=</span>0000000000000000 <span class="nv">new_pp</span><span class="o">=</span>ffffffffffffffff <span class="nv">new_pi</span><span class="o">=</span>0000000000000000 <span class="nv">new_pe</span><span class="o">=</span>ffffffffffffffff
+</span><span class='line'><span class="nb">type</span><span class="o">=</span>CWD <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>:  <span class="nv">cwd</span><span class="o">=</span><span class="s2">&quot;/home/ubuntu&quot;</span>
+</span><span class='line'><span class="nb">type</span><span class="o">=</span>PATH <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">item</span><span class="o">=</span>0 <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;/bin/ping&quot;</span> <span class="nv">inode</span><span class="o">=</span>131711 <span class="nv">dev</span><span class="o">=</span>08:01 <span class="nv">mode</span><span class="o">=</span>0104755 <span class="nv">ouid</span><span class="o">=</span>0 <span class="nv">ogid</span><span class="o">=</span>0 <span class="nv">rdev</span><span class="o">=</span>00:00
+</span><span class='line'><span class="nb">type</span><span class="o">=</span>PATH <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">item</span><span class="o">=</span>1 <span class="nv">name</span><span class="o">=(</span>null<span class="o">)</span> <span class="nv">inode</span><span class="o">=</span>934 <span class="nv">dev</span><span class="o">=</span>08:01 <span class="nv">mode</span><span class="o">=</span>0100755 <span class="nv">ouid</span><span class="o">=</span>0 <span class="nv">ogid</span><span class="o">=</span>0 <span class="nv">rdev</span><span class="o">=</span>00:00
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Next steps: Patching and upgrading the kernel with GRSecurity</h2>
+
+<p>GRSecurity is an awesome tool in the security-minded system administrators toolbag. It will prevent zero days (like the proc mem exploit explained above <a href="http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options#Remove_addresses_from_.2Fproc.2F.3Cpid.3E.2F.5Bsmaps.7Cmaps.7Cstat.5D"><sup>1</sup></a> ) by securing which areas a user can access. A full list can be seen at <a href="http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options">http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options</a> and <a href="http://en.wikipedia.org/wiki/Grsecurity#Miscellaneous_features">http://en.wikipedia.org/wiki/Grsecurity#Miscellaneous_features</a>, I suggest going through these and seeing if you want to continue with this.</p>
+
+<p><strong>The following below is for advanced users. Not responsible for any issues you may run into, please make sure to test this in a staging/test environment.</strong></p>
+
+<p>Here are the steps I followed to install the patch:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Start by downloading the latest kernel</span>
+</span><span class='line'>wget http://www.kernel.org/pub/linux/kernel/v3.0/linux-3.2.39.tar.bz2
+</span><span class='line'>
+</span><span class='line'><span class="c"># Next extract it</span>
+</span><span class='line'>tar xjvf linux-3.2.39.tar.bz2
+</span><span class='line'><span class="nb">cd </span>linux-3.2.39
+</span><span class='line'>
+</span><span class='line'><span class="c"># Copy over your current kernel configuration:</span>
+</span><span class='line'>cp -vi /boot/config-<span class="sb">`</span>uname -r<span class="sb">`</span> .config
+</span><span class='line'>
+</span><span class='line'><span class="c"># Updates the config file to match old config and prompts for any new kernel options.</span>
+</span><span class='line'>make oldconfig
+</span><span class='line'>
+</span><span class='line'><span class="c"># This will make sure only modules get compiled only if they are in your kernel. </span>
+</span><span class='line'>make localmodconfig
+</span><span class='line'>
+</span><span class='line'><span class="c"># Bring up the configuration menu</span>
+</span><span class='line'>make menuconfig
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once your in the menu config you can browse to the <code>Security</code> section and go to <code>Grsecurity</code> and enable it. I set the configuration method to automatic and then went to Customize. For example, you can now go to <code>Kernel Auditing -&gt; Exec logging</code> to turn on some additional logging to shell activities (<strong>WARNING: this will generate a lot of log activity, decide if you want to use this or not). I suggest going through all of these and reading through their menu help descriptions (when selecting one, press the <code>?</code> key to bring up the help</strong>).</p>
+
+<p>Now we&rsquo;ll finish making the kernel and compiling it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Now we can compile the kernel</span>
+</span><span class='line'>make -j2 <span class="c"># where 2 is the # of CPU&#39;s + 1</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Install and load the dynamic kernel modules</span>
+</span><span class='line'>sudo make modules_install
+</span><span class='line'>
+</span><span class='line'><span class="c"># Finally install kernel</span>
+</span><span class='line'>sudo make install
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can now reboot and boot into our GRsecurity patched kernel!</p>
+
+<p>Hopefully this article has provided some insight into what the <code>setuid</code> flag does, how it has and can be exploited, and what we can do to prevent this in the future.</p>
+
+<p>Here are a few links to useful books on the subject of shellcode and exploits that I reccomend:</p>
+
+<center>
+    <iframe src="http://rcm.amazon.com/e/cm?lt1=_blank&bc1=FFFFFF&IS1=1&npa=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=blues0c3-20&o=1&p=8&l=as1&m=amazon&f=ifr&ref=qf_sp_asin_til&asins=1597490059" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>
+
+    <iframe src="http://rcm.amazon.com/e/cm?t=blues0c3-20&o=1&p=8&l=as1&asins=1597494860&IS1=1&ref=qf_sp_asin_til&fc1=000000&lt1=_blank&m=amazon&lc1=0000FF&bc1=FFFFFF&bg1=FFFFFF&npa=1&f=ifr" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>
+</center>
+
+
+<h3>Below is the list of <code>setuid</code> binaries on each OS</h3>
+
+<p><a name="ubuntu"></a></p>
+
+<h4>Ubuntu 12.04 LTS (22)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>-rwsr-xr-x 1 root    root        31304 Mar  2  2012 /bin/fusermount-rwsr-xr-x 1 root    root        94792 Mar 30  2012 /bin/mount
+</span><span class='line'>-rwsr-xr-x 1 root    root        35712 Nov  8  2011 /bin/ping
+</span><span class='line'>-rwsr-xr-x 1 root    root        40256 Nov  8  2011 /bin/ping6
+</span><span class='line'>-rwsr-xr-x 1 root    root        36832 Sep 12 18:29 /bin/su
+</span><span class='line'>-rwsr-xr-x 1 root    root        69096 Mar 30  2012 /bin/umount
+</span><span class='line'>-rwsr-sr-x 1 daemon  daemon      47928 Oct 25  2011 /usr/bin/at
+</span><span class='line'>-rwsr-xr-x 1 root    root        41832 Sep 12 18:29 /usr/bin/chfn
+</span><span class='line'>-rwsr-xr-x 1 root    root        37096 Sep 12 18:29 /usr/bin/chsh
+</span><span class='line'>-rwsr-xr-x 1 root    root        63848 Sep 12 18:29 /usr/bin/gpasswd
+</span><span class='line'>-rwsr-xr-x 1 root    root        62400 Jul 28  2011 /usr/bin/mtr
+</span><span class='line'>-rwsr-xr-x 1 root    root        32352 Sep 12 18:29 /usr/bin/newgrp
+</span><span class='line'>-rwsr-xr-x 1 root    root        42824 Sep 12 18:29 /usr/bin/passwd
+</span><span class='line'>-rwsr-xr-x 2 root    root        71288 May 31  2012 /usr/bin/sudo
+</span><span class='line'>-rwsr-xr-x 2 root    root        71288 May 31  2012 /usr/bin/sudoedit
+</span><span class='line'>-rwsr-xr-x 1 root    root        18912 Nov  8  2011 /usr/bin/traceroute6.iputils
+</span><span class='line'>-rwsr-xr-- 1 root    messagebus 292944 Oct  3 13:03 /usr/lib/dbus-1.0/dbus-daemon-launch-helper
+</span><span class='line'>-rwsr-xr-x 1 root    root        10408 Dec 13  2011 /usr/lib/eject/dmcrypt-get-device
+</span><span class='line'>-rwsr-xr-x 1 root    root       240984 Apr  2  2012 /usr/lib/openssh/ssh-keysign
+</span><span class='line'>-rwsr-xr-x 1 root    root        10592 Oct  5 16:08 /usr/lib/pt_chown
+</span><span class='line'>-rwsr-xr-- 1 root    dip        325744 Feb  4  2011 /usr/sbin/pppd
+</span><span class='line'>-rwsr-sr-x 1 libuuid libuuid     18856 Mar 30  2012 /usr/sbin/uuidd
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="centos"></a></p>
+
+<h4>CentOS 6.3 (21)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>-rwsr-xr-x. 1 root root  76056 Nov  5 05:21 /bin/mount-rwsr-xr-x. 1 root root  40760 Jul 19  2011 /bin/ping
+</span><span class='line'>-rwsr-xr-x. 1 root root  36488 Jul 19  2011 /bin/ping6
+</span><span class='line'>-rwsr-xr-x. 1 root root  34904 Jun 22  2012 /bin/su
+</span><span class='line'>-rwsr-xr-x. 1 root root  50496 Nov  5 05:21 /bin/umount
+</span><span class='line'>-rwsr-x---. 1 root dbus  46232 Sep 13 13:04 /lib64/dbus-1/dbus-daemon-launch-helper
+</span><span class='line'>-rwsr-xr-x. 1 root root  10272 Apr 16  2012 /sbin/pam_timestamp_check
+</span><span class='line'>-rwsr-xr-x. 1 root root  34840 Apr 16  2012 /sbin/unix_chkpwd
+</span><span class='line'>-rwsr-xr-x. 1 root root  54240 Jan 30  2012 /usr/bin/at
+</span><span class='line'>-rwsr-xr-x. 1 root root  66352 Dec  7  2011 /usr/bin/chage
+</span><span class='line'>-rws--x--x. 1 root root  20184 Nov  5 05:21 /usr/bin/chfn
+</span><span class='line'>-rws--x--x. 1 root root  20056 Nov  5 05:21 /usr/bin/chsh
+</span><span class='line'>-rwsr-xr-x. 1 root root  47520 Jul 19  2011 /usr/bin/crontab
+</span><span class='line'>-rwsr-xr-x. 1 root root  71480 Dec  7  2011 /usr/bin/gpasswd
+</span><span class='line'>-rwsr-xr-x. 1 root root  36144 Dec  7  2011 /usr/bin/newgrp
+</span><span class='line'>-rwsr-xr-x. 1 root root  30768 Feb 22  2012 /usr/bin/passwd
+</span><span class='line'>---s--x--x. 2 root root 219272 Aug  6  2012 /usr/bin/sudo
+</span><span class='line'>---s--x--x. 2 root root 219272 Aug  6  2012 /usr/bin/sudoedit
+</span><span class='line'>-rwsr-xr-x. 1 root root 224912 Nov  9 07:49 /usr/libexec/openssh/ssh-keysign
+</span><span class='line'>-rws--x--x. 1 root root  14280 Jan 31 06:30 /usr/libexec/pt_chown
+</span><span class='line'>-rwsr-xr-x. 1 root root   9000 Sep 17 05:55 /usr/sbin/usernetctl
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="openbsd"></a></p>
+
+<h4>OpenBSD 5.2 (3)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>-r-sr-xr-x  1 root  bin       242808 Aug  1  2012 /sbin/ping-r-sr-xr-x  1 root  bin       263288 Aug  1  2012 /sbin/ping6
+</span><span class='line'>-r-sr-x---  1 root  operator  222328 Aug  1  2012 /sbin/shutdown
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="openindiana"></a></p>
+
+<h4>OpenIndiana 11 (53)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>-rwsr-xr-x   1 root     bin        64232 Jun 30  2012 /sbin/wificonfig--wS--lr-x   1 root     root           0 Dec 11 15:20 /media/.hal-mtab-lock
+</span><span class='line'>-r-sr-xr-x   1 root     bin       206316 Dec 11 21:00 /usr/lib/ssh/ssh-keysign
+</span><span class='line'>-rwsr-xr-x   1 root     adm        12140 Jun 30  2012 /usr/lib/acct/accton
+</span><span class='line'>-r-sr-xr-x   1 root     bin        23200 Jun 30  2012 /usr/lib/fs/ufs/quota
+</span><span class='line'>-r-sr-xr-x   1 root     bin       111468 Jun 30  2012 /usr/lib/fs/ufs/ufsrestore
+</span><span class='line'>-r-sr-xr-x   1 root     bin       106964 Jun 30  2012 /usr/lib/fs/ufs/ufsdump
+</span><span class='line'>-r-sr-xr-x   1 root     bin        18032 Jun 30  2012 /usr/lib/fs/smbfs/umount
+</span><span class='line'>-r-sr-xr-x   1 root     bin        18956 Jun 30  2012 /usr/lib/fs/smbfs/mount
+</span><span class='line'>-r-sr-xr-x   1 root     bin        12896 Jun 30  2012 /usr/lib/utmp_update
+</span><span class='line'>-r-sr-xr-x   1 root     bin        35212 Jun 30  2012 /usr/bin/fdformat
+</span><span class='line'>-r-s--x--x   2 root     bin       188080 Jun 30  2012 /usr/bin/sudoedit
+</span><span class='line'>-r-sr-xr-x   1 root     sys        34876 Jun 30  2012 /usr/bin/su
+</span><span class='line'>-r-sr-xr-x   1 root     bin        42504 Jun 30  2012 /usr/bin/login
+</span><span class='line'>-r-sr-xr-x   1 root     bin       257288 Jun 30  2012 /usr/bin/pppd
+</span><span class='line'>-r-sr-xr-x   1 root     sys        46208 Jun 30  2012 /usr/bin/chkey
+</span><span class='line'>-r-sr-xr-x   1 root     sys        29528 Jun 30  2012 /usr/bin/amd64/newtask
+</span><span class='line'>-r-sr-xr-x   2 root     bin        24432 Jun 30  2012 /usr/bin/amd64/w
+</span><span class='line'>-r-sr-xr-x   1 root     bin      3224200 Jun 30  2012 /usr/bin/amd64/Xorg
+</span><span class='line'>-r-sr-xr-x   2 root     bin        24432 Jun 30  2012 /usr/bin/amd64/uptime
+</span><span class='line'>-rwsr-xr-x   1 root     sys        47804 Jun 30  2012 /usr/bin/at
+</span><span class='line'>-r-sr-xr-x   1 root     bin         8028 Jun 30  2012 /usr/bin/mailq
+</span><span class='line'>-r-sr-xr-x   1 root     bin        33496 Jun 30  2012 /usr/bin/rsh
+</span><span class='line'>-r-sr-xr-x   1 root     bin        68704 Jun 30  2012 /usr/bin/rmformat
+</span><span class='line'>-r-sr-sr-x   1 root     sys        31292 Jun 30  2012 /usr/bin/passwd
+</span><span class='line'>-rwsr-xr-x   1 root     sys        23328 Jun 30  2012 /usr/bin/atrm
+</span><span class='line'>-r-sr-xr-x   1 root     bin        97072 Jun 30  2012 /usr/bin/xlock
+</span><span class='line'>-r-sr-xr-x   1 root     bin        78672 Jun 30  2012 /usr/bin/rdist
+</span><span class='line'>-r-sr-xr-x   1 root     bin        27072 Jun 30  2012 /usr/bin/sys-suspend
+</span><span class='line'>-r-sr-xr-x   1 root     bin        29304 Jun 30  2012 /usr/bin/crontab
+</span><span class='line'>-r-sr-xr-x   1 root     bin        53080 Jun 30  2012 /usr/bin/rcp
+</span><span class='line'>-r-s--x--x   2 root     bin       188080 Jun 30  2012 /usr/bin/sudo
+</span><span class='line'>-r-s--x--x   1 uucp     bin        70624 Jun 30  2012 /usr/bin/tip
+</span><span class='line'>-rwsr-xr-x   1 root     sys        18824 Jun 30  2012 /usr/bin/atq
+</span><span class='line'>-r-sr-xr-x   1 root     bin       281732 Jun 30  2012 /usr/bin/xscreensaver
+</span><span class='line'>-r-sr-xr-x   1 root     bin      2767780 Jun 30  2012 /usr/bin/i86/Xorg
+</span><span class='line'>-r-sr-xr-x   1 root     sys        22716 Jun 30  2012 /usr/bin/i86/newtask
+</span><span class='line'>-r-sr-xr-x   2 root     bin        22020 Jun 30  2012 /usr/bin/i86/w
+</span><span class='line'>-r-sr-xr-x   2 root     bin        22020 Jun 30  2012 /usr/bin/i86/uptime
+</span><span class='line'>-rwsr-xr-x   1 root     sys        13636 Jun 30  2012 /usr/bin/newgrp
+</span><span class='line'>-r-sr-xr-x   1 root     bin        39224 Jun 30  2012 /usr/bin/rlogin
+</span><span class='line'>-rwsr-xr-x   1 svctag   daemon    108964 Jun 30  2012 /usr/bin/stclient
+</span><span class='line'>-r-sr-xr-x   1 root     bin        29324 Jun 30  2012 /usr/xpg4/bin/crontab
+</span><span class='line'>-rwsr-xr-x   1 root     sys        47912 Jun 30  2012 /usr/xpg4/bin/at
+</span><span class='line'>-r-sr-xr-x   3 root     bin        41276 Jun 30  2012 /usr/sbin/deallocate
+</span><span class='line'>-rwsr-xr-x   1 root     sys        32828 Jun 30  2012 /usr/sbin/sacadm
+</span><span class='line'>-r-sr-xr-x   1 root     bin        46512 Jun 30  2012 /usr/sbin/traceroute
+</span><span class='line'>-r-sr-xr-x   1 root     bin        18016 Jun 30  2012 /usr/sbin/i86/whodo
+</span><span class='line'>-r-sr-xr-x   1 root     bin        55584 Jun 30  2012 /usr/sbin/ping
+</span><span class='line'>-r-sr-xr-x   3 root     bin        41276 Jun 30  2012 /usr/sbin/allocate
+</span><span class='line'>-r-sr-xr-x   1 root     bin        37320 Jun 30  2012 /usr/sbin/pmconfig
+</span><span class='line'>-r-sr-xr-x   3 root     bin        41276 Jun 30  2012 /usr/sbin/list_devices
+</span><span class='line'>-r-sr-xr-x   1 root     bin        24520 Jun 30  2012 /usr/sbin/amd64/whodo
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Josh Rendek</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-26T22:28:00-05:00" pubdate data-updated="true">Feb 26<sup>th</sup>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/categories/linux/'>linux</a>, <a class='category' href='/categories/security/'>security</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://joshrendek.com/2013/02/why-setuid-is-bad-and-what-you-can-do/" data-via="" data-counturl="http://joshrendek.com/2013/02/why-setuid-is-bad-and-what-you-can-do/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2013/01/securing-ubuntu/" title="Previous Post: Securing Ubuntu">&laquo; Securing Ubuntu</a>
+      
+      
+        <a class="basic-alignment right" href="/2013/06/tywin-lannister-quote/" title="Next Post: Tywin Lannister Quote">Tywin Lannister Quote &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Projects & Software</h1>
+  <ul>
+    <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+    <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+    <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+    <li><a href="/projects/">View More</a>
+
+    <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+    <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+  </ul>
+</section>
+
+<section>
+  <h1>Other Blogs</h1>
+  <ul>
+    <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+    <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2016/06/building-honeypots-and-analyzing-linux-malware/">Building Honeypots and Analyzing Linux Malware</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a Distributed WaitGroup With Go and Redis</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and Ping: Sendmsg: Operation Not Permitted</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/10/influx-alert/">Influx Alert</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/getting-upstart-to-log-to-syslog-with-tags/">Getting Upstart to Log to Syslog With Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/golang-performance-tips/">Golang Performance Tips</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Josh Rendek -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bluescripts';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://joshrendek.com/2013/02/why-setuid-is-bad-and-what-you-can-do/';
+        var disqus_url = 'http://joshrendek.com/2013/02/why-setuid-is-bad-and-what-you-can-do/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

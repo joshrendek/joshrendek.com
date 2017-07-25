@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Lighttpd, Mongrel, Ruby on Rails, and Lighttpd Proxy backend Performance Comparison" />
+<meta property="og:description" content="First I was kind of surprised at the lack of performance comparisons people have made between the different lighttpd proxies with a rails/mongrel cluster backend and which ones would be best.
+Lets start off the the specs of the box: Intel Atom 330 CPU Standard 7,200RPM HDD CentOS 5.2 2GB Ram Lighttpd with 3 Mongrel Clusters running an online food ordering system I wrote (MySQL &#43; Rails)
+Other than that there was nothing special." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2009/03/lighttpd-mongrel-ruby-on-rails-and-lighttpd-proxy-backend-performance-comparison/" />
+
+
+
+<meta property="article:published_time" content="2009-03-18T21:37:27&#43;00:00"/>
+<meta property="article:modified_time" content="2009-03-18T21:37:27&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Lighttpd, Mongrel, Ruby on Rails, and Lighttpd Proxy backend Performance Comparison"/>
+<meta name="twitter:title" content="Lighttpd, Mongrel, Ruby on Rails, and Lighttpd Proxy backend Performance Comparison"/>
+<meta name="twitter:description" content="First I was kind of surprised at the lack of performance comparisons people have made between the different lighttpd proxies with a rails/mongrel cluster backend and which ones would be best.
+Lets start off the the specs of the box: Intel Atom 330 CPU Standard 7,200RPM HDD CentOS 5.2 2GB Ram Lighttpd with 3 Mongrel Clusters running an online food ordering system I wrote (MySQL &#43; Rails)
+Other than that there was nothing special."/>
+
+
+
+
+<meta itemprop="name" content="Lighttpd, Mongrel, Ruby on Rails, and Lighttpd Proxy backend Performance Comparison">
+<meta itemprop="description" content="First I was kind of surprised at the lack of performance comparisons people have made between the different lighttpd proxies with a rails/mongrel cluster backend and which ones would be best.
+Lets start off the the specs of the box: Intel Atom 330 CPU Standard 7,200RPM HDD CentOS 5.2 2GB Ram Lighttpd with 3 Mongrel Clusters running an online food ordering system I wrote (MySQL &#43; Rails)
+Other than that there was nothing special.">
+
+
+<meta itemprop="dateModified" content="2009-03-18T21:37:27&#43;00:00" />
+<meta itemprop="wordCount" content="1095">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Lighttpd, Mongrel, Ruby on Rails, and Lighttpd Proxy backend Performance Comparison 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Mar 18, 2009 - 6 minutes</div>
+      <h1 class="title"> Lighttpd, Mongrel, Ruby on Rails, and Lighttpd Proxy backend Performance Comparison </h1>
+      <div class="content"> <p>First I was kind of surprised at the lack of performance comparisons people have made between the different lighttpd proxies with a rails/mongrel cluster backend and which ones would be best.</p>
+
+<p>Lets start off the the specs of the box:
+Intel Atom 330 CPU
+Standard 7,200RPM HDD
+CentOS 5.2
+2GB Ram
+Lighttpd with 3 Mongrel Clusters running an online food ordering system I wrote (MySQL + Rails)</p>
+
+<p>Other than that there was nothing special. I&rsquo;ve done no kernel tweaking or any other performance optimizations with Lighttpd or any other part of the system.</p>
+
+<p>Result Data / Proxy Type /  Result
+<h2>Requests Per Second</h2>
+<a href="http://bluescripts.net/wp-content/uploads/2009/03/requests-per-second.png"><img class="alignnone size-full wp-image-189" title="requests-per-second lighttpd rails mongrel cluster" src="http://bluescripts.net/wp-content/uploads/2009/03/requests-per-second.png" alt="requests-per-second lighttpd rails mongrel cluster" width="451" height="271" /></a></p>
+
+<p>Hash           21.41
+Round-Robin 39.73
+First   40.07</p>
+
+<p>Hash is the loser in the proxy test over all. The requests per second capabilities of it were nearly half of what Round-Robin and First were able to achieve with the 3 node mongrel cluster running in the background. This is to be expected though since the Hash algorithm (so far as I understand it) will send the same url requests to the same proxy to help caching, whereas round-robin and first proxy methods balance it over the 3 nodes (or however many you have running).
+<h2>Total Time Taken</h2>
+<a href="http://bluescripts.net/wp-content/uploads/2009/03/time-taken.png"><img class="alignnone size-full wp-image-190" title="time-taken" src="http://bluescripts.net/wp-content/uploads/2009/03/time-taken.png" alt="time-taken" width="451" height="271" /></a></p>
+
+<p>Hash    467.20772
+Round-Robin 251.725273
+First   249.578092</p>
+
+<p>Round-Robin are nearly neck and neck with the total time taken to return 10,000 hits with 250 concurrency, while the hash algorithm still lags far behind.
+<h2>Transfer Rate</h2>
+<a href="http://bluescripts.net/wp-content/uploads/2009/03/transfer-rate.png"><img class="alignnone size-full wp-image-191" title="transfer-rate" src="http://bluescripts.net/wp-content/uploads/2009/03/transfer-rate.png" alt="transfer-rate" width="451" height="271" /></a></p>
+
+<p>Hash    59.74
+Round-Robin 110.84
+First   111.79</p>
+
+<p>Since only one mongrel cluster is able to serve all the requests in Hash, where as 3 are able to in the Round Robin and First tests, the transfer rate is much higher. I&rsquo;m sure this could have been improved even further had I put all static files like style sheets and images on a separate instance so Mongrel could just worry about the rails files instead of rails + static, but since this site only has about 5 or so images, I did not think it necessary.
+<h2>Longest Request</h2>
+<a href="http://bluescripts.net/wp-content/uploads/2009/03/longest-request.png"><img class="alignnone size-full wp-image-192" title="longest-request" src="http://bluescripts.net/wp-content/uploads/2009/03/longest-request.png" alt="longest-request" width="451" height="271" /></a></p>
+
+<p>Hash    22795
+Round-Robin 17132
+First   11936</p>
+
+<p>This is the result data where First comes through, beating Round Robin by a good portion (~6 seconds) and proving to be the quickest to serve up the website.
+<h2>Load Averages</h2>
+<a href="http://bluescripts.net/wp-content/uploads/2009/03/load-avg.png"><img class="alignnone size-full wp-image-193" title="load-avg" src="http://bluescripts.net/wp-content/uploads/2009/03/load-avg.png" alt="load-avg" width="451" height="271" /></a></p>
+
+<p>Hash    1.15
+Round-Robin 3.15
+First   3.28</p>
+
+<p>Since Hash is only using one mongrel cluster instance, instead of the 3, the CPU load was much lower. However, Round Robin and First were very close, but I believe that when comparing the request times for First and Round Robin, First is worth the <em>very</em> miniscule increase in server load.
+<h3>Notes on Apache + Passenger + Mod_Rails + Phusion mumbo jumbo</h3>
+I&rsquo;m not going to claim to be an Apache expert, but one thing I&rsquo;m positive about is Apache&rsquo;s slowness&hellip;. with everything. I go nuts when pages don&rsquo;t load fast because of server software and when I tried out Phusion Passenger / Mod Rails and apache (whatever you want to call it)&hellip; even with Enterprise ruby installed, it was still incredibly slow (noticable to me while just randomly hitting refresh).</p>
+
+<p>While Phusion makes deploying rails apps a bit simpler / easier to add new apps, in the long run I view it as detrimental should your application ever grow. The reason I chose to work with mongrel and Lighttpd (although Nginx is another viable option) is because I looked at sites like GitHub and EngineYard (a large rails host) and checked a few of their web server headers and found them to be running Nginx (with a Mongrel backend I&rsquo;m assuming).</p>
+
+<p>If you&rsquo;re worried about memory I did not notice much of a difference between what my application used while in Phusion vs Mongrel, but one of the <span style="text-decoration: underline;"><strong>HUGE</strong></span> differences I did notice was when running <code>ab -n 1000 -c 10</code> the load would shoot up to 5, while Lighttpd&rsquo;s would barely hit .89. I didn&rsquo;t bother attempting <code>ab -n 10000 -c 250</code> with apache since I didn&rsquo;t want the box to melt/halt/be-killed-by-apache. If load isn&rsquo;t an issue and you&rsquo;re a die-hard Apache fan, stick with Phusion, but my tests put it <em>way</em> behind Lighttpd+Mongrel in comparison.</p>
+
+<p>~~~~~~~~~~~~~~~~~~~~</p>
+
+<p>If anyone has any suggestions for other analytic&rsquo;s to test let me know! I&rsquo;d love to do some more research regarding this and post my findings since there seems to be a lack of them on google.</p>
+
+<p><strong>Proxy: Hash Raw Data</strong></p>
+
+<pre>
+Server Port:            80
+
+Document Path:          /
+Document Length:        2495 bytes
+
+Concurrency Level:      250
+Time taken for tests:   467.20772 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      28570261 bytes
+HTML transferred:       24950000 bytes
+Requests per second:    21.41 [#/sec] (mean)
+Time per request:       11675.520 [ms] (mean)
+Time per request:       46.702 [ms] (mean, across all concurrent requests)
+Transfer rate:          59.74 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   3.2      0      35
+Processing:    72 11547 1056.2  11694   22795
+Waiting:       72 11547 1056.2  11694   22795
+Total:         72 11548 1055.2  11694   22795
+
+Percentage of the requests served within a certain time (ms)
+  50%  11694
+  66%  11717
+  75%  11739
+  80%  11794
+  90%  11887
+  95%  11907
+  98%  11928
+  99%  11942
+ 100%  22795 (longest request)
+</pre>
+
+<p><strong>Proxy Type: Round Robin Raw Data</strong>
+<pre>
+Server Port:            80</p>
+
+<p>Document Path:          /
+Document Length:        2495 bytes</p>
+
+<p>Concurrency Level:      250
+Time taken for tests:   251.725273 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      28570213 bytes
+HTML transferred:       24950000 bytes
+Requests per second:    39.73 <a href="mean">#/sec</a>
+Time per request:       6293.132 <a href="mean">ms</a>
+Time per request:       25.173 <a href="mean, across all concurrent requests">ms</a>
+Transfer rate:          110.84 [Kbytes/sec] received</p>
+
+<p>Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   3.2      0      37
+Processing:   103 6192 2439.0   6653   17132
+Waiting:      103 6192 2439.0   6653   17132
+Total:        103 6192 2438.5   6653   17132</p>
+
+<p>Percentage of the requests served within a certain time (ms)
+  50%   6653
+  66%   7665
+  75%   8169
+  80%   8495
+  90%   9038
+  95%  10066
+  98%  10377
+  99%  10468
+ 100%  17132 (longest request)
+</pre></p>
+
+<p><strong>Proxy Type: First Raw Data</strong>
+<pre>
+&mdash; Proxy: First 3.28 &mdash;
+Server Port:            80</p>
+
+<p>Document Path:          /
+Document Length:        2495 bytes</p>
+
+<p>Concurrency Level:      250
+Time taken for tests:   249.578092 seconds
+Complete requests:      10000
+Failed requests:        0
+Write errors:           0
+Total transferred:      28570190 bytes
+HTML transferred:       24950000 bytes
+Requests per second:    40.07 <a href="mean">#/sec</a>
+Time per request:       6239.453 <a href="mean">ms</a>
+Time per request:       24.958 <a href="mean, across all concurrent requests">ms</a>
+Transfer rate:          111.79 [Kbytes/sec] received</p>
+
+<p>Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   3.3      0      37
+Processing:   307 6169 621.6   6256   11936
+Waiting:      306 6168 621.7   6256   11936
+Total:        307 6169 620.0   6256   11936</p>
+
+<p>Percentage of the requests served within a certain time (ms)
+  50%   6256
+  66%   6450
+  75%   6550
+  80%   6598
+  90%   6734
+  95%   6795
+  98%   6858
+  99%   6897
+ 100%  11936 (longest request)
+</pre></p>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

@@ -1,0 +1,1479 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Josh Rendek</title>
+  <meta name="author" content="Josh Rendek">
+
+  
+  <meta name="description" content="Moved to my new hydroponics website: http://hydronerd.com/
+">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://joshrendek.com/page2">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Josh Rendek" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3754808-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">
+      <span class="blue-brace">{</span>Josh Rendek<span class="blue-brace">}</span>
+  </a></h1>
+  
+  <div class="subtitle">
+  <h2>
+    <span class="heart"><3</span> Ruby &amp; Go
+  </h2>
+  </div>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:joshrendek.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects/">Projects</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://devopsbyvideo.com/">Screen Casts</a></li>
+  <li><a href="/categories">Categories</a></li>
+  <li><a href="/resume/">Resumé</a></li>
+  <li><a href="/about/">About</a></li>
+  <li><a href="https://github.com/joshrendek">Github</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/09/starting-out-with-hydroponics/">Starting Out With Hydroponics</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-09-14T12:02:21-04:00" pubdate data-updated="true">Sep 14<sup>th</sup>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://hydronerd.com/2014/09/starting-hydroponics/">Moved to my new hydroponics website: <a href="http://hydronerd.com/">http://hydronerd.com/</a></a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/08/rails-force-https-for-your-application/">Rails Force HTTPS for Your Application</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-22T10:57:37-04:00" pubdate data-updated="true">Aug 22<sup>nd</sup>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>This is your setup:</h2>
+
+<ul>
+<li>Nginx redirecting HTTP to HTTPS</li>
+<li>Unicorn/puma/(etc) being reverse proxied to via nginx</li>
+</ul>
+
+
+<h2>What you may not realize:</h2>
+
+<p>When you&rsquo;re submitting a form and using the <code>redirect_to</code> or <code>respond_with @object, location: []</code> methods rails may not pick up that you want to use HTTPS as the protocol, adding this to your <code>application_controller.rb</code> ensures every URL generated by rails will go to a secure protocol:</p>
+
+<figure class='code'><figcaption><span>application_controller.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">default_url_options</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{})</span>
+</span><span class='line'>    <span class="n">options</span><span class="o">.</span><span class="n">merge!</span><span class="p">(</span><span class="ss">protocol</span><span class="p">:</span> <span class="s1">&#39;https&#39;</span><span class="p">)</span> <span class="k">unless</span> <span class="no">Rails</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">development?</span> <span class="o">||</span> <span class="no">Rails</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">test?</span>
+</span><span class='line'>    <span class="n">options</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I ran into issues with rails redirecting to plain HTTP when doing some uploading utilizing iframes (and Chrome rightfully blocking the redirect back to http). Hope this helps someone else! No need to use any special gems.</p>
+
+<p><strong><em>Note</em></strong>: This only applies if you want <strong>all</strong> actions to be HTTPS though.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/07/go-lang-compare-star-ssh-dot-request-dot-type-against-a-string/">Go-lang Compare *ssh.Request.Type Against a String</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-07-08T08:34:00-04:00" pubdate data-updated="true">Jul 8<sup>th</sup>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I was working on the agent for <a href="http://sshpot.com/">SSH Pot</a> and ran into something interesting last night. A lot of the brute force attempts attempt to run a command like this:</p>
+
+<figure class='code'><figcaption><span>Example Exec</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ssh user@host <span class="s1">&#39;uname&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is different than:</p>
+
+<figure class='code'><figcaption><span>Example Shell</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ssh user@host
+</span><span class='line'><span class="nv">$ </span>uname
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The first command is executing a command then exiting, the second is actually logging in and giving the user a shell. The first requests a exec subsystem and the second requests a shell subsystem - so there are two ways to handle it.</p>
+
+<figure class='code'><figcaption><span>broken_handler.go</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="k">func</span> <span class="n">HandleShellRequest</span><span class="p">(</span><span class="n">channel</span> <span class="n">ssh</span><span class="p">.</span><span class="n">Channel</span><span class="p">,</span> <span class="n">in</span> <span class="p">&lt;-</span><span class="k">chan</span> <span class="p">*</span><span class="n">ssh</span><span class="p">.</span><span class="n">Request</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">req</span> <span class="p">:=</span> <span class="k">range</span> <span class="n">in</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">ok</span> <span class="p">:=</span> <span class="n">true</span>
+</span><span class='line'>      <span class="n">logfile</span><span class="p">.</span><span class="n">Println</span><span class="p">(</span><span class="s">&quot;[request &quot;</span> <span class="p">+</span> <span class="n">req</span><span class="p">.</span><span class="n">Type</span> <span class="p">+</span> <span class="s">&quot;]: &quot;</span> <span class="p">+</span> <span class="nb">string</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">Payload</span><span class="p">))</span>
+</span><span class='line'>      <span class="k">switch</span> <span class="n">req</span><span class="p">.</span><span class="n">Type</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s">&quot;shell&quot;</span><span class="p">:</span>
+</span><span class='line'>          <span class="n">req</span><span class="p">.</span><span class="n">Reply</span><span class="p">(</span><span class="n">ok</span><span class="p">,</span> <span class="n">nil</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s">&quot;exec&quot;</span><span class="p">:</span>
+</span><span class='line'>          <span class="k">if</span> <span class="nb">string</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">Payload</span><span class="p">)</span> <span class="p">==</span> <span class="nb">string</span><span class="p">(</span><span class="s">&quot;uname&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>              <span class="n">channel</span><span class="p">.</span><span class="n">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&quot;\n\rLinux\n\r&quot;</span><span class="p">))</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>          <span class="n">channel</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When logging in my logfile it would show something like:</p>
+
+<figure class='code'><figcaption><span>Log</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>request <span class="nb">exec</span><span class="o">]</span>: uname
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And even when comparing the two side by side with something like this:</p>
+
+<figure class='code'><figcaption><span>log.go</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="n">logfile</span><span class="p">.</span><span class="n">Println</span><span class="p">(</span><span class="s">&quot;[&quot;</span><span class="p">+</span><span class="nb">string</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">Payload</span><span class="p">)+</span><span class="s">&quot;]:[&quot;</span><span class="p">+</span><span class="s">&quot;uname&quot;</span><span class="p">+</span><span class="s">&quot;]&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I would get this output:</p>
+
+<figure class='code'><figcaption><span>Log</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>uname<span class="o">]</span>:<span class="o">[</span>uname<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yet the comparison on line 9 would not get hit. After sitting and thinking about it for a while I decided to print the bytes out:</p>
+
+<figure class='code'><figcaption><span>Log</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>INFO: 2014/07/07 23:15:18 sshd.go:157: <span class="o">[</span>0 0 0 5 117 110 97 109 101<span class="o">]</span>
+</span><span class='line'>INFO: 2014/07/07 23:15:18 sshd.go:158: <span class="o">[</span>117 110 97 109 101<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Aha! So for some reason req.Payload is padded with 3 null bytes and a ENQ byte (hex 5).</p>
+
+<p>Here is the corrected version removing the correct bytes - now the string comparison works:</p>
+
+<figure class='code'><figcaption><span>working_handler.go</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="k">func</span> <span class="n">HandleShellRequest</span><span class="p">(</span><span class="n">channel</span> <span class="n">ssh</span><span class="p">.</span><span class="n">Channel</span><span class="p">,</span> <span class="n">in</span> <span class="p">&lt;-</span><span class="k">chan</span> <span class="p">*</span><span class="n">ssh</span><span class="p">.</span><span class="n">Request</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">req</span> <span class="p">:=</span> <span class="k">range</span> <span class="n">in</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">ok</span> <span class="p">:=</span> <span class="n">true</span>
+</span><span class='line'>      <span class="n">logfile</span><span class="p">.</span><span class="n">Println</span><span class="p">(</span><span class="s">&quot;[request &quot;</span> <span class="p">+</span> <span class="n">req</span><span class="p">.</span><span class="n">Type</span> <span class="p">+</span> <span class="s">&quot;]: &quot;</span> <span class="p">+</span> <span class="nb">string</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">Payload</span><span class="p">))</span>
+</span><span class='line'>      <span class="k">switch</span> <span class="n">req</span><span class="p">.</span><span class="n">Type</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s">&quot;shell&quot;</span><span class="p">:</span>
+</span><span class='line'>          <span class="n">req</span><span class="p">.</span><span class="n">Reply</span><span class="p">(</span><span class="n">ok</span><span class="p">,</span> <span class="n">nil</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s">&quot;exec&quot;</span><span class="p">:</span>
+</span><span class='line'>          <span class="k">if</span> <span class="nb">string</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">Payload</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span> <span class="p">==</span> <span class="nb">string</span><span class="p">(</span><span class="s">&quot;uname&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>              <span class="n">channel</span><span class="p">.</span><span class="n">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&quot;\n\rLinux\n\r&quot;</span><span class="p">))</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>          <span class="n">channel</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/06/go-lang-mocking-exec-dot-command-using-interfaces/">Go-lang: Mocking exec.Command Using Interfaces</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-18T20:53:00-04:00" pubdate data-updated="true">Jun 18<sup>th</sup>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This is a short example showing how to use an interface to ease testing, and how to use an interface with running shell commands / other programs and providing mock output.</p>
+
+<center>
+<a href="https://github.com/joshrendek/go-exec-mock-example">Source on Github</a>
+</center>
+
+
+<p>Here is our main file that actually runs the commands and prints out &ldquo;hello&rdquo;.</p>
+
+<figure class='code'><figcaption><span>example.go</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="k">package</span> <span class="n">main</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">import</span> <span class="p">(</span>
+</span><span class='line'>  <span class="s">&quot;fmt&quot;</span>
+</span><span class='line'>  <span class="s">&quot;os/exec&quot;</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// first argument is the command, like cat or echo,</span>
+</span><span class='line'><span class="c1">// the second is the list of args to pass to it</span>
+</span><span class='line'><span class="k">type</span> <span class="n">Runner</span> <span class="k">interface</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">Run</span><span class="p">(</span><span class="nb">string</span><span class="p">,</span> <span class="p">...</span><span class="nb">string</span><span class="p">)</span> <span class="p">([]</span><span class="nb">byte</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">type</span> <span class="n">RealRunner</span> <span class="k">struct</span><span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">var</span> <span class="n">runner</span> <span class="n">Runner</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// the real runner for the actual program, actually execs the command</span>
+</span><span class='line'><span class="k">func</span> <span class="p">(</span><span class="n">r</span> <span class="n">RealRunner</span><span class="p">)</span> <span class="n">Run</span><span class="p">(</span><span class="n">command</span> <span class="nb">string</span><span class="p">,</span> <span class="n">args</span> <span class="p">...</span><span class="nb">string</span><span class="p">)</span> <span class="p">([]</span><span class="nb">byte</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="p">:=</span> <span class="n">exec</span><span class="p">.</span><span class="n">Command</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">args</span><span class="p">...).</span><span class="n">CombinedOutput</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">err</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">func</span> <span class="n">Hello</span><span class="p">()</span> <span class="nb">string</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="p">:=</span> <span class="n">runner</span><span class="p">.</span><span class="n">Run</span><span class="p">(</span><span class="s">&quot;echo&quot;</span><span class="p">,</span> <span class="s">&quot;hello&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">err</span> <span class="p">!=</span> <span class="n">nil</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">panic</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nb">string</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">runner</span> <span class="p">=</span> <span class="n">RealRunner</span><span class="p">{}</span>
+</span><span class='line'>  <span class="n">fmt</span><span class="p">.</span><span class="n">Println</span><span class="p">(</span><span class="n">Hello</span><span class="p">())</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here is our test file. We start by defining our <code>TestRunner</code> type and implementing the <code>Run(...)</code> interface for it.</p>
+
+<p>This function builds up a command to run the current test file and run the <code>TestHelperProcess</code> function passing along all the args you originally sent. This lets you do things like return different output for different commands you want to run.</p>
+
+<p>The <code>TestHelperProcess</code> function exits when run in the context of the test file, but runs when specified in the files arguments.</p>
+
+<figure class='code'><figcaption><span>example_test.go</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="k">package</span> <span class="n">main</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">import</span> <span class="p">(</span>
+</span><span class='line'>  <span class="s">&quot;fmt&quot;</span>
+</span><span class='line'>  <span class="s">&quot;os&quot;</span>
+</span><span class='line'>  <span class="s">&quot;os/exec&quot;</span>
+</span><span class='line'>  <span class="s">&quot;testing&quot;</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">type</span> <span class="n">TestRunner</span> <span class="k">struct</span><span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">func</span> <span class="p">(</span><span class="n">r</span> <span class="n">TestRunner</span><span class="p">)</span> <span class="n">Run</span><span class="p">(</span><span class="n">command</span> <span class="nb">string</span><span class="p">,</span> <span class="n">args</span> <span class="p">...</span><span class="nb">string</span><span class="p">)</span> <span class="p">([]</span><span class="nb">byte</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">cs</span> <span class="p">:=</span> <span class="p">[]</span><span class="nb">string</span><span class="p">{</span><span class="s">&quot;-test.run=TestHelperProcess&quot;</span><span class="p">,</span> <span class="s">&quot;--&quot;</span><span class="p">}</span>
+</span><span class='line'>  <span class="n">cs</span> <span class="p">=</span> <span class="n">append</span><span class="p">(</span><span class="n">cs</span><span class="p">,</span> <span class="n">args</span><span class="p">...)</span>
+</span><span class='line'>  <span class="n">cmd</span> <span class="p">:=</span> <span class="n">exec</span><span class="p">.</span><span class="n">Command</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">Args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cs</span><span class="p">...)</span>
+</span><span class='line'>  <span class="n">cmd</span><span class="p">.</span><span class="n">Env</span> <span class="p">=</span> <span class="p">[]</span><span class="nb">string</span><span class="p">{</span><span class="s">&quot;GO_WANT_HELPER_PROCESS=1&quot;</span><span class="p">}</span>
+</span><span class='line'>  <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="p">:=</span> <span class="n">cmd</span><span class="p">.</span><span class="n">CombinedOutput</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">err</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">func</span> <span class="n">TestHello</span><span class="p">(</span><span class="n">t</span> <span class="p">*</span><span class="n">testing</span><span class="p">.</span><span class="n">T</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">runner</span> <span class="p">=</span> <span class="n">TestRunner</span><span class="p">{}</span>
+</span><span class='line'>  <span class="n">out</span> <span class="p">:=</span> <span class="n">Hello</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">out</span> <span class="p">==</span> <span class="s">&quot;testing helper process&quot;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">t</span><span class="p">.</span><span class="n">Logf</span><span class="p">(</span><span class="s">&quot;out was eq to %s&quot;</span><span class="p">,</span> <span class="nb">string</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">func</span> <span class="n">TestHelperProcess</span><span class="p">(*</span><span class="n">testing</span><span class="p">.</span><span class="n">T</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">os</span><span class="p">.</span><span class="n">Getenv</span><span class="p">(</span><span class="s">&quot;GO_WANT_HELPER_PROCESS&quot;</span><span class="p">)</span> <span class="p">!=</span> <span class="s">&quot;1&quot;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">defer</span> <span class="n">os</span><span class="p">.</span><span class="n">Exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">fmt</span><span class="p">.</span><span class="n">Println</span><span class="p">(</span><span class="s">&quot;testing helper process&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Hopefully this helps someone else! I had a hard time finding some good, short examples on the internet that combined both interfaces and mocking like this.</p>
+
+<center>
+<a href="http://golang.org/src/pkg/os/exec/exec_test.go">More examples from os/exec/exec_test.go</a>
+</center>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/06/a-useful-logger-in-go/">A Useful Logger in Go</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-09T21:26:00-04:00" pubdate data-updated="true">Jun 9<sup>th</sup>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Small function that will print out useful information when invoked:</p>
+
+<figure class='code'><figcaption><span>log.go</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="nx">logMsg</span><span class="p">(</span><span class="nx">msg</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">pc</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">runtime</span><span class="p">.</span><span class="nx">Caller</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">caller</span> <span class="o">:=</span> <span class="nx">runtime</span><span class="p">.</span><span class="nx">FuncForPC</span><span class="p">(</span><span class="nx">pc</span><span class="p">).</span><span class="nx">Name</span><span class="p">()</span>
+</span><span class='line'>  <span class="nx">_</span><span class="p">,</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">line</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">runtime</span><span class="p">.</span><span class="nx">Caller</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">sp</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">Split</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">short_path</span> <span class="o">:=</span> <span class="nx">sp</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">sp</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="nx">sp</span><span class="p">)]</span>
+</span><span class='line'>  <span class="nx">path_line</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;[%s/%s:%d]&quot;</span><span class="p">,</span> <span class="nx">short_path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">short_path</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">line</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">log_string</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;[%s]%s %s:: %s&quot;</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">(),</span> <span class="nx">path_line</span><span class="p">,</span> <span class="nx">caller</span><span class="p">,</span> <span class="nx">msg</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">log_string</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Sample output:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>[2014-06-10 01:38:45.812215998 +0000 UTC][src/trex-client.go:15]{main.main}:: checking jobs - finish
+</span><span class='line'>[2014-06-10 01:38:47.329650331 +0000 UTC][src/trex-client.go:15]{main.main}:: building package list - start
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/04/motivation-to-work-on-new-projects/">Motivation to Work on New Projects</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-26T14:21:00-04:00" pubdate data-updated="true">Apr 26<sup>th</sup>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Whenever I have spare time ( often around Christmas or when I&rsquo;m on vacation/traveling ), I tend to fill it with working on projects I&rsquo;ve built up in my backlog. I&rsquo;m also really trying to keep a continuous streak of OSS commits going on Github (something about filling that chart up makes me want to work harder). Here&rsquo;s my process and how I go about working on personal projects and try to stay motivated - if you have any ideas I&rsquo;d love to hear them in the comments!</p>
+
+<h2>Have a backlog</h2>
+
+<p>I use Evernote for all my ideas and project notes:</p>
+
+<p><img src="/images/motivation/evernote.png" alt="Evernote" /></p>
+
+<p>I have two columns - one for things in progress or to do and one for projects that are done ( with a link to any github repos I published ). When I have some downtime but don&rsquo;t feel like actually writing any code - I&rsquo;ll write out plans for what the project needs (use cases, backend needs, software I plan on using, etc) and do research and store all that as a sub-note in Evernote (you can see that with the light green link to the HAProxy Frontend ) under the main page. Plus I can easily share these with friends for feedback by just copying the share URL.</p>
+
+<h2>Use small milestones to build up bigger ones</h2>
+
+<p>For instance, when I was working on the code for <a href="https://github.com/joshrendek/scala-ifcfg-api">http://ifcfg.net/</a> I decided there were two major components I would need to create: the web api to access the data, and then a backing library to do some web scraping to gather BGP data.
+I started out writing a small scraper in Scala for scraping BGP and looking glass info (which involved learning some more SBT, and selenium apis for Scala) and then moved onto learning a small amount of the Play! framework and exposing my library via that api. This let me focus on one small component at a time and finish it ( I have a habit of leaving personal projects unfinished or taking a long time to finish them if I let the scope creep beyond what I deemed as minimum requirements ).</p>
+
+<h2>Pick an interesting project</h2>
+
+<p>There are some areas I just don&rsquo;t have an interest in - like writing an application to track golf scores.</p>
+
+<p>So pick something you like - I love doing backend systems and APIs - pick something your passionate about already or a topic you want to learn more about.</p>
+
+<h2>Learn</h2>
+
+<p>If I&rsquo;m working on a personal project and not learning anything new (even if its just a new way to test, for instance) - I get bored, <em>really</em> quickly. I&rsquo;ve been stemming this by trying to pick up new languages as I work on projects and working on projects with broader goals.</p>
+
+<p>For instance, my latest project I&rsquo;m working on is <a href="https://github.com/joshrendek/patchasaurus">Patchasaurus</a> ( yes there isn&rsquo;t a readme yet ). I know theres a gap in the systems world for (open source) patch management, especially focused on Ubuntu and Debian - so I decided to write a small initial version of one.
+I had been playing around with Go at work (and boy is it nice to get a HTTP API running in a few MB of RAM) and decided to write the <em>agent</em> for patchasaurus in that ( nicknamed <em>trex</em> ).
+I&rsquo;ve been learning how to cross compile programs in Go, what libraries don&rsquo;t work with cross-compilation (looking at you <code>os/user</code>) and a nice work flow for testing these while developing them ( sshfs is great for this with VirtualBox or Vagrant ).
+I also chose to use Rails 4.1 as the management interface since I wanted to stay up to date with the new Rails features - turns out <code>spring</code> is very nice and a great improvement over the guard work flow I&rsquo;ve used before.</p>
+
+<h2>Don&rsquo;t focus on processes versus getting things done</h2>
+
+<p>I&rsquo;m a big fan of testing, and TDD, however I&rsquo;m not always in the mood to do it. Sometimes I just want to see results and I&rsquo;ll go back and refactor and test later. Picking what works for you on a specific project/component, and getting it done I think is much more important than rigidly following a specific set of guidelines on every project you do ( aka: test first, setup CI before any code, etc ).</p>
+
+<h2>Don&rsquo;t get in a rut</h2>
+
+<p>Staring at HackerNews or Reddit all day can be daunting - try and not focus on what everyone else is doing and instead focus on what you&rsquo;re getting done and how you&rsquo;re improving yourself.</p>
+
+<p>Also don&rsquo;t let this influence your technology choices. Sometimes there are articles trending for <code>AngularJS</code> or <code>Ruby on Rails</code> - stick with what you picked ( unless you really want to learn that new tech ) - or figure out ways to incorporate that into smaller components of your project. Don&rsquo;t throw away all that progress just because you saw a few posts reach the page!</p>
+
+<h2>Take breaks</h2>
+
+<p>Don&rsquo;t spend all day coding - take breaks, go for a walk, a run, play with your dog, play a video game - something that can give you a moment to breathe and think about something else or give you time to re-focus on the grand vision you&rsquo;ve been laboring over. Figure out what works for you to relax and do it to break up that screen glow tan you&rsquo;re getting.</p>
+
+<h2>Talk about what you&rsquo;re working on</h2>
+
+<p>Talk with friends to brainstorm ideas, pair up on some problems, see if theres a more idiomatic way to do a function in the language your using ( for example, I spent some time trying to see if there were any <code>map()</code> equivalents on #go-nuts), and blog about what you&rsquo;re doing if that&rsquo;s your style.</p>
+
+<p>Knowing people are using code and software I&rsquo;ve written is a huge motivating factor to working on future projects ( star/watch counts on Github, downloads on RubyGems, traffic to my blog, etc).</p>
+
+<h2>Finish!!</h2>
+
+<p>Yes it can be hard, but figure out what <em>finished</em> means to you, and do it. Publish it on Github, submit it to HackerNews, post it to reddit, get it hooked into TravisCI - make sure you come to the finish line of each component or project you&rsquo;re working on. Building up these small accomplishments can help set a streak for the future so you have the motivation to power through and get items done.</p>
+
+<p>Sometimes you&rsquo;re more interested in getting an application finished than on the deployment process - throw it on Heroku, a shared hosting provider, etc.  There&rsquo;s nothing wrong with some shared hosting for a small project. Don&rsquo;t let things like deployment stop you from finishing!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2013/11/2-patterns-for-refactoring-with-your-ruby-application/">2 Patterns for Refactoring With Your Ruby Application</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-15T21:55:00-05:00" pubdate data-updated="true">Nov 15<sup>th</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>When working on a rails application you can sometimes find duplicated or very similar code between two different controllers (for instance a UI element and an API endpoint).
+Realizing that you have this duplication there are several things you can do. I&rsquo;m going to go over how to extract this code out into the
+query object pattern <sup><a href="http://www.martinfowler.com/eaaCatalog/queryObject.html">1</a></sup>
+and clean up our constructor using the builder pattern <sup><a href="http://en.wikipedia.org/wiki/Builder_pattern">2</a></sup> adapted to ruby.</p>
+
+<p>I&rsquo;m going to make a few assumptions here, but this should be applicable to any
+data access layer of your application. I&rsquo;m also assuming you&rsquo;re using something like Kaminari for pagination and have a model
+for <code>People</code>.</p>
+
+<figure class='code'><figcaption><span>dummy_controller.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">index</span>
+</span><span class='line'>  <span class="n">page</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:page</span><span class="o">]</span> <span class="o">||</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="n">per_page</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:per_page</span><span class="o">]</span> <span class="o">||</span> <span class="mi">50</span>
+</span><span class='line'>  <span class="nb">name</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">sort</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:sort_by</span><span class="o">]</span> <span class="o">||</span> <span class="s1">&#39;last_name&#39;</span>
+</span><span class='line'>  <span class="n">direction</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:sort_direction</span><span class="o">]</span> <span class="o">||</span> <span class="s1">&#39;asc&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">query</span> <span class="o">=</span> <span class="no">People</span>
+</span><span class='line'>  <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="nb">name</span><span class="p">)</span> <span class="k">if</span> <span class="nb">name</span><span class="o">.</span><span class="n">present?</span>
+</span><span class='line'>  <span class="vi">@results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">order</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">sort</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">direction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="n">page</span><span class="p">)</span><span class="o">.</span><span class="n">per_page</span><span class="p">(</span><span class="n">per_page</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So we see this duplicated elsehwere in the code base and we want to clean it up. Lets first start by extracting this out into a new class called <code>PeopleQuery</code>.</p>
+
+<p>I usually put these under <code>app/queries</code> in my rails application.</p>
+
+<figure class='code'><figcaption><span>people_query.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">PeopleQuery</span>
+</span><span class='line'>  <span class="kp">attr_accessor</span> <span class="ss">:page</span><span class="p">,</span> <span class="ss">:per_page</span><span class="p">,</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:sort</span><span class="p">,</span> <span class="ss">:direction</span><span class="p">,</span> <span class="ss">:query</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">per_page</span><span class="p">,</span> <span class="nb">name</span><span class="p">,</span> <span class="n">sort</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="n">page</span> <span class="o">||</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">per_page</span> <span class="o">=</span> <span class="n">per_page</span> <span class="o">||</span> <span class="mi">50</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">name</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">sort</span> <span class="o">=</span> <span class="n">sort</span> <span class="o">||</span> <span class="s1">&#39;last_name&#39;</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span> <span class="o">||</span> <span class="s1">&#39;asc&#39;</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="no">People</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">build</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="nb">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="nb">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">present?</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">order</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="nb">self</span><span class="o">.</span><span class="n">sort</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="nb">self</span><span class="o">.</span><span class="n">direction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">page</span><span class="p">)</span><span class="o">.</span><span class="n">per_page</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">per_page</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now our controller looks like this:</p>
+
+<figure class='code'><figcaption><span>dummy_controller.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">index</span>
+</span><span class='line'>  <span class="n">query</span> <span class="o">=</span> <span class="no">PeopleQuery</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:page</span><span class="o">]</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:per_page</span><span class="o">]</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:sort</span><span class="o">]</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:direction</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="vi">@results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">build</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Much better! We&rsquo;ve decoupled our control from our data access object (<code>People</code>/ActiveRecord), moved some of the query logic outside of the controller and into
+a specific class meant to deal with building it. But that constructor doesn&rsquo;t look very nice. We can do better since we&rsquo;re using ruby.</p>
+
+<p>Our new <code>PeopleQuery</code> class will look like this and will use a block to initialize itself instead of a long list of constructor arguments.</p>
+
+<figure class='code'><figcaption><span>dummy_controller.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">PeopleQuery</span>
+</span><span class='line'>  <span class="kp">attr_accessor</span> <span class="ss">:page</span><span class="p">,</span> <span class="ss">:per_page</span><span class="p">,</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:sort</span><span class="p">,</span> <span class="ss">:direction</span><span class="p">,</span> <span class="ss">:query</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">yield</span> <span class="nb">self</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">page</span> <span class="o">||=</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">per_page</span> <span class="o">=||</span> <span class="mi">50</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">sort</span> <span class="o">||=</span> <span class="s1">&#39;last_name&#39;</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">||=</span> <span class="s1">&#39;asc&#39;</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="no">People</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">build</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="nb">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="nb">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">present?</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">order</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="nb">self</span><span class="o">.</span><span class="n">sort</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="nb">self</span><span class="o">.</span><span class="n">direction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">page</span><span class="p">)</span><span class="o">.</span><span class="n">per_page</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">per_page</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We yield first to let the caller set the values and then after yielding we set our default values if they weren&rsquo;t passed in. There is another method of doing this
+with <code>instance_eval</code> but you end up losing variable scope and the constructor looks worse since you have to start passing around the params variable to get access to it, so we&rsquo;re
+going to stick with yield.</p>
+
+<figure class='code'><figcaption><span>dummy_controller.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">index</span>
+</span><span class='line'>  <span class="n">query</span> <span class="o">=</span> <span class="no">PeopleQuery</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">query</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">query</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:page</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">query</span><span class="o">.</span><span class="n">per_page</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:per_page</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">query</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">query</span><span class="o">.</span><span class="n">sort</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:sort</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">query</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:direction</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="vi">@results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">build</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that&rsquo;s it! We&rsquo;ve de-duplicated some code (remember we assumed dummy controller&rsquo;s index method was duplicated elsewhere in an API call in a seperate namespaced controller),
+extracted out a common query object, decoupled our controller from ActiveRecord, and built up a nice way to construct the query object using the builder pattern.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2013/10/parsing-html-in-scala/">Parsing HTML in Scala</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-31T13:34:00-04:00" pubdate data-updated="true">Oct 31<sup>st</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Is there ever a confusing amount of information out there on parsing HTML in Scala. Here is the list of possible ways I ran across:</p>
+
+<ul>
+<li>Hope the document is valid XHTML and use <code>scala.xml.XML</code> to parse it</li>
+<li>If the document isn&rsquo;t valid XHTML use something like TagSoup and hope it parses again</li>
+<li>Still think its valid XHTML? Try using <code>scalaz</code>&rsquo;s XML parser</li>
+</ul>
+
+
+<p>All of the answers I found on Google pointed to some type of XML parsing, which won&rsquo;t always work. Coming from Ruby I know there are tools out there like Selenium that can simulate a web browser for you and give you a rich interface to interact with the returned HTML.</p>
+
+<p>So I went on Maven and found the two Selenium web drivers I wanted for my project and added them to my <code>libraryDependencies</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>"org.seleniumhq.webdriver" % "webdriver-selenium" % "0.9.7376",
+</span><span class='line'>"org.seleniumhq.webdriver" % "webdriver-htmlunit" % "0.9.7376"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The project I&rsquo;m working on is to parse Looking Glass websites for BGP information and AS peering, so I wanted to scrape the data. I also didn&rsquo;t want to have to use a full blown web browser (ala Selenium + Firefox for instance) - so I stuck with the <code>HtmlUnit</code> driver for the implementation.</p>
+
+<p>Here is a quick code snippet that lets me grab AS #&rsquo;s and Peer names from an AS:</p>
+
+<figure class='code'><figcaption><span>AS.scala</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="s">&quot;http://example.com/AS&quot;</span> <span class="o">+</span> <span class="n">as</span><span class="o">.</span><span class="n">toString</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">driver</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">HtmlUnitDriver</span>
+</span><span class='line'><span class="c1">// Proxy for BetaMax when writing tests</span>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="nc">_port</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">driver</span><span class="o">.</span><span class="n">setProxy</span><span class="o">(</span><span class="s">&quot;localhost&quot;</span><span class="o">,</span> <span class="nc">_port</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">url</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">peers</span> <span class="k">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">findElementsByXPath</span><span class="o">(</span><span class="s">&quot;//*[@id=\&quot;table_peers4\&quot;]/tbody/tr/td[position() = 1 or position() = 2]&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// zip up the list in pairs so List(a,b,c,d) becomes List((a,b), (c,d))</span>
+</span><span class='line'><span class="k">for</span><span class="o">(</span><span class="n">peer</span> <span class="k">&lt;-</span> <span class="n">peers</span> <span class="n">zip</span> <span class="n">peers</span><span class="o">.</span><span class="n">tail</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="n">peer</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>No XML to muck with and I get some nice selectors to query the document for. Remember if the source you want data from doesn&rsquo;t have an API, HTML is an API! Just be respectful of how you query and interact with them (ie: Don&rsquo;t do 100 requests/second, cache/record responses while writing tests, etc).</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2013/10/getting-started-with-scala/">Getting Started With Scala</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-28T20:42:00-04:00" pubdate data-updated="true">Oct 28<sup>th</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Recently I&rsquo;ve been getting into more Java and (attempting to) Scala development. I always got annoyed with the Scala ecosystem for development and would get fed up and just go back to writing straight Java (<em>cough</em>sbt<em>cough</em>). Today I decided to write down everything I did and get a sane process going for Scala development with SBT.</p>
+
+<p>I decided to write a small Scala client for <a href="http://openweathermap.org">OpenWeatherMap</a> - here is what I went through.</p>
+
+<p>A brief guide on naming conventions is <a href="http://docs.scala-lang.org/style/naming-conventions.html">here</a>. I found this useful just to reference conventions since not everything is the same as Ruby (camelCase vs snake_case for instance).</p>
+
+<h2>Setting up and starting a project</h2>
+
+<p>First make sure you hava a JVM installed, Scala, and SBT. I&rsquo;ll be using Scala 2.10.2 and SBT 0.12.1 since that is what I have installed.</p>
+
+<p>One of the nice things I like about Ruby on Rails is the project generation ( aka: <code>rails new project [opts]</code> ) so I was looking for something similar with Scala.</p>
+
+<p>Enter giter8: <a href="https://github.com/n8han/giter8">https://github.com/n8han/giter8</a></p>
+
+<p>giter8 runs through SBT and has <a href="http://github.com/n8han/giter8/wiki/giter8-templates">templates</a> available for quickstart.</p>
+
+<p>Follow the install instructions and install giter8 into SBT globally and load SBT to make sure it downloads and installs.</p>
+
+<p>Once you do that you can pick a template from the list, or go with the one I chose: <code>fayimora/basic-scala-project</code> which sets up the directories properly and also sets up <a href="www.scalatest.org">ScalaTest</a>, a testing framework with a DSL similar to RSpec.</p>
+
+<p>To setup your project you need to run:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>g8 fayimora/basic-scala-project</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You&rsquo;ll be prompted with several questions and then your project will be made. Switch into that directory and run <code>sbt test</code> to make sure the simple HelloWorld passes and everything with SBT is working.</p>
+
+<h2>Setting up IntelliJ</h2>
+
+<p>For Java and Scala projects I stick with IntelliJ over my usual vim. When using Java IntelliJ is good about picking up library and class path&rsquo;s and resolving dependencies (especially if you are using Maven). However there isn&rsquo;t a good SBT plugin (as of writing this) that manages to do all this inside IntelliJ.</p>
+
+<p>The best plugin for SBT I&rsquo;ve found that does this is <a href="https://github.com/mpeltonen/sbt-idea">sbt-idea</a>. You&rsquo;re going to need to make a <code>project/plugins.sbt</code> file:</p>
+
+<figure class='code'><figcaption><span>plugins.sbt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">addSbtPlugin</span><span class="o">(</span><span class="s">&quot;com.github.mpeltonen&quot;</span> <span class="o">%</span> <span class="s">&quot;sbt-idea&quot;</span> <span class="o">%</span> <span class="s">&quot;1.5.2&quot;</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and now you can generate your <code>.idea</code> files by running: <code>sbt gen-idea</code></p>
+
+<p>IntelliJ should now resolve your project dependencies and you can start coding your project.</p>
+
+<h2>Final Result</h2>
+
+<p><a href="https://github.com/joshrendek/scala-weather">scala-weather</a> - A simple to use OpenWeatherMap client in Scala set up with Travis-CI and CodeClimate. This is just the first of several projects I plan on working on / open sourcing to get my feet wet with Scala more.</p>
+
+<h2>Useful libraries</h2>
+
+<ul>
+<li><a href="HTTP:">HTTP:</a> <a href="www.bigbeeconsultants.co.uk/bee-client">Bee Client</a></li>
+<li>HTTP Mocking: <a href="http://freeside.co/betamax/">BetaMax</a></li>
+<li>JSON Parsing: <a href="http://json4s.org/">Json4s</a></li>
+<li>Testing: <a href="http://scalatest.org">ScalaTest</a></li>
+<li>Logging: <a href="http://logback.qos.ch/">logback</a></li>
+</ul>
+
+
+<h2>Notes</h2>
+
+<p>By default Bee Client will log everything to STDOUT - you&rsquo;ll need to configure <a href="http://logback.qos.ch">logback</a> with an XML file located in <code>src/main/resources/logback.xml</code>:</p>
+
+<figure class='code'><figcaption><span>src/main/resources/logback/xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;appender</span> <span class="na">name=</span><span class="s">&quot;STDOUT&quot;</span> <span class="na">class=</span><span class="s">&quot;ch.qos.logback.core.ConsoleAppender&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;encoder&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;pattern&gt;</span>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n<span class="nt">&lt;/pattern&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/encoder&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/appender&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;root</span> <span class="na">level=</span><span class="s">&quot;ERROR&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">&quot;STDOUT&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/root&gt;</span>
+</span><span class='line'><span class="nt">&lt;/configuration&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2013/07/from-0-to-testing-on-windows-with-jruby/">From 0 to Testing on Windows With JRuby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-17T22:46:00-04:00" pubdate data-updated="true">Jul 17<sup>th</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Testing is one of the most important parts of software development and helps to ensure
+bugs don&rsquo;t get into production and that code can be refactored safely.
+If you&rsquo;re working on a team with multiple people with different skill sets,
+you might have people doing testing who only know windows and development is only
+using OSX or Linux. We want everyone to be able to test - someone in QA who is familiar
+with Windows shouldn&rsquo;t have to throw away all that knowledge, install Linux, and start from scratch.
+Enter JRuby and John.</p>
+
+<p>John is our tester and he is running windows. He wants to help make sure that when a user
+goes to <code>http://google.com/</code> that a button appears with the text &ldquo;Google Search&rdquo;.
+The quick way to do this is to open his browser, navigate to <code>http://google.com/</code>
+glance through the page for the button and confirm that its there.
+John has a problem though, he has 30 other test cases to run and the developers are pushing code to the frontpage
+several times a day; John now has to continously do this manually everytime code is touched and
+his test load is piling up.</p>
+
+<p>So let&rsquo;s help John out and install <a href="http://sublimetext.com/2">Sublime Text 2</a> and <a href="http://jruby.org/">JRuby</a>.</p>
+
+<p><img src="/images/jrubytesting/download-sublime.png" alt="" /></p>
+
+<p>Start by downloading the 64-bit version of Sublime Text.
+Make sure to add the context menu when going through the install process.</p>
+
+<p><img src="/images/jrubytesting/slt-setup.png" alt="" /></p>
+
+<p>Now we&rsquo;ll visit the JRuby homepage and download the 64 bit installer.</p>
+
+<p><img src="/images/jrubytesting/dl-jruby.png" alt="" /></p>
+
+<p>Go through the installer and let JRuby set your path so you can access ruby from <code>cmd.exe</code></p>
+
+<p><img src="/images/jrubytesting/jruby-path.png" alt="" /></p>
+
+<p>Now when we open <code>cmd.exe</code> and type <code>jruby -v</code> we&rsquo;ll be able to see that it was installed.</p>
+
+<p><img src="/images/jrubytesting/jruby-cmd.png" alt="" /></p>
+
+<p>Now that we have our tools installed lets setup our test directory on the Desktop.
+Inside our <code>testing</code> folder we&rsquo;ll create a folder called <code>TestDemo</code> for our tests for the Demo project.</p>
+
+<p><img src="/images/jrubytesting/testdemo-folder.png" alt="" /></p>
+
+<p>Next we&rsquo;ll open Sublime Text and go to <code>File &gt; Open Folder</code> and navigate to our <code>TestDemo</code> folder and hit open.</p>
+
+<p><img src="/images/jrubytesting/slt-openfolder.png" alt="" /></p>
+
+<p>Now we can continue making our directory structure inside Sublime Text. Since we&rsquo;re going to use <code>rspec</code>
+we need to create a folder called <code>spec</code> to contain all of our tests. Right click on the <code>TestDemo</code> in the
+tree navigation and click <code>New Folder</code>.</p>
+
+<p><img src="/images/jrubytesting/slt-newfolder.png" alt="" /></p>
+
+<p>Call the folder <code>spec</code> in the bottom title bar when it prompts you for the folder name.</p>
+
+<p>Next we&rsquo;ll create our Gemfile which will declare all of our dependencies - so make a file in the project root called
+<code>Gemfile</code> and put the our dependencies in it:</p>
+
+<figure class='code'><figcaption><span>Gemfile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">source</span> <span class="s2">&quot;https://rubygems.org&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;rspec&quot;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;selenium&quot;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;selenium-webdriver&quot;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s2">&quot;capybara&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once we have that file created, open <code>cmd.exe</code> and switch to your project&rsquo;s root directory.</p>
+
+<p>Type <code>jgem install bundler</code> to install <code>bundler</code> which manages ruby dependencies.</p>
+
+<p><img src="/images/jrubytesting/bundler.png" alt="" /></p>
+
+<p>While still at the command prompt we&rsquo;re going to <code>bundle</code> to install our dependencies:</p>
+
+<p><img src="/images/jrubytesting/bundle.png" alt="" /></p>
+
+<p>After that finishes we need to run one last command for <code>selenium</code> to work properly: <code>selenium install</code></p>
+
+<p><img src="/images/jrubytesting/selenium-install.png" alt="" /></p>
+
+<p>We also need a <code>spec_helper.rb</code> file inside our <code>spec</code> directory.</p>
+
+<figure class='code'><figcaption><span>specs\spec_helper.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;rspec&quot;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;selenium&quot;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;capybara/rspec&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Capybara</span><span class="o">.</span><span class="n">default_driver</span> <span class="o">=</span>  <span class="ss">:selenium</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;ve now setup our rspec folders, our Gemfile with dependencies, and installed them. Now we can write
+the test that will save John a ton of time.</p>
+
+<p>Chrome comes with a simple tool to get XPath paths so we&rsquo;re going to use that to get the XPath
+for the search button. Right click on the &ldquo;Google Search&rdquo; button and click <code>Inspect element</code></p>
+
+<p><img src="/images/jrubytesting/google-inspect.png" alt="" /></p>
+
+<p>Right click on the highlighted element and hit <code>Copy XPath</code>.</p>
+
+<p><img src="/images/jrubytesting/google-xpath.png" alt="" /></p>
+
+<p>Now we&rsquo;re going to make our spec file and call it <code>homepage_spec.rb</code> and locate it under <code>spec\integration</code>.</p>
+
+<p>Here is a picture showing the directory structure and files:
+<img src="/images/jrubytesting/homepage-spec.png" alt="" /></p>
+
+<p>Here is the spec file with comments explaining each part:</p>
+
+<figure class='code'><figcaption><span>spec\integration\homepage_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># This loads the spec helper file that we required everything in</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;spec_helper&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># This is the outer level description of the test</span>
+</span><span class='line'><span class="c1"># For this example it describes going to the homepage of Google.com</span>
+</span><span class='line'><span class="c1"># Setting the feature type is necessary if you have</span>
+</span><span class='line'><span class="c1"># Capybara specs outside of the spec\features folder</span>
+</span><span class='line'><span class="n">describe</span> <span class="s2">&quot;Going to google.com&quot;</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:feature</span> <span class="k">do</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># Context is like testing a specific component of the homepage, in this case</span>
+</span><span class='line'>  <span class="c1"># its the search button</span>
+</span><span class='line'>  <span class="n">context</span> <span class="s2">&quot;The search button&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="c1"># This is our actual test where we give it a meaningful test description</span>
+</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should contain the text &#39;Google Search&#39;&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">visit</span> <span class="s2">&quot;http://google.com/&quot;</span> <span class="c1"># Opens Firefox and visits google</span>
+</span><span class='line'>      <span class="n">button</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="ss">:xpath</span><span class="p">,</span> <span class="s1">&#39;//*[@id=gbqfba&quot;&#39;</span><span class="p">)</span> <span class="c1"># find an object on the page by its XPath path</span>
+</span><span class='line'>      <span class="c1"># This uses an rspec assertion saying that the string returned</span>
+</span><span class='line'>      <span class="c1"># by button.text is equal to &quot;Google Search&quot;</span>
+</span><span class='line'>      <span class="n">button</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="s2">&quot;Google Seearch&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can tab back to our <code>cmd.exe</code> prompt and run our tests!
+<code>rspec spec</code> will run all your tests under the <code>spec</code> folder.
+<img src="/images/jrubytesting/rspec-spec.png" alt="" /></p>
+
+<h3>Things to take note of</h3>
+
+<p>This example scenario is showing how to automate browser testing to do end-to-end tests on a product using rspec.
+This is by no means everything you can do with rspec and ruby - you can SSH, hit APIs and parse JSON, and do anything
+you want with the ability to make assertions.</p>
+
+<p>A lot is going on in these examples - there are plenty of resources out there on google and other websites
+that provide more rspec examples and ruby examples.</p>
+
+<p>We also showed how to add dependencies and install them using <code>bundler</code>.
+Two of the best resources for finding libraries and other gems is
+<a href="http://rubygems.org/">RubyGems</a> and <a href="http://ruby-toolbox.com/">Ruby-Toolbox</a> - the only thing to take note of
+is anything saying to be a native C extension (they won&rsquo;t work with JRuby out of the box).</p>
+
+<p>My last note is that you also need to have firefox installed as well - Selenium will work with Chrome but I&rsquo;ve found it to be a
+hassle to setup (and unless you really need Chrome), the default of Firefox will work great.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page3">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/index.html">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Projects & Software</h1>
+  <ul>
+    <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+    <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+    <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple &#8216;what is my IP&#8217; service with a few extra RESTful endpoints.</li>
+
+    <li><a href="/projects/">View More</a>
+
+    <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+    <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+  </ul>
+</section>
+
+<section>
+  <h1>Other Blogs</h1>
+  <ul>
+    <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+    <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2016/06/building-honeypots-and-analyzing-linux-malware/">Building Honeypots and Analyzing Linux Malware</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a Distributed WaitGroup With Go and Redis</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and Ping: Sendmsg: Operation Not Permitted</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/10/influx-alert/">Influx Alert</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/getting-upstart-to-log-to-syslog-with-tags/">Getting Upstart to Log to Syslog With Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/golang-performance-tips/">Golang Performance Tips</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Josh Rendek -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bluescripts';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

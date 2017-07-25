@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="A useful logger in Go" />
+<meta property="og:description" content="Small function that will print out useful information when invoked:
+1 func logMsg(msg string) { 2 	pc, _, _, _ := runtime.Caller(1) 3 	caller := runtime.FuncForPC(pc).Name() 4 	_, file, line, _ := runtime.Caller(0) 5 	sp := strings.Split(file, &quot;/&quot;) 6 	short_path := sp[len(sp)-2 : len(sp)] 7 	path_line := fmt.Sprintf(&quot;[%s/%s:%d]&quot;, short_path[0], short_path[1], line) 8 	log_string := fmt.Sprintf(&quot;[%s]%s %s:: %s&quot;, time.Now(), path_line, caller, msg) 9 	fmt." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2014/06/a-useful-logger-in-go/" />
+
+
+
+<meta property="article:published_time" content="2014-06-09T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2014-06-09T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="A useful logger in Go"/>
+<meta name="twitter:title" content="A useful logger in Go"/>
+<meta name="twitter:description" content="Small function that will print out useful information when invoked:
+1 func logMsg(msg string) { 2 	pc, _, _, _ := runtime.Caller(1) 3 	caller := runtime.FuncForPC(pc).Name() 4 	_, file, line, _ := runtime.Caller(0) 5 	sp := strings.Split(file, &quot;/&quot;) 6 	short_path := sp[len(sp)-2 : len(sp)] 7 	path_line := fmt.Sprintf(&quot;[%s/%s:%d]&quot;, short_path[0], short_path[1], line) 8 	log_string := fmt.Sprintf(&quot;[%s]%s %s:: %s&quot;, time.Now(), path_line, caller, msg) 9 	fmt."/>
+
+
+
+
+<meta itemprop="name" content="A useful logger in Go">
+<meta itemprop="description" content="Small function that will print out useful information when invoked:
+1 func logMsg(msg string) { 2 	pc, _, _, _ := runtime.Caller(1) 3 	caller := runtime.FuncForPC(pc).Name() 4 	_, file, line, _ := runtime.Caller(0) 5 	sp := strings.Split(file, &quot;/&quot;) 6 	short_path := sp[len(sp)-2 : len(sp)] 7 	path_line := fmt.Sprintf(&quot;[%s/%s:%d]&quot;, short_path[0], short_path[1], line) 8 	log_string := fmt.Sprintf(&quot;[%s]%s %s:: %s&quot;, time.Now(), path_line, caller, msg) 9 	fmt.">
+
+
+<meta itemprop="dateModified" content="2014-06-09T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="84">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     A useful logger in Go 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Jun 9, 2014 - 1 minutes</div>
+      <h1 class="title"> A useful logger in Go </h1>
+      <div class="content"> <p>Small function that will print out useful information when invoked:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span></span><span class="lineno"> 1 </span><span class="kd">func</span> <span class="nx">logMsg</span><span class="p">(</span><span class="nx">msg</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno"> 2 </span>	<span class="nx">pc</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">runtime</span><span class="p">.</span><span class="nx">Caller</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="lineno"> 3 </span>	<span class="nx">caller</span> <span class="o">:=</span> <span class="nx">runtime</span><span class="p">.</span><span class="nx">FuncForPC</span><span class="p">(</span><span class="nx">pc</span><span class="p">).</span><span class="nx">Name</span><span class="p">()</span>
+<span class="lineno"> 4 </span>	<span class="nx">_</span><span class="p">,</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">line</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">runtime</span><span class="p">.</span><span class="nx">Caller</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="lineno"> 5 </span>	<span class="nx">sp</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">Split</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">)</span>
+<span class="lineno"> 6 </span>	<span class="nx">short_path</span> <span class="o">:=</span> <span class="nx">sp</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">sp</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="nx">sp</span><span class="p">)]</span>
+<span class="lineno"> 7 </span>	<span class="nx">path_line</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;[%s/%s:%d]&quot;</span><span class="p">,</span> <span class="nx">short_path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">short_path</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">line</span><span class="p">)</span>
+<span class="lineno"> 8 </span>	<span class="nx">log_string</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;[%s]%s %s:: %s&quot;</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">(),</span> <span class="nx">path_line</span><span class="p">,</span> <span class="nx">caller</span><span class="p">,</span> <span class="nx">msg</span><span class="p">)</span>
+<span class="lineno"> 9 </span>	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">log_string</span><span class="p">)</span>
+<span class="lineno">10 </span><span class="p">}</span>
+</code></pre></div>
+
+
+<p>Sample output:</p>
+
+<pre><code class="language-bash">[2014-06-10 01:38:45.812215998 +0000 UTC][src/trex-client.go:15]{main.main}:: checking jobs - finish
+[2014-06-10 01:38:47.329650331 +0000 UTC][src/trex-client.go:15]{main.main}:: building package list - start
+</code></pre>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

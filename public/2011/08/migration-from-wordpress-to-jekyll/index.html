@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Migration from WordPress to Jekyll" />
+<meta property="og:description" content="While I love WordPress - I think it was a bit of overkill for what I was doing on this blog so I converted everything to Jekyll, and threw all my images up on Amazon&rsquo;s S3. I&rsquo;ve also migrated all the comments over to Disqus.
+One of the problems I ran into was getting the URLs to map the same; the _config.yml that worked for me was:
+1 pygments: true 2 markdown: rdiscount 3 permalink: /:year/:month/:title 4 paginate: 10  And then to get my /apps/ working again I made a directory structure like this: 1 apps//bluebug: 2 BlueBug." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2011/08/migration-from-wordpress-to-jekyll/" />
+
+
+
+<meta property="article:published_time" content="2011-08-18T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2011-08-18T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Migration from WordPress to Jekyll"/>
+<meta name="twitter:title" content="Migration from WordPress to Jekyll"/>
+<meta name="twitter:description" content="While I love WordPress - I think it was a bit of overkill for what I was doing on this blog so I converted everything to Jekyll, and threw all my images up on Amazon&rsquo;s S3. I&rsquo;ve also migrated all the comments over to Disqus.
+One of the problems I ran into was getting the URLs to map the same; the _config.yml that worked for me was:
+1 pygments: true 2 markdown: rdiscount 3 permalink: /:year/:month/:title 4 paginate: 10  And then to get my /apps/ working again I made a directory structure like this: 1 apps//bluebug: 2 BlueBug."/>
+
+
+
+
+<meta itemprop="name" content="Migration from WordPress to Jekyll">
+<meta itemprop="description" content="While I love WordPress - I think it was a bit of overkill for what I was doing on this blog so I converted everything to Jekyll, and threw all my images up on Amazon&rsquo;s S3. I&rsquo;ve also migrated all the comments over to Disqus.
+One of the problems I ran into was getting the URLs to map the same; the _config.yml that worked for me was:
+1 pygments: true 2 markdown: rdiscount 3 permalink: /:year/:month/:title 4 paginate: 10  And then to get my /apps/ working again I made a directory structure like this: 1 apps//bluebug: 2 BlueBug.">
+
+
+<meta itemprop="dateModified" content="2011-08-18T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="316">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Migration from WordPress to Jekyll 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Aug 18, 2011 - 2 minutes</div>
+      <h1 class="title"> Migration from WordPress to Jekyll </h1>
+      <div class="content"> 
+
+<p>While I love WordPress - I think it was a bit of overkill for what I was doing on this blog so I converted everything to Jekyll, and threw all my images up on Amazon&rsquo;s S3. I&rsquo;ve also migrated all the comments over to Disqus.</p>
+
+<p>One of the problems I ran into was getting the URLs to map the same; the _config.yml that worked for me was:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="ss">pygments</span><span class="p">:</span> <span class="kp">true</span>
+<span class="lineno">2 </span><span class="ss">markdown</span><span class="p">:</span> <span class="n">rdiscount</span>
+<span class="lineno">3 </span><span class="ss">permalink</span><span class="p">:</span> <span class="sr">/:year/</span><span class="ss">:month</span><span class="o">/</span><span class="ss">:title</span>
+<span class="lineno">4 </span><span class="ss">paginate</span><span class="p">:</span> <span class="mi">10</span>
+</code></pre></div>
+
+
+<p>And then to get my /apps/ working again I made a directory structure like this:
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1 </span><span class="n">apps</span><span class="o">//</span><span class="ss">bluebug</span><span class="p">:</span>
+<span class="lineno"> 2 </span><span class="no">BlueBug</span><span class="o">.</span><span class="n">zip</span>	<span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno"> 3 </span>
+<span class="lineno"> 4 </span><span class="n">apps</span><span class="o">//</span><span class="ss">greenmail</span><span class="p">:</span>
+<span class="lineno"> 5 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno"> 6 </span>
+<span class="lineno"> 7 </span><span class="n">apps</span><span class="o">//</span><span class="ss">light_logify</span><span class="p">:</span>
+<span class="lineno"> 8 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno"> 9 </span>
+<span class="lineno">10 </span><span class="n">apps</span><span class="o">//</span><span class="ss">pyultradns</span><span class="p">:</span>
+<span class="lineno">11 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">12 </span>
+<span class="lineno">13 </span><span class="n">apps</span><span class="o">//</span><span class="n">quote</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">the</span><span class="o">-</span><span class="n">day</span><span class="o">-</span><span class="ss">tweeter</span><span class="p">:</span>
+<span class="lineno">14 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">15 </span>
+<span class="lineno">16 </span><span class="n">apps</span><span class="o">//</span><span class="ss">rails_rrdtool</span><span class="p">:</span>
+<span class="lineno">17 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">18 </span>
+<span class="lineno">19 </span><span class="n">apps</span><span class="o">//</span><span class="n">server</span><span class="o">-</span><span class="n">setup</span><span class="o">-</span><span class="ss">fu</span><span class="p">:</span>
+<span class="lineno">20 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">21 </span>
+<span class="lineno">22 </span><span class="n">apps</span><span class="o">//</span><span class="ss">servly</span><span class="p">:</span>
+<span class="lineno">23 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">24 </span>
+<span class="lineno">25 </span><span class="n">apps</span><span class="o">//</span><span class="n">ventrilo</span><span class="o">-</span><span class="n">ping</span><span class="o">-</span><span class="ss">analyzer</span><span class="p">:</span>
+<span class="lineno">26 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+</code></pre></div>
+</p>
+
+<p>Some nice helper scripts I&rsquo;ve found:</p>
+
+<h3 id="creating-a-new-post">Creating a new post</h3>
+
+<p><div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1 </span><span class="c1">#!/usr/bin/env ruby</span>
+<span class="lineno"> 2 </span>
+<span class="lineno"> 3 </span><span class="c1"># Script to create a jekyll blog post using a template. It takes one input parameter</span>
+<span class="lineno"> 4 </span><span class="c1"># which is the title of the blog post</span>
+<span class="lineno"> 5 </span><span class="c1"># e.g. command:</span>
+<span class="lineno"> 6 </span><span class="c1"># $ ./new.rb &quot;helper script to create new posts using jekyll&quot;</span>
+<span class="lineno"> 7 </span><span class="c1">#</span>
+<span class="lineno"> 8 </span><span class="c1"># Author:Khaja Minhajuddin (http://minhajuddin.com)</span>
+<span class="lineno"> 9 </span>
+<span class="lineno">10 </span><span class="c1"># Some constants</span>
+<span class="lineno">11 </span><span class="no">TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;template.markdown&quot;</span>
+<span class="lineno">12 </span><span class="no">TARGET_DIR</span> <span class="o">=</span> <span class="s2">&quot;_posts&quot;</span>
+<span class="lineno">13 </span>
+<span class="lineno">14 </span><span class="c1"># Get the title which was passed as an argument</span>
+<span class="lineno">15 </span><span class="n">title</span> <span class="o">=</span> <span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+<span class="lineno">16 </span><span class="c1"># Get the filename</span>
+<span class="lineno">17 </span><span class="n">filename</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="lineno">18 </span><span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-%d&#39;</span><span class="p">)</span> <span class="si">}</span><span class="s2">-</span><span class="si">#{</span><span class="n">filename</span><span class="o">.</span><span class="n">downcase</span><span class="si">}</span><span class="s2">.markdown&quot;</span>
+<span class="lineno">19 </span><span class="n">filepath</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="no">TARGET_DIR</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+<span class="lineno">20 </span>
+<span class="lineno">21 </span><span class="c1"># Create a copy of the template with the title replaced</span>
+<span class="lineno">22 </span><span class="n">new_post</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="no">TEMPLATE</span><span class="p">)</span>
+<span class="lineno">23 </span><span class="n">new_post</span><span class="o">.</span><span class="n">gsub!</span><span class="p">(</span><span class="s1">&#39;TITLE&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">);</span>
+<span class="lineno">24 </span>
+<span class="lineno">25 </span><span class="c1"># Write out the file to the target directory</span>
+<span class="lineno">26 </span><span class="n">new_post_file</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="lineno">27 </span><span class="n">new_post_file</span><span class="o">.</span><span class="n">puts</span> <span class="n">new_post</span>
+<span class="lineno">28 </span><span class="n">new_post_file</span><span class="o">.</span><span class="n">close</span>
+<span class="lineno">29 </span>
+<span class="lineno">30 </span><span class="nb">puts</span> <span class="s2">&quot;created =&gt; </span><span class="si">#{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div>
+</p>
+
+<h3 id="publishing-a-new-post">Publishing a new post</h3>
+
+<p><div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="n">jekyll</span> <span class="o">&amp;&amp;</span> <span class="n">rsync</span> <span class="o">-</span><span class="n">avz</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;ssh -p SSHPORT&#39;</span> <span class="o">--</span><span class="n">delete</span> <span class="o">.</span> <span class="no">USERNAME</span><span class="vi">@DOMAIN</span><span class="o">.</span><span class="n">com</span><span class="ss">:/</span><span class="n">home</span><span class="o">/</span><span class="no">YOURPATH</span><span class="o">/</span>
+</code></pre></div>
+</p>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

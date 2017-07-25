@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Jvm | Josh Rendek]]></title>
+  <link href="http://joshrendek.com/categories/jvm/atom.xml" rel="self"/>
+  <link href="http://joshrendek.com/"/>
+  <updated>2016-12-15T16:05:34-05:00</updated>
+  <id>http://joshrendek.com/</id>
+  <author>
+    <name><![CDATA[Josh Rendek]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Sidekiq vs Resque, With MRI and JRuby]]></title>
+    <link href="http://joshrendek.com/2012/11/sidekiq-vs-resque/"/>
+    <updated>2012-11-03T19:51:00-04:00</updated>
+    <id>http://joshrendek.com/2012/11/sidekiq-vs-resque</id>
+    <content type="html"><![CDATA[<p>Before we dive into the benchmarks of Resque vs Sidekiq it will first help to have a better understanding of how forking and threading works in Ruby.</p>
+
+<h1>Threading vs Forking</h1>
+
+<h2>Forking</h2>
+
+<p>When you fork a process you are creating an entire copy of that process: the address space and all open file descriptors. You get a separate copy of the address space of the parent process, isolating any work done to that fork. If the forked child process does a lot of work and uses a lot of memory, when that child exits the memory gets free&rsquo;d back to the operating system. If your programming language (MRI Ruby) doesn&rsquo;t support actual kernel level threading, then this is the only way to spread work out across multiple cores since each process will get scheduled to a different core. You also gain some stability since if a child crashes the parent can just respawn a new fork, however there is a caveat. If the parent dies while there are children that haven&rsquo;t exited, then those children become zombies.</p>
+
+<h3>Forking and Ruby</h3>
+
+<p>One important note about forking with Ruby is that the maintainers have done a good job on keeping memory usage down when forking. Ruby implements a copy on write system for memory allocation with child forks.</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">benchmark</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;fork_pids = []&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="no">Lets</span> <span class="n">fill</span> <span class="n">up</span> <span class="n">some</span> <span class="n">memory</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;objs = {}</span>
+</span><span class='line'><span class="sr">objs[&amp;lsquo;test&amp;rsquo;] = []</span>
+</span><span class='line'><span class="sr">1_000_000.times do</span>
+</span><span class='line'><span class="sr">  objs[&amp;lsquo;test&amp;rsquo;] &amp;lt;&amp;lt; Object.new</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="mi">50</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">fork_pids</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Process</span><span class="o">.</span><span class="n">fork</span> <span class="k">do</span>
+</span><span class='line'>        <span class="nb">sleep</span> <span class="mi">0</span><span class="o">.</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="n">fork_pids</span><span class="o">.</span><span class="n">map</span><span class="p">{</span><span class="o">|</span><span class="nb">p</span><span class="o">|</span> <span class="no">Process</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="nb">p</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>We can see this in action here:</p>
+
+<p><img src="/images/showdown/copy_on_write.png"></p>
+
+<p>However when we start modifying memory inside the child forks, memory quickly grows.</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="mi">50</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">fork_pids</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Process</span><span class="o">.</span><span class="n">fork</span> <span class="k">do</span>
+</span><span class='line'>      <span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">objs</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="n">fork_pids</span><span class="o">.</span><span class="n">map</span><span class="p">{</span><span class="o">|</span><span class="nb">p</span><span class="o">|</span> <span class="no">Process</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="nb">p</span><span class="p">)</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>We&rsquo;re now creating a million new objects in each forked child:</p>
+
+<p><img src="/images/showdown/forced_copy_on_write.png"></p>
+
+<h2>Threading</h2>
+
+<p>Threads on the other hand have considerably less overhead since they share address space, memory, and allow easier communication (versus inter-process communication with forks). Context switching between threads inside the same process is also generally cheaper than scheduling switches between processes. Depending on the runtime being used, any issues that might occur using threads (for instance needing to use lots of memory for a task) can be handled by the garbage collector for the most part. One of the benefits of threading is that you do not have to worry about zombie processes since all threads die when the process dies, avoiding the issue of zombies.</p>
+
+<h2>Threading with Ruby</h2>
+
+<p>As of 1.9 the GIL (Global Interpreter Lock) is gone! But it&rsquo;s only been renamed to the GVL (Global VM Lock). The GVL in MRI ruby uses a lock called <code>rb_thread_lock_t</code> which is a mutex around when ruby code can be run. When no ruby objects are being touched, you can actually run ruby threads in parallel before the GVL kicks in again (ie: system level blocking call, IO blocking outside of ruby). After these blocking calls each thread checks the interrupt <code>RUBY_VM_CHECK_INTS</code>.</p>
+
+<p>With MRI ruby threads are pre-emptively scheduled using a function called <code>rb_thread_schedule</code> which schedules an &ldquo;interrupt&rdquo; that lets each thread get a fair amount of execution time (every 10 microseconds). <a href="http://svn.ruby-lang.org/cgi-bin/viewvc.cgi/trunk/thread.c?view=markup">[source: thread.c:1018]</a></p>
+
+<p>We can see an example of the GIL/GVL in action here:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">threads</span> <span class="o">=</span> <span class="o">[]&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;objs = []</span>
+</span><span class='line'><span class="sr">objs[&amp;lsquo;test&amp;rsquo;] = []</span>
+</span><span class='line'><span class="sr">1_000_000.times do</span>
+</span><span class='line'><span class="sr">  objs &amp;lt;&amp;lt; Object.new</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="mi">50</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span> <span class="o">|</span><span class="n">num</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">threads</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Thread</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span>
+</span><span class='line'>    <span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">objs</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;threads.map(&amp;amp;:join)</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Normally this would be an unsafe operation, but since the GIL/GVL exists we don&rsquo;t have to worry about two threads adding to the same ruby object at once since only one thread can run on the VM at once and it ends up being an atomic operation <em>(although don&rsquo;t rely on this quirk for thread safety, it definitely doesn&rsquo;t apply to any other VMs)</em>.</p>
+
+<p>Another important note is that the Ruby GC is doing a really horrible job during this benchmark.</p>
+
+<p><img src="/images/showdown/threading_leak.png"></p>
+
+<p>The memory kept growing so I had to kill the process after a few seconds.</p>
+
+<h2>Threading with JRuby on the JVM</h2>
+
+<p>JRuby specifies the use of native threads based on the operating system support using the <code>getNativeThread</code> call <a href="https://github.com/jruby/jruby/blob/master/src/org/jruby/RubyThread.java#L216">[2]</a>. JRuby&rsquo;s implementation of threads using the JVM means there is no GIL/GVL. This allows CPU bound processes to utilize all cores of a machine without having to deal with forking (which, in the case of resque, can be <em>very</em> expensive).</p>
+
+<p>When trying to execute the GIL safe code above JRuby spits out a concurrency error: <code>ConcurrencyError: Detected invalid array contents due to unsynchronized modifications with concurrent users</code></p>
+
+<p>We can either add a mutex around this code or modify it to not worry about concurrent access. I chose the latter:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">threads</span> <span class="o">=</span> <span class="o">[]&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;objs = {}</span>
+</span><span class='line'><span class="sr">objs[&amp;lsquo;test&amp;rsquo;] = []</span>
+</span><span class='line'><span class="sr">1_000_000.times do</span>
+</span><span class='line'><span class="sr">  objs[&amp;lsquo;test&amp;rsquo;] &amp;lt;&amp;lt; Object.new</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="mi">50</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span> <span class="o">|</span><span class="n">num</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">threads</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Thread</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span>
+</span><span class='line'>    <span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">objs</span><span class="o">[</span><span class="n">num</span><span class="o">]</span> <span class="o">=</span> <span class="o">[]</span> <span class="k">if</span> <span class="n">objs</span><span class="o">[</span><span class="n">num</span><span class="o">].</span><span class="n">nil?</span>
+</span><span class='line'>      <span class="n">objs</span><span class="o">[</span><span class="n">num</span><span class="o">]</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;threads.map(&amp;amp;:join)</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Compared to the MRI version, ruby running on the JVM was able to make some optimizations and keep memory usage around 800MB for the duration of the test:</p>
+
+<p><img src="/images/showdown/jvm_threading.png"></p>
+
+<p>Now that we have a better understanding of the differences between forking and threading in Ruby, lets move on to Sidekiq and Resque.</p>
+
+<h1>Sidekiq and Resque</h1>
+
+<h2>Resque&rsquo;s view of the world</h2>
+
+<p>Resque assumes chaos in your environment. It follows the forking model with C and ruby and makes a complete copy of each resque parent when a new job needs to be run. This has its advantages in preventing memory leaks, long running workers, and locking. You run into an issue with forking though when you need to increase the amount of workers on a machine. You end up not having enough spare CPU cycles since the majority are being taken up handling all the forking.</p>
+
+<p>Resque follows a simple fork and do work model, each worker will take a job off the queue and fork a new process to do the job.</p>
+
+<p><a href="https://github.com/defunkt/resque">Resque @ Github</a></p>
+
+<h2>Sidekiq&rsquo;s view of the world</h2>
+
+<p>Unlike Resque, Sidekiq uses threads and is extremely easy to use as a drop in replacement to Resque since they both work on the same <code>perform</code> method. When you dig into the results below you can see that Sidekiq&rsquo;s claim of being able to handle a larger number of workers and amount of work is true. Due to using threads and not having to allocate a new stack and address space for each fork, you get that overhead back and are able to do more work with a threaded model.</p>
+
+<p>Sidekiq follows the actor pattern. So compared to Resque which has N workers that fork, Sidekiq has an Actor manager, with N threads and one Fetcher actor which will pop jobs off Redis and hand them to the Manager. Sidekiq handles the &ldquo;chaos&rdquo; portion of Resque by catching all exceptions and bubbling them up to an exception handler such as Airbrake or Errbit.</p>
+
+<p>Now that we know how Sidekiq and Resque work we can get on to testing them and comparing the results.</p>
+
+<p><a href="https://github.com/mperham/sideki://github.com/mperham/sidekiq">Sidekiq @ Github</a></p>
+
+<h1>The Test Code</h1>
+
+<p>The idea behind the test was to pick a CPU bound processing task, in this case SHA256 and apply it across a set of 20 numbers, 150,000 times.</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">sidekiq</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span>
+</span><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">resque</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span>
+</span><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">digest</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;h1&gt;Running:&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">sidekiq</span> <span class="o">-</span><span class="n">r</span> <span class="o">.</span><span class="n">/por</span><span class="o">.</span><span class="n">rb</span> <span class="o">-</span><span class="n">c</span> <span class="mi">240</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;#&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">sidekiq</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;h1&gt;require &amp;lsquo;./</span><span class="n">por</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;h1&gt;queueing: 150_000.times { Sidekiq::Client.enqueue(POR, [rand(123098)]*20) }&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="ss">queueing</span><span class="p">:</span> <span class="mi">150_000</span><span class="o">.</span><span class="n">times</span> <span class="p">{</span> <span class="no">Resque</span><span class="o">.</span><span class="n">enqueue</span><span class="p">(</span><span class="no">POR</span><span class="p">,</span> <span class="o">[</span><span class="nb">rand</span><span class="p">(</span><span class="mi">123098</span><span class="p">)</span><span class="o">]*</span><span class="mi">20</span><span class="p">)</span> <span class="p">}</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;class POR</span>
+</span><span class='line'><span class="sr">  include Sidekiq::Worker&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="vi">@queue</span> <span class="o">=</span> <span class="ss">:por</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  def perform(arr)</span>
+</span><span class='line'><span class="sr">    arr.each do |a|</span>
+</span><span class='line'><span class="sr">      Digest::SHA2.new &amp;lt;&amp;lt; a.to_s</span>
+</span><span class='line'><span class="sr">    end</span>
+</span><span class='line'><span class="sr">  end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">perform</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">arr</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">a</span><span class="o">|</span>
+</span><span class='line'>      <span class="no">Digest</span><span class="o">::</span><span class="no">SHA2</span><span class="o">.</span><span class="n">new</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">a</span><span class="o">.</span><span class="n">to_s</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;end</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h1>Test Machine</h1>
+
+<pre><code>      Model Name: Mac Pro
+      Model Identifier: MacPro4,1
+      Processor Name: Quad-Core Intel Xeon
+      Processor Speed: 2.26 GHz
+      Number of Processors: 2
+      Total Number of Cores: 8
+      L2 Cache (per Core): 256 KB
+      L3 Cache (per Processor): 8 MB
+      Memory: 12 GB
+      Processor Interconnect Speed: 5.86 GT/s
+</code></pre>
+
+<p>This gives us a total of 16 cores to use for our testing. I&rsquo;m also using a <a href="http://www.amazon.com/gp/product/B004W2JKZI/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=B004W2JKZI&amp;linkCode=as2&amp;tag=josren-20">Crucial M4 SSD</a></p>
+
+<h1>Results</h1>
+
+<h2>Time to Process 150,000 sets of 20 numbers</h2>
+
+<p><img src="/images/showdown/time_to_process.png"></p>
+
+<center>
+<table width="100%" style="text-align: center;">
+<tr>
+<td><strong>Type</strong></td><td><strong>Time to Completion (seconds)</strong></td>
+</tr>
+<tr>
+<td>Sidekiq (JRuby) 150 Threads</td><td>88</td>
+</tr>
+<tr>
+<td>Sidekiq (JRuby) 240 Threads</td><td>89</td>
+</tr>
+<tr>
+<td>Sidekiq (JRuby) 50 Threads</td><td>91</td>
+</tr>
+<tr>
+<td>Sidekiq (MRI) 5x50</td><td>98</td>
+</tr>
+<tr>
+<td>Sidekiq (MRI) 3x50</td><td>120</td>
+</tr>
+<tr>
+<td>Sidekiq (MRI) 50</td><td>312</td>
+</tr>
+<tr>
+<td>Resque 50</td><td>396</td>
+</tr>
+</table>
+</center>
+
+
+
+
+<hr> 
+
+
+<h2>All about the CPU</h2>
+
+<h3>Resque: 50 workers</h3>
+
+<p><img src="/images/showdown/resque_50.png"></p>
+
+<p>Here we can see that the forking is taking its toll on the available CPU we have for processing. Roughly 50% of the CPU is being wasted on forking and scheduling those new processes. Resque took 396 seconds to finish and process 150,000 jobs.</p>
+
+<h3>Sidekiq (MRI) 1 process, 50 threads</h3>
+
+<p><img src="/images/showdown/mri_50.png"></p>
+
+<p>We&rsquo;re not fully utilizing the CPU. When running this test it pegged one CPU at 100% usage and kept it there for the duration of the test. We have a slight overhead with system CPU usage. Sidekiq took 312 seconds with 50 threads using MRI Ruby. Lets now take a look at doing things a bit resque-ish, and use multiple sidekiq processes to get more threads scheduled across multiple CPUs.</p>
+
+<h3>Sidekiq (MRI) 3 processes, 50 threads</h3>
+
+<p><img src="/images/showdown/mri_3x50.png"></p>
+
+<p>We&rsquo;re doing better. We&rsquo;ve cut our processing time roughly in third and we&rsquo;re utilizing more of our resources (CPUs). 3 Sidekiq processes with 50 threads each (for a total of 150 threads) took 120 seconds to complete 150,000 jobs.</p>
+
+<h3>Sidekiq (MRI) 5 processes, 50 threads</h3>
+
+<p><img src="/images/showdown/mri_5x50.png"></p>
+
+<p>As we keep adding more processes that get scheduled to different cores we&rsquo;re seeing the CPU usage go up even further, however with more processes comes more overhead for process scheduling (versus thread scheduling). We&rsquo;re still wasting CPU cycles, but we&rsquo;re completing 150,000 jobs in 98 seconds.</p>
+
+<h3>Sidekiq (JRuby) 50 threads</h3>
+
+<p><img src="/images/showdown/jruby_50.png"></p>
+
+<p>We&rsquo;re doing much better now with native threads. With 50 OS level threads, we&rsquo;re completing our set of jobs in 91 seconds.</p>
+
+<h3>Sidekiq (JRuby) 150 threads &amp; 240 Threads</h3>
+
+<p><img src="/images/showdown/jruby_150.png">
+<img src="/images/showdown/jruby_240.png"></p>
+
+<p>We&rsquo;re no longer seeing a increase in (much) CPU usage and only a slight decrease in processing time. As we keep adding more and more threads we end up running into some thread contention issues with accessing redis and how quickly we can pop things off the queue.</p>
+
+<h1>Overview</h1>
+
+<p>Even if we stick with the stock MRI ruby and go with Sidekiq, we&rsquo;re going to see a huge decrease in CPU usage while also gaining a little bit of performance as well.</p>
+
+<p>Sidekiq, overall, provides a cleaner, more object oriented interface (in my opinion) to inspecting jobs and what is going on in the processing queue.</p>
+
+<p>In Resque you would do something like: <code>Resque.size("queue_name")</code>. However, in Sidekiq you would take your class, in this case, <code>POR</code> and call <code>POR.jobs</code> to get the list of jobs for that worker queue. (note: you need to <code>require 'sidekiq/testing'</code> to get access to the jobs method).</p>
+
+<p>The only thing I find missing from Sidekiq that I enjoyed in Resque was the ability to inspect failed jobs in the web UI. However Sidekiq more than makes up for that with the ability to automatically retry failed jobs (although be careful you don&rsquo;t introduce race conditions and accidentally DOS yourself).</p>
+
+<p>And of course, JRuby comes out on top and gives us the best performance and bang for the buck (although your mileage may vary, depending on the task).</p>
+
+<h1>Further Reading</h1>
+
+<p><a href="http://www.amazon.com/gp/product/1934356972/ref=as_li_qf_sp_asin_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1934356972&linkCode=as2&tag=josren-20">Deploying with JRuby: Deliver Scalable Web Apps using the JVM (Pragmatic Programmers)</a><img src="http://www.assoc-amazon.com/e/ir?t=josren-20&l=as2&o=1&a=1934356972" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
+
+<p><a href="http://www.amazon.com/gp/product/B005SNJF28/ref=as_li_qf_sp_asin_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B005SNJF28&linkCode=as2&tag=josren-20">JRuby Cookbook</a><img src="http://www.assoc-amazon.com/e/ir?t=josren-20&l=as2&o=1&a=B005SNJF28" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
+
+<h1>Sidekiq &amp; Resque</h1>
+
+<p><a href="https://github.com/mperham/sidekiq">Sidekiq</a></p>
+
+<p><a href="https://github.com/defunkt/resque">Resque</a></p>
+]]></content>
+  </entry>
+  
+</feed>

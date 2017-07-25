@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Security Linux Ubuntu on Josh Rendek</title>
+    <link>https://joshrendek.com/categories/security-linux-ubuntu/</link>
+    <description>Recent content in Security Linux Ubuntu on Josh Rendek</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Copyright 2008-2017 Josh Rendek</copyright>
+    <lastBuildDate>Thu, 17 Jan 2013 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://joshrendek.com/categories/security-linux-ubuntu/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Securing Ubuntu</title>
+      <link>https://joshrendek.com/2013/01/securing-ubuntu/</link>
+      <pubDate>Thu, 17 Jan 2013 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2013/01/securing-ubuntu/</guid>
+      <description>Table of Contents Initial Setup Setting up iptables and Fail2Ban Fail2Ban iptables rules Make shared memory read-only Setting up Bastille Linux Configuring Bastille sysctl hardening Setting up a chroot environment Securing nginx inside the chroot Extras 
+Initial Setup Let&amp;rsquo;s login to our new machine and take some initial steps to secure our system. For this article I&amp;rsquo;m going to assume your username is ubuntu.
+If you need to, setup your sudoers file by adding the following lines to /etc/sudoers:</description>
+    </item>
+    
+  </channel>
+</rss>

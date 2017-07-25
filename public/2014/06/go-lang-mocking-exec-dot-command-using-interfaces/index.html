@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Go-lang: mocking exec.Command using interfaces" />
+<meta property="og:description" content="This is a short example showing how to use an interface to ease testing, and how to use an interface with running shell commands / other programs and providing mock output.
+ Source on Github 
+Here is our main file that actually runs the commands and prints out &ldquo;hello&rdquo;.
+1 package main 2  3 import ( 4 	&quot;fmt&quot; 5 	&quot;os/exec&quot; 6 ) 7  8 // first argument is the command, like cat or echo, 9 // the second is the list of args to pass to it 10 type Runner interface { 11 	Run(string, ." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2014/06/go-lang-mocking-exec-dot-command-using-interfaces/" />
+
+
+
+<meta property="article:published_time" content="2014-06-18T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2014-06-18T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Go-lang: mocking exec.Command using interfaces"/>
+<meta name="twitter:title" content="Go-lang: mocking exec.Command using interfaces"/>
+<meta name="twitter:description" content="This is a short example showing how to use an interface to ease testing, and how to use an interface with running shell commands / other programs and providing mock output.
+ Source on Github 
+Here is our main file that actually runs the commands and prints out &ldquo;hello&rdquo;.
+1 package main 2  3 import ( 4 	&quot;fmt&quot; 5 	&quot;os/exec&quot; 6 ) 7  8 // first argument is the command, like cat or echo, 9 // the second is the list of args to pass to it 10 type Runner interface { 11 	Run(string, ."/>
+
+
+
+
+<meta itemprop="name" content="Go-lang: mocking exec.Command using interfaces">
+<meta itemprop="description" content="This is a short example showing how to use an interface to ease testing, and how to use an interface with running shell commands / other programs and providing mock output.
+ Source on Github 
+Here is our main file that actually runs the commands and prints out &ldquo;hello&rdquo;.
+1 package main 2  3 import ( 4 	&quot;fmt&quot; 5 	&quot;os/exec&quot; 6 ) 7  8 // first argument is the command, like cat or echo, 9 // the second is the list of args to pass to it 10 type Runner interface { 11 	Run(string, .">
+
+
+<meta itemprop="dateModified" content="2014-06-18T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="417">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Go-lang: mocking exec.Command using interfaces 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Jun 18, 2014 - 2 minutes</div>
+      <h1 class="title"> Go-lang: mocking exec.Command using interfaces </h1>
+      <div class="content"> <p>This is a short example showing how to use an interface to ease testing, and how to use an interface with running shell commands / other programs and providing mock output.</p>
+
+<p><center>
+<a href="https://github.com/joshrendek/go-exec-mock-example">Source on Github</a>
+</center></p>
+
+<p>Here is our main file that actually runs the commands and prints out &ldquo;hello&rdquo;.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span></span><span class="lineno"> 1 </span><span class="kn">package</span> <span class="nx">main</span>
+<span class="lineno"> 2 </span>
+<span class="lineno"> 3 </span><span class="kn">import</span> <span class="p">(</span>
+<span class="lineno"> 4 </span>	<span class="s">&quot;fmt&quot;</span>
+<span class="lineno"> 5 </span>	<span class="s">&quot;os/exec&quot;</span>
+<span class="lineno"> 6 </span><span class="p">)</span>
+<span class="lineno"> 7 </span>
+<span class="lineno"> 8 </span><span class="c1">// first argument is the command, like cat or echo,</span>
+<span class="lineno"> 9 </span><span class="c1">// the second is the list of args to pass to it</span>
+<span class="lineno">10 </span><span class="kd">type</span> <span class="nx">Runner</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="lineno">11 </span>	<span class="nx">Run</span><span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+<span class="lineno">12 </span><span class="p">}</span>
+<span class="lineno">13 </span>
+<span class="lineno">14 </span><span class="kd">type</span> <span class="nx">RealRunner</span> <span class="kd">struct</span><span class="p">{}</span>
+<span class="lineno">15 </span>
+<span class="lineno">16 </span><span class="kd">var</span> <span class="nx">runner</span> <span class="nx">Runner</span>
+<span class="lineno">17 </span>
+<span class="lineno">18 </span><span class="c1">// the real runner for the actual program, actually execs the command</span>
+<span class="lineno">19 </span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="nx">RealRunner</span><span class="p">)</span> <span class="nx">Run</span><span class="p">(</span><span class="nx">command</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">args</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">20 </span>	<span class="nx">out</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">exec</span><span class="p">.</span><span class="nx">Command</span><span class="p">(</span><span class="nx">command</span><span class="p">,</span> <span class="nx">args</span><span class="o">...</span><span class="p">).</span><span class="nx">CombinedOutput</span><span class="p">()</span>
+<span class="lineno">21 </span>	<span class="k">return</span> <span class="nx">out</span><span class="p">,</span> <span class="nx">err</span>
+<span class="lineno">22 </span><span class="p">}</span>
+<span class="lineno">23 </span>
+<span class="lineno">24 </span><span class="kd">func</span> <span class="nx">Hello</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+<span class="lineno">25 </span>	<span class="nx">out</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">runner</span><span class="p">.</span><span class="nx">Run</span><span class="p">(</span><span class="s">&quot;echo&quot;</span><span class="p">,</span> <span class="s">&quot;hello&quot;</span><span class="p">)</span>
+<span class="lineno">26 </span>	<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="lineno">27 </span>		<span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+<span class="lineno">28 </span>	<span class="p">}</span>
+<span class="lineno">29 </span>	<span class="k">return</span> <span class="nb">string</span><span class="p">(</span><span class="nx">out</span><span class="p">)</span>
+<span class="lineno">30 </span><span class="p">}</span>
+<span class="lineno">31 </span>
+<span class="lineno">32 </span><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="lineno">33 </span>	<span class="nx">runner</span> <span class="p">=</span> <span class="nx">RealRunner</span><span class="p">{}</span>
+<span class="lineno">34 </span>	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">Hello</span><span class="p">())</span>
+<span class="lineno">35 </span><span class="p">}</span>
+</code></pre></div>
+
+
+<p>Here is our test file. We start by defining our <code>TestRunner</code> type and implementing the <code>Run(...)</code> interface for it.</p>
+
+<p>This function builds up a command to run the current test file and run the <code>TestHelperProcess</code> function passing along all the args you originally sent. This lets you do things like return different output for different commands you want to run.</p>
+
+<p>The <code>TestHelperProcess</code> function exits when run in the context of the test file, but runs when specified in the files arguments.</p>
+
+<p><div class="highlight"><pre><code class="language-go" data-lang="go"><span></span><span class="lineno"> 1 </span><span class="kn">package</span> <span class="nx">main</span>
+<span class="lineno"> 2 </span>
+<span class="lineno"> 3 </span><span class="kn">import</span> <span class="p">(</span>
+<span class="lineno"> 4 </span>	<span class="s">&quot;fmt&quot;</span>
+<span class="lineno"> 5 </span>	<span class="s">&quot;os&quot;</span>
+<span class="lineno"> 6 </span>	<span class="s">&quot;os/exec&quot;</span>
+<span class="lineno"> 7 </span>	<span class="s">&quot;testing&quot;</span>
+<span class="lineno"> 8 </span><span class="p">)</span>
+<span class="lineno"> 9 </span>
+<span class="lineno">10 </span><span class="kd">type</span> <span class="nx">TestRunner</span> <span class="kd">struct</span><span class="p">{}</span>
+<span class="lineno">11 </span>
+<span class="lineno">12 </span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="nx">TestRunner</span><span class="p">)</span> <span class="nx">Run</span><span class="p">(</span><span class="nx">command</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">args</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">13 </span>	<span class="nx">cs</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;-test.run=TestHelperProcess&quot;</span><span class="p">,</span> <span class="s">&quot;--&quot;</span><span class="p">}</span>
+<span class="lineno">14 </span>	<span class="nx">cs</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">cs</span><span class="p">,</span> <span class="nx">args</span><span class="o">...</span><span class="p">)</span>
+<span class="lineno">15 </span>	<span class="nx">cmd</span> <span class="o">:=</span> <span class="nx">exec</span><span class="p">.</span><span class="nx">Command</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">cs</span><span class="o">...</span><span class="p">)</span>
+<span class="lineno">16 </span>	<span class="nx">cmd</span><span class="p">.</span><span class="nx">Env</span> <span class="p">=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;GO_WANT_HELPER_PROCESS=1&quot;</span><span class="p">}</span>
+<span class="lineno">17 </span>	<span class="nx">out</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">cmd</span><span class="p">.</span><span class="nx">CombinedOutput</span><span class="p">()</span>
+<span class="lineno">18 </span>	<span class="k">return</span> <span class="nx">out</span><span class="p">,</span> <span class="nx">err</span>
+<span class="lineno">19 </span><span class="p">}</span>
+<span class="lineno">20 </span>
+<span class="lineno">21 </span><span class="kd">func</span> <span class="nx">TestHello</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">22 </span>	<span class="nx">runner</span> <span class="p">=</span> <span class="nx">TestRunner</span><span class="p">{}</span>
+<span class="lineno">23 </span>	<span class="nx">out</span> <span class="o">:=</span> <span class="nx">Hello</span><span class="p">()</span>
+<span class="lineno">24 </span>	<span class="k">if</span> <span class="nx">out</span> <span class="o">==</span> <span class="s">&quot;testing helper process&quot;</span> <span class="p">{</span>
+<span class="lineno">25 </span>		<span class="nx">t</span><span class="p">.</span><span class="nx">Logf</span><span class="p">(</span><span class="s">&quot;out was eq to %s&quot;</span><span class="p">,</span> <span class="nb">string</span><span class="p">(</span><span class="nx">out</span><span class="p">))</span>
+<span class="lineno">26 </span>	<span class="p">}</span>
+<span class="lineno">27 </span><span class="p">}</span>
+<span class="lineno">28 </span>
+<span class="lineno">29 </span><span class="kd">func</span> <span class="nx">TestHelperProcess</span><span class="p">(</span><span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+<span class="lineno">30 </span>	<span class="k">if</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Getenv</span><span class="p">(</span><span class="s">&quot;GO_WANT_HELPER_PROCESS&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&quot;1&quot;</span> <span class="p">{</span>
+<span class="lineno">31 </span>		<span class="k">return</span>
+<span class="lineno">32 </span>	<span class="p">}</span>
+<span class="lineno">33 </span>	<span class="k">defer</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="lineno">34 </span>	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;testing helper process&quot;</span><span class="p">)</span>
+<span class="lineno">35 </span><span class="p">}</span>
+</code></pre></div>
+</p>
+
+<p>Hopefully this helps someone else! I had a hard time finding some good, short examples on the internet that combined both interfaces and mocking like this.</p>
+
+<p><center>
+<a href="http://golang.org/src/pkg/os/exec/exec_test.go">More examples from os/exec/exec_test.go</a>
+</center></p>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

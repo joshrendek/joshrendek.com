@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Josh Rendek" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://joshrendek.com/" />
+
+
+
+<meta property="og:updated_time" content="2008-09-05T11:34:26&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Josh Rendek">
+<meta itemprop="description" content="">
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+    Josh Rendek
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item active" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    
+    
+    <article class="post">
+      <div class="date"> Sep 5, 2008 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2008/09/centos-w/out-yum/'> CentOS w/out Yum</a> </h1>
+      <div class="content"> 
+
+<p>Took me about 20 minutes to figure out why this wasn&rsquo;t working when installing yum:</p>
+
+<p>After you follow the instructions atÂ <a href="http://wiki.centos.org/TipsAndTricks/BrokenVserver">http://wiki.centos.org/TipsAndTricks/BrokenVserver</a>
+You get to the part where your trying to install rpm-python. This doesn&rsquo;t work quite as you&rsquo;d hoped.Â</p>
+
+<p>Error:
+<pre></p>
+
+<h1 id="rpm-uvh-rpm-python-4-4-2-48-el5-i386-rpm">rpm -Uvh rpm-python-4.4.2-48.el5.i386.rpm</h1>
+
+<p>warning: rpm-python-4.4.2-48.el5.i386.rpm: Header V3 DSA signature: NOKEY, key ID e8562897</p>
+
+<p>error: Failed dependencies:</p>
+
+<p>Â Â  Â  Â  Â rpm = 4.4.2-48.el5 is needed by rpm-python-4.4.2-48.el5.i386</p>
+
+<p></pre></p>
+
+<p>So clear all the other RPM&rsquo;s you installed, download these three from the repository (varies if your using 64 bit or i386)</p>
+
+<p>rpm-4.4.2-48.el5.i386.rpm Â  Â  Â  rpm-python-4.4.2-48.el5.i386.rpm</p>
+
+<p>rpm-libs-4.4.2-48.el5.i386.rpm Â</p>
+
+<p>Make sure all these are present then run:
+<pre>rpm -Uvh *.rpm</pre></p>
+
+<p>Â This will install the libs and the RPM update at the same time so the error isn&rsquo;t thrown.</pre></p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Sep 4, 2008 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2008/09/sar-command/'> sar command</a> </h1>
+      <div class="content"> 
+
+<p>I&rsquo;m always trying to find a good method of monitoring system performance and logging it, but today I ran into a rather strange issue that I couldn&rsquo;t find on google.</p>
+
+<p>sar 0 was returning high idle percentages:
+<pre></p>
+
+<h1 id="sar-u-0">sar -u 0</h1>
+
+<p>08:17:29 AM Â  Â  Â  CPU Â  Â  %user Â  Â  %nice Â  %system Â  %iowait Â  Â  %idle</p>
+
+<p>08:17:29 AM Â  Â  Â  all Â  Â  18.11 Â  Â  Â 0.01 Â  Â  11.66 Â  Â  70.22 Â  Â 3549.42
+<div>running top didn&rsquo;t produce 3.5k % idle and in fact the system was nearly 98% idle.Â </div>
+<div>The quick fix is to simply run</div>
+<div></div>
+<pre>yum update sysstat</pre>
+<div>That fixed the problem immediately on the box I was using.</div>
+<div></div>
+<div>Hope this helps someone else.</div></pre></p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Aug 31, 2008 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2008/08/new-design/'> New Design</a> </h1>
+      <div class="content"> <p>Made a fresh look for BlueScripts, hope it&rsquo;s a bit easier on the eyes now.</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Aug 27, 2008 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2008/08/bluebug-demo/'> BlueBug Demo</a> </h1>
+      <div class="content"> <p>BlueBug demo site:</p>
+
+<p><a href="http://bb.bluescripts.net/">http://bb.bluescripts.net/</a></p>
+
+<p>Let me know what you think by leaving a rating!</p>
+
+<table width="250" border="1" cellpadding="4" cellspacing="0" bordercolor="#840300" bgcolor="#D70500"><form action="http://www.hotscripts.com/rate/82573.html" method="POST">
+<tr>
+<td>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td><strong><font color="#FFFFFF">If you like our
+script, please rate it!</font></strong>
+<input type="hidden" name="external" value="1"></td>
+</tr>
+<tr>
+<td><select name="rate" size="1">
+<option value="5" selected>Excellent!</option>
+<option value="4">Very Good</option>
+<option value="3">Good</option>
+
+<option value="2">Fair</option>
+<option value="1">Poor</option>
+</select>
+<input name="submit" type="submit" value="Cast My Vote!"> </td>
+
+</tr>
+</table></td>
+</tr></form>
+</table>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Aug 3, 2008 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2008/08/bluebug-almost-ready-for-release/'> BlueBug almost ready for release</a> </h1>
+      <div class="content"> <p>I will be finishing up the admin functions and installation scripts for a new bug reporting system called BlueBug the next few days that will be open source and free, look forward to it!</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Jul 29, 2008 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2008/07/sketches/'> Sketches</a> </h1>
+      <div class="content"> <p>Got my new Intuos drawing tablet (the bamboo one) and didÂ  a few sketches:</p>
+
+<p><a href="http://bluescripts.net/wp-content/uploads/2008/07/cat.jpg"><img class="alignnone size-medium wp-image-28" title="cat" src="http://bluescripts.net/wp-content/uploads/2008/07/cat-300x199.jpg" alt="" width="300" height="199" /></a><a href="http://bluescripts.net/wp-content/uploads/2008/07/ale.jpg"><img class="alignnone size-medium wp-image-29" title="ale" src="http://bluescripts.net/wp-content/uploads/2008/07/ale-276x300.jpg" alt="" width="276" height="300" /></a></p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Jul 29, 2008 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2008/07/ifconfig--netmasks/'> ifconfig &amp; Netmasks</a> </h1>
+      <div class="content"> <div class="entry">
+
+Whenever moving IPs around on servers I always find myself looking up the hex for a netmask.
+
+Ever run into this
+<pre class="highlightcode">$ ifconfig
+
+inet xxxxxxxxxxx netmask 0xfffffff0 broadcast xxxxxxxxxxxxxx</pre>
+And need to know what the fffffff0 was for Here it is:
+<table border="1" cellspacing="5" cellpadding="3">
+<tbody>
+<tr>
+<td align="middle"><strong>Dotted
+Decimal</strong></td>
+<td align="middle"><strong>Hex</strong></td>
+<td align="middle"><strong>Number of
+Addresses</strong></td>
+</tr>
+<tr>
+<td align="middle">255.0.0.0</td>
+<td align="middle">FF000000</td>
+<td align="middle">16777214 (16777216-2)</td>
+</tr>
+<tr>
+<td align="middle">255.255.0.0</td>
+<td align="middle">FFFF0000</td>
+<td align="middle">65534 (65536-2)</td>
+</tr>
+<tr>
+<td align="middle">255.255.255.0</td>
+<td align="middle">FFFFFF00</td>
+<td align="middle">254 (256-2)</td>
+</tr>
+<tr>
+<td align="middle">255.255.255.128</td>
+<td align="middle">FFFFFF80</td>
+<td align="middle">126 (128-2)</td>
+</tr>
+<tr>
+<td align="middle">255.255.255.192</td>
+<td align="middle">FFFFFFC0</td>
+<td align="middle">62 (64-2)</td>
+</tr>
+<tr>
+<td align="middle">255.255.255.224</td>
+<td align="middle">FFFFFFE0</td>
+<td align="middle">30 (32-2)</td>
+</tr>
+<tr>
+<td align="middle">255.255.255.240</td>
+<td align="middle">FFFFFFF0</td>
+<td align="middle">14 (16-2)</td>
+</tr>
+<tr>
+<td align="middle">255.255.255.248</td>
+<td align="middle">FFFFFFF8</td>
+<td align="middle">6 (8-2)</td>
+</tr>
+<tr>
+<td align="middle"><span style="color: #808080;">255.255.255.252 *</span></td>
+<td align="middle"><span style="color: #808080;">FFFFFFFC *</span></td>
+<td align="middle"><span style="color: #808080;">2 (4-2) *</span></td>
+</tr>
+</tbody></table>
+</div>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Jul 28, 2008 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2008/07/php-easy-timezone-set/'> PHP easy timezone set</a> </h1>
+      <div class="content"> <p>Here is a quick way to set a timezone:</p>
+
+<p><span style="font-family: courier,monospace;"> <php putenv('TZ=America/New_York'); ></span></p>
+
+<p>A list of timezones for php: <a href="http://www.theprojects.org/dev/zone.txt" target="_blank"><a href="http://www.theprojects.org/dev/zone.txt">http://www.theprojects.org/dev/zone.txt</a></a></p>
+
+<p>To get the timezones into a file quickly:</p>
+
+<p>wget <a href="http://www.theprojects.org/dev/zone.txt">http://www.theprojects.org/dev/zone.txt</a></p>
+
+<p>cat zone.txt | awk &lsquo;{ print $3}&rsquo; &gt;&gt; timezones.txt</p>
+
+<p>Remove the first few lines and you have an easily read file that you can make a selection box out of.</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Jul 28, 2008 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2008/07/welcome/'> Welcome</a> </h1>
+      <div class="content"> <p>Updated the blog again with a new design and decided to re-do a bunch of my portfolio as it was a bit unorganized. More to come!</p>
+ </div>
+    </article>
+    
+  </div>
+
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+
+<div class="page-nav">
+  <div class="page-prev">
+    
+        <a href="/page/11/" title="Previous page" > &lt;&lt; </a>
+    
+  </div>
+
+  <div class="page-num">
+    12/12
+  </div>
+
+  <div class="page-next">
+    
+  </div>
+</div> 
+
+
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

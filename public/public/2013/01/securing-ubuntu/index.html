@@ -1,0 +1,987 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Securing Ubuntu - Josh Rendek</title>
+  <meta name="author" content="Josh Rendek">
+
+  
+  <meta name="description" content="Table of Contents Initial Setup Setting up iptables and Fail2Ban Fail2Ban iptables rules Make shared memory read-only Setting up Bastille Linux &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://joshrendek.com/2013/01/securing-ubuntu">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Josh Rendek" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3754808-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">
+      <span class="blue-brace">{</span>Josh Rendek<span class="blue-brace">}</span>
+  </a></h1>
+  
+  <div class="subtitle">
+  <h2>
+    <span class="heart"><3</span> Ruby &amp; Go
+  </h2>
+  </div>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:joshrendek.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects/">Projects</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://devopsbyvideo.com/">Screen Casts</a></li>
+  <li><a href="/categories">Categories</a></li>
+  <li><a href="/resume/">Resumé</a></li>
+  <li><a href="/about/">About</a></li>
+  <li><a href="https://github.com/joshrendek">Github</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Securing Ubuntu</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-17T20:25:00-05:00" pubdate data-updated="true">Jan 17<sup>th</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Table of Contents</h2>
+
+<h4><a href="#initial_setup">Initial Setup</a></h4>
+
+<h4><a href="#iptables_fail2ban">Setting up iptables and Fail2Ban</a></h4>
+
+<h5><span style='padding-left: 20px;'></span><a href="#fail2ban">Fail2Ban</a></h5>
+
+<h5><span style='padding-left: 20px;'></span><a href="#iptables_rules">iptables rules</a></h5>
+
+<h4><a href="#shared_memory">Make shared memory read-only</a></h4>
+
+<h4><a href="#bastille">Setting up Bastille Linux</a></h4>
+
+<h5><span style='padding-left: 20px;'></span><a href="#bastille_config">Configuring Bastille</a></h5>
+
+<h4><a href="#sysctl">sysctl hardening</a></h4>
+
+<h4><a href="#chroot">Setting up a chroot environment</a></h4>
+
+<h4><a href="#nginx">Securing nginx inside the chroot</a></h4>
+
+<h4><a href="#extras">Extras</a></h4>
+
+<p><a name="initial_setup"></a></p>
+
+<h2>Initial Setup</h2>
+
+<p>Let&rsquo;s login to our new machine and take some initial steps to secure our system. For this article I&rsquo;m going to assume your username is <code>ubuntu</code>.</p>
+
+<p>If you need to, setup your sudoers file by adding the following lines:</p>
+
+<figure class='code'><figcaption><span>/etc/sudoers</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ubuntu <span class="nv">ALL</span><span class="o">=(</span>ALL:ALL<span class="o">)</span> ALL <span class="c"># put this in the &quot;User privilege specification&quot; section</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Edit your <code>~/.ssh/authorized_keys</code> and put your public key inside it. Make sure you can login without a password now once your key is in place.</p>
+
+<p>Open up <code>/etc/ssh/sshd_config</code> and make sure these lines exist to secure SSH:</p>
+
+<figure class='code'><figcaption><span>/etc/ssh/sshd_config</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Only allow version 2 communications, version 1 has known vulnerabilities</span>
+</span><span class='line'>Protocol 2
+</span><span class='line'><span class="c"># Disable root login over ssh</span>
+</span><span class='line'>PermitRootLogin no
+</span><span class='line'><span class="c"># Load authorized keys files from a users home directory</span>
+</span><span class='line'>AuthorizedKeysFile  %h/.ssh/authorized_keys
+</span><span class='line'><span class="c"># Don&#39;t allow empty passwords to be used to authenticate</span>
+</span><span class='line'>PermitEmptyPasswords no
+</span><span class='line'><span class="c"># Disable password auth, you must use ssh keys</span>
+</span><span class='line'>PasswordAuthentication no
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Keep your current session open and restart sshd:</p>
+
+<figure class='code'><figcaption><span>/etc/ssh/sshd_config</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo service ssh restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Make sure you can login from another terminal. If you can, move on.</p>
+
+<p>Now we need to update and upgrade to make sure all of our packages are up to date and install two pre-requisites for later in the article: build-essential and ntp.</p>
+
+<figure class='code'><figcaption><span>apt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get update
+</span><span class='line'>sudo apt-get install build-essential ntp
+</span><span class='line'>sudo apt-get upgrade
+</span><span class='line'>sudo reboot
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="iptables_fail2ban"></a></p>
+
+<h2>Setting up iptables and Fail2Ban</h2>
+
+<p><a name="fail2ban"></a></p>
+
+<h3>Fail2Ban</h3>
+
+<figure class='code'><figcaption><span>apt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get install fail2ban
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Open up the fail2ban config and change the ban time, destemail, and maxretry:</p>
+
+<figure class='code'><figcaption><span>/etc/fail2ban/jail.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>DEFAULT<span class="o">]</span>
+</span><span class='line'><span class="nv">ignoreip</span> <span class="o">=</span> 127.0.0.1/8
+</span><span class='line'><span class="nv">bantime</span>  <span class="o">=</span> 3600
+</span><span class='line'><span class="nv">maxretry</span> <span class="o">=</span> 2
+</span><span class='line'><span class="nv">destemail</span> <span class="o">=</span> ubuntu@yourdomain.com
+</span><span class='line'><span class="nv">action</span> <span class="o">=</span> %<span class="o">(</span>action_mw<span class="o">)</span>s
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>ssh<span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">enabled</span>  <span class="o">=</span> <span class="nb">true</span>
+</span><span class='line'><span class="nv">port</span>     <span class="o">=</span> ssh
+</span><span class='line'><span class="nv">filter</span>   <span class="o">=</span> sshd
+</span><span class='line'><span class="nv">logpath</span>  <span class="o">=</span> /var/log/auth.log
+</span><span class='line'><span class="nv">maxretry</span> <span class="o">=</span> 2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now restart fail2ban.</p>
+
+<figure class='code'><figcaption><span>/etc/fail2ban/jail.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo service fail2ban restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you try and login from another machine and fail, you should see the ip in iptables.</p>
+
+<figure class='code'><figcaption><span>/etc/fail2ban/jail.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># sudo iptables -L</span>
+</span><span class='line'>Chain fail2ban-ssh <span class="o">(</span>1 references<span class="o">)</span>
+</span><span class='line'>target     prot opt <span class="nb">source               </span>destination
+</span><span class='line'>DROP       all  --  li203-XX.members.linode.com  anywhere
+</span><span class='line'>RETURN     all  --  anywhere             anywhere
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="iptables_rules"></a></p>
+
+<h3>iptables Rules</h3>
+
+<p>Here are my default iptables rules, it opens up port 80 and 443 for HTTP/HTTPS communication, and allows port 22.
+We also allow ping and then log all denied calls and then reject everything else. If you have other services you need to run, such as a game server or something else, you&rsquo;ll have to add the rules to open up the ports in the iptables config.</p>
+
+<figure class='code'><figcaption><span>/etc/iptables.up.rules </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>*filter
+</span><span class='line'>
+</span><span class='line'># Accepts all established inbound connections
+</span><span class='line'> -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+</span><span class='line'>
+</span><span class='line'># Allows all outbound traffic
+</span><span class='line'># You could modify this to only allow certain traffic
+</span><span class='line'> -A OUTPUT -j ACCEPT
+</span><span class='line'>
+</span><span class='line'># Allows HTTP and HTTPS connections from anywhere (the normal ports for websites)
+</span><span class='line'> -A INPUT -p tcp --dport 443 -j ACCEPT
+</span><span class='line'> -A INPUT -p tcp --dport 80 -j ACCEPT
+</span><span class='line'># Allows SSH connections for script kiddies
+</span><span class='line'># THE -dport NUMBER IS THE SAME ONE YOU SET UP IN THE SSHD_CONFIG FILE
+</span><span class='line'> -A INPUT -p tcp -m state --state NEW --dport 22 -j ACCEPT
+</span><span class='line'>
+</span><span class='line'># Now you should read up on iptables rules and consider whether ssh access
+</span><span class='line'># for everyone is really desired. Most likely you will only allow access from certain IPs.
+</span><span class='line'>
+</span><span class='line'># Allow ping
+</span><span class='line'> -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
+</span><span class='line'>
+</span><span class='line'># log iptables denied calls (access via &#39;dmesg&#39; command)
+</span><span class='line'> -A INPUT -m limit --limit 5/min -j LOG --log-prefix &quot;iptables denied: &quot; --log-level 7
+</span><span class='line'>
+</span><span class='line'># Reject all other inbound - default deny unless explicitly allowed policy:
+</span><span class='line'> -A INPUT -j REJECT
+</span><span class='line'> -A FORWARD -j REJECT
+</span><span class='line'>
+</span><span class='line'>COMMIT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can load that up into iptables:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo iptables-restore &lt; /etc/iptables.up.rules
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Make sure it loads on boot by putting it into the if-up scripts:</p>
+
+<figure class='code'><figcaption><span>/etc/network/if-up.d/iptables</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'>iptables-restore /etc/iptables.up.rules
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now make it executable:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chmod +x /etc/network/if-up.d/iptables
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Rebooting here is optional, I usually reboot after major changes to make sure everything boots up properly.</p>
+
+<p>If you&rsquo;re getting hit by scanners or brute-force attacks, you&rsquo;ll see a line similar to this in your <code>/var/log/syslog</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Jan 18 03:30:37 localhost kernel: <span class="o">[</span>   79.631680<span class="o">]</span> iptables denied: <span class="nv">IN</span><span class="o">=</span>eth0 <span class="nv">OUT</span><span class="o">=</span> <span class="nv">MAC</span><span class="o">=</span>04:01:01:40:70:01:00:12:f2:c6:e8:00:08:00 <span class="nv">SRC</span><span class="o">=</span>87.13.110.30 <span class="nv">DST</span><span class="o">=</span>192.34.XX.XX <span class="nv">LEN</span><span class="o">=</span>64 <span class="nv">TOS</span><span class="o">=</span>0x00 <span class="nv">PREC</span><span class="o">=</span>0x00 <span class="nv">TTL</span><span class="o">=</span>34 <span class="nv">ID</span><span class="o">=</span>57021 DF <span class="nv">PROTO</span><span class="o">=</span>TCP <span class="nv">SPT</span><span class="o">=</span>1253 <span class="nv">DPT</span><span class="o">=</span>135 <span class="nv">WINDOW</span><span class="o">=</span>53760 <span class="nv">RES</span><span class="o">=</span>0x00 SYN <span class="nv">URGP</span><span class="o">=</span>0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="shared_memory"></a></p>
+
+<h2>Read only shared memory</h2>
+
+<p>A common exploit vector is going through shared memory (which can let you change the UID of running programs and other malicious actions). It can also be used as a place to drop files once an initial breakin has been made. An example of one such exploit is available <a href="http://www.juniper.net/security/auto/vulnerabilities/vuln17587.html">here</a>.</p>
+
+<p>Open <code>/etc/fstab/</code>:</p>
+
+<figure class='code'><figcaption><span>/etc/fstab </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tmpfs     /dev/shm     tmpfs     defaults,ro     0     0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once you do this you need to reboot.</p>
+
+<p><a name="bastille"></a></p>
+
+<h2>Setting up Bastille Linux</h2>
+
+<blockquote><p>The Bastille Hardening program &#8220;locks down&#8221; an operating system, proactively configuring the system for increased security and decreasing its susceptibility to compromise. Bastille can also assess a system&#8217;s current state of hardening, granularly reporting on each of the security settings with which it works.</p><footer><strong>Bastille Linux</strong> <cite><a href='http://bastille-linux.sourceforge.net/'>bastille-linux.sourceforge.net/&hellip;</a></cite></footer></blockquote>
+
+
+
+
+<figure class='code'><figcaption><span>Bastille: Installation and Setup</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get install bastille <span class="c"># choose Internet site for postfix</span>
+</span><span class='line'><span class="c"># configure bastille</span>
+</span><span class='line'>sudo bastille
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After you run that command you&rsquo;ll be prompted to configure your system, here are the options I chose:</p>
+
+<p><a name="bastille_config"></a></p>
+
+<h3>Configuring Bastille</h3>
+
+<ul>
+<li>File permissions module: Yes (suid)</li>
+<li>Disable SUID for mount/umount: Yes</li>
+<li>Disable SUID on ping: Yes</li>
+<li>Disable clear-text r-protocols that use IP-based authentication? Yes</li>
+<li>Enforce password aging? No (situation dependent, I have no users accessing my machines except me, and I only allow ssh keys)</li>
+<li>Default umask: Yes</li>
+<li>Umask: 077</li>
+<li>Disable root login on tty&rsquo;s 1-6: No</li>
+<li>Password protect GRUB prompt: No (situation dependent, I&rsquo;m on a VPS and would like to get support in case I need it)</li>
+<li>Password protect su mode: Yes</li>
+<li>default-deny on tcp-wrappers and xinetd? No</li>
+<li>Ensure telnet doesn&rsquo;t run? Yes</li>
+<li>Ensure FTP does not run? Yes</li>
+<li>display authorized use message? No (situation dependent, if you had other users, Yes)</li>
+<li>Put limits on system resource usage? Yes</li>
+<li>Restrict console access to group of users? Yes (then choose root)</li>
+<li>Add additional logging? Yes</li>
+<li>Setup remote logging if you have a remote log host, I don&rsquo;t so I answered No</li>
+<li>Setup process accounting? Yes</li>
+<li>Disable acpid? Yes</li>
+<li>Deactivate nfs + samba? Yes (situation dependent)</li>
+<li>Stop sendmail from running in daemon mode? No (I have this firewalled off, so I&rsquo;m not concerned)</li>
+<li>Deactivate apache? Yes</li>
+<li>Disable printing? Yes</li>
+<li>TMPDIR/TMP scripts? No (if a multi-user system, yes)</li>
+<li>Packet filtering script? No (we configured the firewall previously)</li>
+<li>Finished? YES! &amp; reboot</li>
+</ul>
+
+
+<p>You can verify some of these changes by testing them out, for instance, the SUID change on ping:</p>
+
+<figure class='code'><figcaption><span>Bastille: Verifying changes</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ubuntu@app1:~<span class="nv">$ </span>ping google.com
+</span><span class='line'>ping: icmp open socket: Operation not permitted
+</span><span class='line'>ubuntu@app1:~<span class="nv">$ </span>sudo ping google.com
+</span><span class='line'>PING google.com <span class="o">(</span>74.125.228.72<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+</span><span class='line'>64 bytes from iad23s07-in-f8.1e100.net <span class="o">(</span>74.125.228.72<span class="o">)</span>: <span class="nv">icmp_req</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>55 <span class="nb">time</span><span class="o">=</span>9.06 ms
+</span><span class='line'>^C
+</span><span class='line'>--- google.com ping statistics ---
+</span><span class='line'>1 packets transmitted, 1 received, 0% packet loss, <span class="nb">time </span>0ms
+</span><span class='line'>rtt min/avg/max/mdev <span class="o">=</span> 9.067/9.067/9.067/0.000 ms
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="sysctl"></a></p>
+
+<h2>Sysctl hardening</h2>
+
+<p>Since our machine isn&rsquo;t running as a router and is going to be running as an application/web server, there are additional
+steps we can take to secure the machine. Many of these are from the NSA&rsquo;s security guide, which you can read in its entirety
+<a href="http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf">here</a>.</p>
+
+<figure class='code'><figcaption><span>/etc/sysctl.conf</span><a href='http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf'>Source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Protect ICMP attacks</span>
+</span><span class='line'>net.ipv4.icmp_echo_ignore_broadcasts <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Turn on protection for bad icmp error messages</span>
+</span><span class='line'>net.ipv4.icmp_ignore_bogus_error_responses <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Turn on syncookies for SYN flood attack protection</span>
+</span><span class='line'>net.ipv4.tcp_syncookies <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Log suspcicious packets, such as spoofed, source-routed, and redirect</span>
+</span><span class='line'>net.ipv4.conf.all.log_martians <span class="o">=</span> 1
+</span><span class='line'>net.ipv4.conf.default.log_martians <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Disables these ipv4 features, not very legitimate uses</span>
+</span><span class='line'>net.ipv4.conf.all.accept_source_route <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.default.accept_source_route <span class="o">=</span> 0
+</span><span class='line'>
+</span><span class='line'><span class="c"># Enables RFC-reccomended source validation (dont use on a router)</span>
+</span><span class='line'>net.ipv4.conf.all.rp_filter <span class="o">=</span> 1
+</span><span class='line'>net.ipv4.conf.default.rp_filter <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Make sure no one can alter the routing tables</span>
+</span><span class='line'>net.ipv4.conf.all.accept_redirects <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.default.accept_redirects <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.all.secure_redirects <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.default.secure_redirects <span class="o">=</span> 0
+</span><span class='line'>
+</span><span class='line'><span class="c"># Host only (we&#39;re not a router)</span>
+</span><span class='line'>net.ipv4.ip_forward <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.all.send_redirects <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.default.send_redirects <span class="o">=</span> 0
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Turn on execshild</span>
+</span><span class='line'>kernel.exec-shield <span class="o">=</span> 1
+</span><span class='line'>kernel.randomize_va_space <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Tune IPv6</span>
+</span><span class='line'>net.ipv6.conf.default.router_solicitations <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.accept_ra_rtr_pref <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.accept_ra_pinfo <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.accept_ra_defrtr <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.autoconf <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.dad_transmits <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.max_addresses <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Optimization for port usefor LBs</span>
+</span><span class='line'><span class="c"># Increase system file descriptor limit</span>
+</span><span class='line'>fs.file-max <span class="o">=</span> 65535
+</span><span class='line'>
+</span><span class='line'><span class="c"># Allow for more PIDs (to reduce rollover problems); may break some programs 32768</span>
+</span><span class='line'>kernel.pid_max <span class="o">=</span> 65536
+</span><span class='line'>
+</span><span class='line'><span class="c"># Increase system IP port limits</span>
+</span><span class='line'>net.ipv4.ip_local_port_range <span class="o">=</span> 2000 65000
+</span><span class='line'>
+</span><span class='line'><span class="c"># Increase TCP max buffer size setable using setsockopt()</span>
+</span><span class='line'>net.ipv4.tcp_rmem <span class="o">=</span> 4096 87380 8388608
+</span><span class='line'>net.ipv4.tcp_wmem <span class="o">=</span> 4096 87380 8388608
+</span><span class='line'>
+</span><span class='line'><span class="c"># Increase Linux auto tuning TCP buffer limits</span>
+</span><span class='line'><span class="c"># min, default, and max number of bytes to use</span>
+</span><span class='line'><span class="c"># set max to at least 4MB, or higher if you use very high BDP paths</span>
+</span><span class='line'>net.core.rmem_max <span class="o">=</span> 8388608
+</span><span class='line'>net.core.wmem_max <span class="o">=</span> 8388608
+</span><span class='line'>net.core.netdev_max_backlog <span class="o">=</span> 5000
+</span><span class='line'>net.ipv4.tcp_window_scaling <span class="o">=</span> 1
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After making these changes you should reboot.</p>
+
+<p><a name="chroot"></a></p>
+
+<h2>Setting up a chroot environment</h2>
+
+<p>We&rsquo;ll be setting up a chroot environment to run our web server and applications in. Chroot&rsquo;s provide isolation from the rest of the operating system, so even in the event of a application compromise, damage can be mitigated.</p>
+
+<figure class='code'><figcaption><span>chroot: Installation and Setup </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get install debootstrap dchroot
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now add this to your <code>/etc/schroot/schroot.conf</code> file, precise is the release of Ubuntu I&rsquo;m using, so change it if you need to:</p>
+
+<figure class='code'><figcaption><span>/etc/schroot/schroot.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>precise<span class="o">]</span>
+</span><span class='line'><span class="nv">description</span><span class="o">=</span>Ubuntu Precise LTS
+</span><span class='line'><span class="nv">location</span><span class="o">=</span>/var/chroot
+</span><span class='line'><span class="nv">priority</span><span class="o">=</span>3
+</span><span class='line'><span class="nv">users</span><span class="o">=</span>ubuntu
+</span><span class='line'><span class="nv">groups</span><span class="o">=</span>sbuild
+</span><span class='line'>root-groups<span class="o">=</span>root
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now bootstrap the chroot with a minimal Ubuntu installation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo debootstrap --variant<span class="o">=</span>buildd --arch amd64 precise /var/chroot/ http://mirror.anl.gov/pub/ubuntu/
+</span><span class='line'>sudo cp /etc/resolv.conf /var/chroot/etc/resolv.conf
+</span><span class='line'>sudo mount -o <span class="nb">bind</span> /proc /var/chroot/proc
+</span><span class='line'>sudo chroot /var/chroot/
+</span><span class='line'>apt-get install ubuntu-minimal
+</span><span class='line'>apt-get update
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Add the following to <code>/etc/apt/sources.list</code> inside the chroot:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>deb http://archive.ubuntu.com/ubuntu precise main
+</span><span class='line'>deb http://archive.ubuntu.com/ubuntu precise-updates main
+</span><span class='line'>deb http://security.ubuntu.com/ubuntu precise-security main
+</span><span class='line'>deb http://archive.ubuntu.com/ubuntu precise universe
+</span><span class='line'>deb http://archive.ubuntu.com/ubuntu precise-updates universe
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s test out our chroot and install nginx inside of it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>apt-get update
+</span><span class='line'>apt-get install nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="nginx"></a></p>
+
+<h2>Securing nginx inside the chroot</h2>
+
+<p>First thing we will do is add a www user for nginx to run under:</p>
+
+<figure class='code'><figcaption><span>Adding a application user </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo chroot /var/chroot
+</span><span class='line'>useradd www -d /home/www
+</span><span class='line'>mkdir /home/www
+</span><span class='line'>chown -R www.www /home/www
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Open up <code>/etc/nginx/nginx.conf</code> and make sure you change user to www inside the chroot:</p>
+
+<figure class='code'><figcaption><span>/etc/nginx/nginx.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>user www;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can now start nginx inside the chroot:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo chroot /var/chroot
+</span><span class='line'>service nginx start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now if you go to <a href="http://your_vm_ip/">http://your_vm_ip/</a> you should see &ldquo;Welcome to nginx!&rdquo; running inside your fancy new chroot.</p>
+
+<p>We also need to setup ssh to run inside the chroot so we can deploy our applications more easily.</p>
+
+<figure class='code'><figcaption><span>Chroot: sshd </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo chroot /var/chroot
+</span><span class='line'>apt-get install openssh-server udev
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since we already have SSH for the main host running on 22, we&rsquo;re going to run SSH for the chroot on port 2222. We&rsquo;ll copy over our config from outside the chroot to the chroot.</p>
+
+<figure class='code'><figcaption><span>sshd config</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo cp /etc/ssh/sshd_config /var/chroot/etc/ssh/sshd_config
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now open the config and change the bind port to 2222.</p>
+
+<p>We also need to add the rules to our firewall script:</p>
+
+<figure class='code'><figcaption><span>/etc/iptables.up.rules </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Chroot ssh</span>
+</span><span class='line'> -A INPUT -p tcp -m state --state NEW --dport 2222 -j ACCEPT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now make a startup script for chroot-precise in `/etc/init.d/chroot-precise:</p>
+
+<figure class='code'><figcaption><span>/etc/init.d/chroot-precise</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mount -o <span class="nb">bind</span> /proc /var/chroot/proc
+</span><span class='line'>mount -o <span class="nb">bind</span> /dev /var/chroot/dev
+</span><span class='line'>mount -o <span class="nb">bind</span> /sys /var/chroot/sys
+</span><span class='line'>mount -o <span class="nb">bind</span> /dev/pts /var/chroot/dev/pts
+</span><span class='line'>chroot /var/chroot service nginx start
+</span><span class='line'>chroot /var/chroot service ssh start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Set it to executable and to start at boot:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo chmod +x /etc/init.d/chroot-precise
+</span><span class='line'>sudo update-rc.d chroot-precise defaults
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next is to put your public key inside the <code>.ssh/authorized_keys</code> file for the www user inside the chroot so you can ssh and deploy your applications.</p>
+
+<p>If you want, you can test your server and reboot it now to ensure nginx and ssh boot up properly. If it&rsquo;s not running right now, you start it: <code>sudo /etc/init.d/chroot-precise</code>.</p>
+
+<p>You should now be able to ssh into your chroot and main server without a password.</p>
+
+<p><a name="extras"></a></p>
+
+<h2>Extras</h2>
+
+<p>I would like to also mention the <a href="http://grsecurity.net/">GRSecurity kernel patch</a>. I had tried several times to install this (two different versions were released while I was writing this) and both make the kernel unable to compile. Hopefully they&rsquo;ll fix these bugs and I&rsquo;ll be able to update this article with notes on setting GRSecurity up as well.</p>
+
+<p>I hope this article proved useful to anyone trying to secure a Ubuntu system, and if you liked it please share it!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Josh Rendek</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-17T20:25:00-05:00" pubdate data-updated="true">Jan 17<sup>th</sup>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/categories/linux/'>linux</a>, <a class='category' href='/categories/security/'>security</a>, <a class='category' href='/categories/ubuntu/'>ubuntu</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://joshrendek.com/2013/01/securing-ubuntu/" data-via="" data-counturl="http://joshrendek.com/2013/01/securing-ubuntu/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2012/12/rb-rfo-status-simple-system-status-page-in-ruby/" title="Previous Post: Rb RFO Status: A Simple System Status Page in Ruby">&laquo; Rb RFO Status: A Simple System Status Page in Ruby</a>
+      
+      
+        <a class="basic-alignment right" href="/2013/02/why-setuid-is-bad-and-what-you-can-do/" title="Next Post: Why setuid Is Bad and What You Can Do">Why setuid Is Bad and What You Can Do &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Projects & Software</h1>
+  <ul>
+    <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+    <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+    <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+    <li><a href="/projects/">View More</a>
+
+    <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+    <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+  </ul>
+</section>
+
+<section>
+  <h1>Other Blogs</h1>
+  <ul>
+    <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+    <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2016/06/building-honeypots-and-analyzing-linux-malware/">Building Honeypots and Analyzing Linux Malware</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a Distributed WaitGroup With Go and Redis</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and Ping: Sendmsg: Operation Not Permitted</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/10/influx-alert/">Influx Alert</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/getting-upstart-to-log-to-syslog-with-tags/">Getting Upstart to Log to Syslog With Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/golang-performance-tips/">Golang Performance Tips</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Josh Rendek -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bluescripts';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://joshrendek.com/2013/01/securing-ubuntu/';
+        var disqus_url = 'http://joshrendek.com/2013/01/securing-ubuntu/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

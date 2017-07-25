@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Ruby on Rails, NGINX, and Passenger: Setting up the ultimate development environment" />
+<meta property="og:description" content="My office (underneath the desks) is a mess of cables. I have a dual monitor setup for my mac pro, usually having documentation (or a video) on the second screen, and coding going on in my main 28&rdquo; HANNS-G. I love developing rails applications on my mac because of the tools I have available to me and how easy it is to access them. However I wanted to keep running applications on linux (since thats where they end up going) and doing some other specific linux things." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2010/09/ruby-on-rails-nginx-and-passenger-setting-up-the-ultimate-development-environment/" />
+
+
+
+<meta property="article:published_time" content="2010-09-15T12:14:01&#43;00:00"/>
+<meta property="article:modified_time" content="2010-09-15T12:14:01&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Ruby on Rails, NGINX, and Passenger: Setting up the ultimate development environment"/>
+<meta name="twitter:title" content="Ruby on Rails, NGINX, and Passenger: Setting up the ultimate development environment"/>
+<meta name="twitter:description" content="My office (underneath the desks) is a mess of cables. I have a dual monitor setup for my mac pro, usually having documentation (or a video) on the second screen, and coding going on in my main 28&rdquo; HANNS-G. I love developing rails applications on my mac because of the tools I have available to me and how easy it is to access them. However I wanted to keep running applications on linux (since thats where they end up going) and doing some other specific linux things."/>
+
+
+
+
+<meta itemprop="name" content="Ruby on Rails, NGINX, and Passenger: Setting up the ultimate development environment">
+<meta itemprop="description" content="My office (underneath the desks) is a mess of cables. I have a dual monitor setup for my mac pro, usually having documentation (or a video) on the second screen, and coding going on in my main 28&rdquo; HANNS-G. I love developing rails applications on my mac because of the tools I have available to me and how easy it is to access them. However I wanted to keep running applications on linux (since thats where they end up going) and doing some other specific linux things.">
+
+
+<meta itemprop="dateModified" content="2010-09-15T12:14:01&#43;00:00" />
+<meta itemprop="wordCount" content="841">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Ruby on Rails, NGINX, and Passenger: Setting up the ultimate development environment 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Sep 15, 2010 - 4 minutes</div>
+      <h1 class="title"> Ruby on Rails, NGINX, and Passenger: Setting up the ultimate development environment </h1>
+      <div class="content"> <p>My office (underneath the desks) is a mess of cables. I have a dual monitor setup for my mac pro, usually having documentation (or a video) on the second screen, and coding going on in my main 28&rdquo; HANNS-G. I love developing rails applications on my mac because of the tools I have available to me and how easy it is to access them. However I wanted to keep running applications on linux (since thats where they end up going) and doing some other specific linux things.</p>
+
+<p>I have all my programs / apps in a directory called /apps/ and I wanted to use Nginx and the passenger gem to handle everything.</p>
+
+<p>I want to do all my development on my Mac and running the applications on linux. I have a spare Dell Vostro 200 that used to be my gaming desktop that now has CentOS installed on it.</p>
+
+<p>Goals: Lets say I have an application called foobar . When (on my mac) I go to foobar.dev, it should go to my linux box and load the foobar app from nginx+passenger .</p>
+
+<p>To keep everything in sync, I&rsquo;m going to use NFS and export the directory from my mac to my linux box. Thankfully on mac it is ridiculously easy to setup NFS.</p>
+
+<p>Replace things in caps like XXX and YOURUSERNAME with your information. Obviously if your network is different or mask, change it. I would not do this on a public server. I did this on my private, firewalled home network.</p>
+
+<p>Just add this to /etc/exports:
+<pre>/Users/YOURUSERNAME/apps/  -rw -mapall=root -network 192.168.0.0 -mask 255.255.0.0</pre>
+You may need to restart NFSD on your mac:
+<pre> sudo nfsd restart</pre>
+Once your NFS is working you should be able to issue a command:
+<pre> showmount -e</pre>
+and you&rsquo;ll see your export list.</p>
+
+<p>You can then mount this on your linux box:
+<pre>cd /home
+mkdir apps
+mount -t nfs 192.168.1.XXX:/Users/YOURUSERNAME/apps apps</pre>
+Next step you should install WEBMIN. You can this in a few different ways, but for CentOS:
+<pre>cd ~
+wget <a href="http://prdownloads.sourceforge.net/webadmin/webmin-1.520-1.noarch.rpm">http://prdownloads.sourceforge.net/webadmin/webmin-1.520-1.noarch.rpm</a>
+rpm -Uvh webmin-1.520-1.noarch.rpm</pre>
+Login at <a href="https://YOURLINUXIP:10000/">https://YOURLINUXIP:10000/</a>. We&rsquo;re going to setup BIND and the DNS server. You could do this without webmin, but webmin lets you do it in a few clicks, and setting up DNS isn&rsquo;t one of my strong points.</p>
+
+<p>Navigate to Servers -&gt; Bind DNS Server.</p>
+
+<p>Click on &ldquo;Create master zone&rdquo;. Enter &ldquo;dev&rdquo; into the domain, so it should look like this:
+<p style="text-align: center;"><a href="http://bluescripts.net/wp-content/uploads/2010/09/Webmin-1.520-on-localhost.localdomain-CentOS-Linux-5.5.png"><img class="size-medium wp-image-410   aligncenter" title="Webmin 1.520 on localhost.localdomain (CentOS Linux 5.5)" src="http://bluescripts.net/wp-content/uploads/2010/09/Webmin-1.520-on-localhost.localdomain-CentOS-Linux-5.5-300x65.png" alt="" width="300" height="65" /></a></p>
+<p style="text-align: left;">After that hit &ldquo;Create&rdquo;.</p>
+<p style="text-align: left;">Back on the &ldquo;Module Index&rdquo;, click on the &ldquo;dev&rdquo; world icon, and click on Address records. Enter *.dev into the name field and the IP of your linux server, once created it should look like this:</p>
+<p style="text-align: center;"><a href="http://bluescripts.net/wp-content/uploads/2010/09/Webmin-1.520-on-localhost.localdomain-CentOS-Linux-5.5-1.png"><img class="size-medium wp-image-413  aligncenter" title="Webmin 1.520 on localhost.localdomain (CentOS Linux 5.5)-1" src="http://bluescripts.net/wp-content/uploads/2010/09/Webmin-1.520-on-localhost.localdomain-CentOS-Linux-5.5-1-300x91.png" alt="" width="300" height="91" /></a></p>
+<p style="text-align: left;">Hit &ldquo;Apply configuration&rdquo; in the very top right corner and your done with the linux DNS setup.</p>
+<p style="text-align: left;">On your Mac, to use the new DNS go to System Preferences -&gt; Network (choose your adapter) -&gt; Advanced -&gt; DNS.</p>
+<p style="text-align: left;">I&rsquo;m using Google DNS but you need to add your new DNS server in there as well. It should look like this when you&rsquo;re done (or similar, depending on your IPs and previous DNS configuration):</p>
+<p style="text-align: center;"><a href="http://bluescripts.net/wp-content/uploads/2010/09/System-Preferences.png"><img class="size-medium wp-image-414  aligncenter" title="System Preferences" src="http://bluescripts.net/wp-content/uploads/2010/09/System-Preferences-300x259.png" alt="" width="300" height="259" /></a></p>
+<p style="text-align: left;">DNS configuration is done, just to verify you should be able to ping ANYTHING.dev or foobar.dev or blah.dev and it should resolve to your linux server&rsquo;s IP:</p>
+<p style="text-align: left;"></p>
+<p style="text-align: center;"><a href="http://bluescripts.net/wp-content/uploads/2010/09/ping.png"><img class="size-medium wp-image-415  aligncenter" title="ping" src="http://bluescripts.net/wp-content/uploads/2010/09/ping-300x214.png" alt="" width="300" height="214" /></a></p>
+<p style="text-align: left;">On your linux box, go ahead and install ruby, rails, and rubygems. Once you have that running and working, install passenger:</p>
+<p style="text-align: left;"></p></p>
+
+<p><pre>gem install passenger</pre>
+<p style="text-align: left;">Then run the nginx setup:</p></p>
+
+<p><pre>passenger-install-nginx-module</pre>
+This will install Nginx for you and configure /opt/nginx/conf/nginx.conf for you as well.</p>
+
+<p>I&rsquo;ve shrunk my nginx.conf down to this, and modified it to load *.dev as server and host names.
+<pre>#user  nobody;
+worker_processes  1;</p>
+
+<p>#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;</p>
+
+<p>#pid        logs/nginx.pid;</p>
+
+<p>events {
+    worker_connections  1024;
+}</p>
+
+<p>http {
+    passenger_root /opt/ruby-enterprise-1.8.7-2010.01/lib/ruby/gems/1.8/gems/passenger-2.2.15;
+    passenger_ruby /opt/ruby-enterprise-1.8.7-2010.01/bin/ruby;</p>
+
+<pre><code>include       mime.types;
+default_type  application/octet-stream;
+
+#log_format  main  '$remote_addr - $remote_user [$time_local] &quot;$request&quot; '
+#                  '$status $body_bytes_sent &quot;$http_referer&quot; '
+#                  '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';
+
+#access_log  logs/access.log  main;
+
+sendfile        on;
+#tcp_nopush     on;
+
+#keepalive_timeout  0;
+keepalive_timeout  65;
+
+#gzip  on;
+
+server {
+    listen       80;
+server_name   ~^(www\.)?([-\w\.]+)\.\w+$;
+    #charset koi8-r;
+
+    #access_log  logs/host.access.log  main;
+        root   /home/apps/$2/public;
+    passenger_enabled on;
+    rails_env development;
+}
+</code></pre>
+
+<p>}</pre>
+The important line is <strong>server_name Â  ~^(www.)?([-\w.]+).\w+$; </strong>This allows you to catch those domains.</p>
+
+<p>My Mac is my database server (it has an SSD and 8 gigs of memory and is backed up, so I keep everything on it). Now I need to let my linux box connect to my mac pro&rsquo;s mysql instance.</p>
+
+<p>I use SequelPro to do my database management, and you need to run the following queries:
+<pre>CREATE USER &lsquo;root&rsquo;@&lsquo;%&rsquo; IDENTIFIED BY &lsquo;YOURPASSWORD&rsquo;;
+GRANT ALL PRIVILEGES ON <em>.</em> to &lsquo;root&rsquo;@&lsquo;%&rsquo; WITH GRANT OPTION;</pre>
+Run the query and you should be all set. You can start Nginx and your applications should start running when you go to foobar.dev or yourappname.dev !</p>
+
+<p>I found this took a bit of time to do (although this tutorial should let you do it in a few minutes) but it saves me from having to worry about start/shutting down thin/mongrel&rsquo;s and other stuff on my mac.</p>
+
+<p>Let me know if you have any comments or questions!</p>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

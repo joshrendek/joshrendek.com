@@ -1,0 +1,966 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Josh Rendek</title>
+  <meta name="author" content="Josh Rendek">
+
+  
+  <meta name="description" content="I&rsquo;m currently working on a project where I&rsquo;m trying to make everything as extensible as possible. I have a Ticket model and I want &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://joshrendek.com/page6">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Josh Rendek" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3754808-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">
+      <span class="blue-brace">{</span>Josh Rendek<span class="blue-brace">}</span>
+  </a></h1>
+  
+  <div class="subtitle">
+  <h2>
+    <span class="heart"><3</span> Ruby &amp; Go
+  </h2>
+  </div>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:joshrendek.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects/">Projects</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://devopsbyvideo.com/">Screen Casts</a></li>
+  <li><a href="/categories">Categories</a></li>
+  <li><a href="/resume/">Resumé</a></li>
+  <li><a href="/about/">About</a></li>
+  <li><a href="https://github.com/joshrendek">Github</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/12/rails-polymorphic-routes-models-and-forms/">Rails: Polymorphic Routes, Models, and Forms</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-12-24T16:54:36-05:00" pubdate data-updated="true">Dec 24<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&rsquo;m currently working on a project where I&rsquo;m trying to make everything as extensible as possible. I have a Ticket model and I want everything to be ticketable (thats my polymorphic association).</p>
+
+<p>The problem is that I want the URLs to be sensible and still have my polymorphic attribute loaded automatically without having to do <em>to</em> much hacking / un-dry code, so I wanted the URLs to be: /users/1/tickets/new.</p>
+
+<p>This needs to be applied to any arbitrary number of models that has_many :tickets, :as => :ticketable .</p>
+
+<p>The tickets controller needs to be able to get the object, and set it for a user to access it for the polymorphic form. <em>instance_set_variable</em> is the magic that lets this happen very easily. By having the before filter on create and new requests, the :get_object is called each request for those actions and the nested resources parent object is found and loaded into a variable called @ticketable .</p>
+
+<p>The last bit of magic is the form_for that lets you create the ticket and have ticketable be automatically filled in by the rails engine with one little modification in the ticket_controllers.rb create method. Thats it!</p>
+
+<script src="https://gist.github.com/754505.js"> </script>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/11/backups-gone-bad-site-may-have-been-downunresponsive-past-few-days/">Backups Gone Bad! Site May Have Been Down/unresponsive Past Few Days</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-11-25T14:20:27-05:00" pubdate data-updated="true">Nov 25<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I was doing some development work on rather large files (like 30 gigs each) and I forgot to exclude them from my backup script that runs so I inadvertently filled up my disk space really quickly causing MySQL to hang &ndash; needless to say everything should be back to normal now :).</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/10/mac-it-just-works-unless-you-have-a-mac-book-pro-with-a-slot-load-dvd-drive/">Mac: It Just Works! Unless You Have a Mac Book Pro With a Slot Load Dvd Drive</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-10-29T19:36:04-04:00" pubdate data-updated="true">Oct 29<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Yesterday I was trying to install Ubuntu 10.10 (occasionally I give linux another try for a desktop) on my Macbook Pro &ndash; and boy did I run into issues. First, when I was reformatting my mac, the disc kept ejecting &ndash; so finally when I got it to load and stay in, the formatter would error out. After repeating this several dozen times with various CD/DVD&rsquo;s and different burns of Ubuntu, I ran to Walmart and grabbed a Targus external DVD reader. After my mac kept ejecting cd&rsquo;s every time I stuck them in, this managed to fix the problem. Everything worked first time, even discs with a few scratches/dust on them.</p>
+
+<p><a href="http://discussions.apple.com/thread.jspa?threadID=1037884&amp;start=45&amp;tstart=0">This has apparently been a long standing issue</a>, and I&#8217;mÂ surprisedÂ apple is still selling them with this DVD drive.</p>
+
+<p>On another note, I just ordered another SSD for my macbook pro to reinstall OSX on since Ubuntu doesn&rsquo;t seem to be panning out :).</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/10/starcraft-2-freezing-when-loading-map/">Starcraft 2: Freezing When Loading Map</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-10-16T10:31:04-04:00" pubdate data-updated="true">Oct 16<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Starcraft 2 was freezing when I was loading maps ( after I accidentally forcequit it the other night :| ) -after trying the Blizzard Repair tool and uninstalling/reinstalling several times, a simple reboot was all that was needed to fix it. Hope this helps someone else!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/10/ruby-and-ebay-get-list-prices/">Ruby and Ebay: Get List Prices</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-10-03T10:45:49-04:00" pubdate data-updated="true">Oct 3<sup>rd</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&rsquo;ll eventually be turning my ruby ebay work into a gem, but for now here are little snippets:</p>
+
+<p>Please note that this code automagically takes care of things like 4x SOMETHING &ndash; it&rsquo;ll take the current list price and divide by four, if you don&rsquo;t want that functionality, remove the divider. You also need rest-open-uri and hpricot for gems.</p>
+
+<p>To get a list of prices:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">get_search_results</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+            <span class="c1"># API request variables</span>
+            <span class="n">endpoint</span> <span class="o">=</span> <span class="s1">&#39;http://svcs.ebay.com/services/search/FindingService/v1&#39;</span><span class="p">;</span>  <span class="c1"># URL to call</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">;</span>  <span class="c1"># API version supported by your application</span>
+            <span class="n">appid</span> <span class="o">=</span> <span class="s1">&#39;YOUR APP ID&#39;</span><span class="p">;</span>  <span class="c1"># Replace with your own AppID</span>
+            <span class="n">globalid</span> <span class="o">=</span> <span class="s1">&#39;EBAY-US&#39;</span><span class="p">;</span>  <span class="c1"># Global ID of the eBay site you want to search (e.g., EBAY-DE)</span>
+            <span class="n">safequery</span> <span class="o">=</span> <span class="no">URI</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">query</span><span class="p">);</span>  <span class="c1"># Make the query URL-friendly</span>
+
+            <span class="c1"># Construct the findItemsByKeywords HTTP GET call </span>
+            <span class="n">apicall</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">?&quot;</span><span class="p">;</span>
+            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;OPERATION-NAME=findItemsByKeywords&quot;</span><span class="p">;</span>
+            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;SERVICE-VERSION=</span><span class="si">#{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span>
+            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;SECURITY-APPNAME=</span><span class="si">#{</span><span class="n">appid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span>
+            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;GLOBAL-ID=</span><span class="si">#{</span><span class="n">globalid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span>
+            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;keywords=</span><span class="si">#{</span><span class="n">safequery</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span>
+            <span class="n">apicall</span> <span class="o">+=</span> <span class="s2">&quot;&amp;paginationInput.entriesPerPage=25&quot;</span><span class="p">;</span> 
+        
+            <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="nb">open</span><span class="p">(</span> <span class="n">apicall</span> <span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span> <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="n">s</span> <span class="p">}</span>
+            <span class="n">prices</span> <span class="o">=</span> <span class="o">[]</span>
+            
+            
+            <span class="n">doc</span> <span class="o">=</span> <span class="no">Hpricot</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="p">(</span><span class="n">doc</span><span class="o">/</span><span class="ss">:item</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
+                
+                <span class="n">divider</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">get_count</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="ss">:title</span><span class="p">)</span><span class="o">.</span><span class="n">inner_html</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[0-9]/</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
+                <span class="nb">p</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="ss">:title</span><span class="p">)</span><span class="o">.</span><span class="n">inner_html</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">if</span> <span class="o">!</span><span class="n">get_count</span><span class="o">.</span><span class="n">nil?</span>
+                    <span class="n">divider</span> <span class="o">=</span> <span class="n">get_count</span><span class="o">.</span><span class="n">to_i</span>
+                <span class="k">end</span>
+                <span class="n">prices</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="ss">:sellingstatus</span><span class="o">/</span><span class="ss">:currentprice</span><span class="p">)</span><span class="o">.</span><span class="n">inner_html</span><span class="o">.</span><span class="n">to_f</span><span class="o">/</span><span class="n">divider</span>
+            <span class="k">end</span>
+            
+            <span class="n">prices</span>
+<span class="k">end</span></code></pre></div>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/09/ruby-on-rails-nginx-and-passenger-setting-up-the-ultimate-development-environment/">Ruby on Rails, NGINX, and Passenger: Setting Up the Ultimate Development Environment</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-15T12:14:01-04:00" pubdate data-updated="true">Sep 15<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>My office (underneath the desks) is a mess of cables. I have a dual monitor setup for my mac pro, usually having documentation (or a video) on the second screen, and coding going on in my main 28&#8221; HANNS-G. I love developing rails applications on my mac because of the tools I have available to me and how easy it is to access them. However I wanted to keep running applications on linux (since thats where they end up going) and doing some other specific linux things.</p>
+
+<p>I have all my programs / apps in a directory called /apps/ and I wanted to use Nginx and the passenger gem to handle everything.</p>
+
+<p>I want to do all my development on my Mac and running the applications on linux. I have a spare Dell Vostro 200 that used to be my gaming desktop that now has CentOS installed on it.</p>
+
+<p>Goals: Lets say I have an application called foobar . When (on my mac) I go to foobar.dev, it should go to my linux box and load the foobar app from nginx+passenger .</p>
+
+<p>To keep everything in sync, I&rsquo;m going to use NFS and export the directory from my mac to my linux box. Thankfully on mac it is ridiculously easy to setup NFS.</p>
+
+<p>Replace things in caps like XXX and YOURUSERNAME with your information. Obviously if your network is different or mask, change it. I would not do this on a public server. I did this on my private, firewalled home network.</p>
+
+<p>Just add this to /etc/exports:</p>
+
+<pre>/Users/YOURUSERNAME/apps/  -rw -mapall=root -network 192.168.0.0 -mask 255.255.0.0</pre>
+
+
+<p>You may need to restart NFSD on your mac:</p>
+
+<pre> sudo nfsd restart</pre>
+
+
+<p>Once your NFS is working you should be able to issue a command:</p>
+
+<pre> showmount -e</pre>
+
+
+<p>and you&rsquo;ll see your export list.</p>
+
+<p>You can then mount this on your linux box:</p>
+
+<pre>cd /home
+mkdir apps
+mount -t nfs 192.168.1.XXX:/Users/YOURUSERNAME/apps apps</pre>
+
+
+<p>Next step you should install WEBMIN. You can this in a few different ways, but for CentOS:</p>
+
+<pre>cd ~
+wget http://prdownloads.sourceforge.net/webadmin/webmin-1.520-1.noarch.rpm
+rpm -Uvh webmin-1.520-1.noarch.rpm</pre>
+
+
+<p>Login at <a href="https://YOURLINUXIP:10000/.">https://YOURLINUXIP:10000/.</a> We&rsquo;re going to setup BIND and the DNS server. You could do this without webmin, but webmin lets you do it in a few clicks, and setting up DNS isn&rsquo;t one of my strong points.</p>
+
+<p>Navigate to Servers -> Bind DNS Server.</p>
+
+<p>Click on &ldquo;Create master zone&rdquo;. Enter &ldquo;dev&rdquo; into the domain, so it should look like this:</p>
+
+<p style="text-align: center;"><a href="http://bluescripts.net/wp-content/uploads/2010/09/Webmin-1.520-on-localhost.localdomain-CentOS-Linux-5.5.png"><img class="size-medium wp-image-410   aligncenter" title="Webmin 1.520 on localhost.localdomain (CentOS Linux 5.5)" src="http://bluescripts.net/wp-content/uploads/2010/09/Webmin-1.520-on-localhost.localdomain-CentOS-Linux-5.5-300x65.png" alt="" width="300" height="65" /></a></p>
+
+
+<p style="text-align: left;">After that hit &#8220;Create&#8221;.</p>
+
+
+<p style="text-align: left;">Back on the &#8220;Module Index&#8221;, click on the &#8220;dev&#8221; world icon, and click on Address records. Enter *.dev into the name field and the IP of your linux server, once created it should look like this:</p>
+
+
+<p style="text-align: center;"><a href="http://bluescripts.net/wp-content/uploads/2010/09/Webmin-1.520-on-localhost.localdomain-CentOS-Linux-5.5-1.png"><img class="size-medium wp-image-413  aligncenter" title="Webmin 1.520 on localhost.localdomain (CentOS Linux 5.5)-1" src="http://bluescripts.net/wp-content/uploads/2010/09/Webmin-1.520-on-localhost.localdomain-CentOS-Linux-5.5-1-300x91.png" alt="" width="300" height="91" /></a></p>
+
+
+<p style="text-align: left;">Hit &#8220;Apply configuration&#8221; in the very top right corner and your done with the linux DNS setup.</p>
+
+
+<p style="text-align: left;">On your Mac, to use the new DNS go to System Preferences -> Network (choose your adapter) -> Advanced -> DNS.</p>
+
+
+<p style="text-align: left;">I&#8217;m using Google DNS but you need to add your new DNS server in there as well. It should look like this when you&#8217;re done (or similar, depending on your IPs and previous DNS configuration):</p>
+
+
+<p style="text-align: center;"><a href="http://bluescripts.net/wp-content/uploads/2010/09/System-Preferences.png"><img class="size-medium wp-image-414  aligncenter" title="System Preferences" src="http://bluescripts.net/wp-content/uploads/2010/09/System-Preferences-300x259.png" alt="" width="300" height="259" /></a></p>
+
+
+<p style="text-align: left;">DNS configuration is done, just to verify you should be able to ping ANYTHING.dev or foobar.dev or blah.dev and it should resolve to your linux server&#8217;s IP:</p>
+
+
+<p style="text-align: left;"></p>
+
+
+<p style="text-align: center;"><a href="http://bluescripts.net/wp-content/uploads/2010/09/ping.png"><img class="size-medium wp-image-415  aligncenter" title="ping" src="http://bluescripts.net/wp-content/uploads/2010/09/ping-300x214.png" alt="" width="300" height="214" /></a></p>
+
+
+<p style="text-align: left;">On your linux box, go ahead and install ruby, rails, and rubygems. Once you have that running and working, install passenger:</p>
+
+
+<p style="text-align: left;"></p>
+
+
+
+
+<pre>gem install passenger</pre>
+
+
+<p style="text-align: left;">Then run the nginx setup:</p>
+
+
+
+
+<pre>passenger-install-nginx-module</pre>
+
+
+<p>This will install Nginx for you and configure /opt/nginx/conf/nginx.conf for you as well.</p>
+
+<p>I&rsquo;ve shrunk my nginx.conf down to this, and modified it to load *.dev as server and host names.</p>
+
+<pre>#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    passenger_root /opt/ruby-enterprise-1.8.7-2010.01/lib/ruby/gems/1.8/gems/passenger-2.2.15;
+    passenger_ruby /opt/ruby-enterprise-1.8.7-2010.01/bin/ruby;
+
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+    server_name   ~^(www\.)?([-\w\.]+)\.\w+$;
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+            root   /home/apps/$2/public;
+        passenger_enabled on;
+        rails_env development;
+    }
+
+}</pre>
+
+
+<p>The important line is <strong>server_name Â  ~^(www.)?([-\w.]+).\w+$; </strong>This allows you to catch those domains.</p>
+
+<p>My Mac is my database server (it has an SSD and 8 gigs of memory and is backed up, so I keep everything on it). Now I need to let my linux box connect to my mac pro&rsquo;s mysql instance.</p>
+
+<p>I use SequelPro to do my database management, and you need to run the following queries:</p>
+
+<pre>CREATE USER 'root'@'%' IDENTIFIED BY 'YOURPASSWORD';
+GRANT ALL PRIVILEGES ON *.* to 'root'@'%' WITH GRANT OPTION;</pre>
+
+
+<p>Run the query and you should be all set. You can start Nginx and your applications should start running when you go to foobar.dev or yourappname.dev !</p>
+
+<p>I found this took a bit of time to do (although this tutorial should let you do it in a few minutes) but it saves me from having to worry about start/shutting down thin/mongrel&rsquo;s and other stuff on my mac.</p>
+
+<p>Let me know if you have any comments or questions!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/09/mac-im-an-ide-whore/">Mac: I&#8217;m an IDE Whore</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-10T21:37:27-04:00" pubdate data-updated="true">Sep 10<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I don&rsquo;t know if I&rsquo;ve posted about how many IDE&rsquo;s I use but I&rsquo;m always switching between TextMate/RubyMine and several others. I will say that I have been sticking more with the Java variant IDEs though since I got my Mac Pro with an SSD&hellip;. it makes uber-slow Java apps actually run at a near native speed.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/09/just-launched-a-starcraft-videostrat-site/">Just Launched a Starcraft Video/strat Site</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-09T14:19:03-04:00" pubdate data-updated="true">Sep 9<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://starcraft2-buildorder.com">Starcraft 2 Build Order</a> its a collection of videos and information on starcraft and strategies.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/09/ruby-random-stat/">Ruby: Random Stat</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-08T12:24:40-04:00" pubdate data-updated="true">Sep 8<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I have a program that takes a block of texts and then counts the most popular occurrences of words in that text. Processed a 680,354 character string in about 30 minutes on 2 Core i7s and an SSD. Probably could be optimized a bit I think.</p>
+
+<p>Snippet:</p>
+
+<pre lang="ruby">
+def get_keywords_for_content(content, n)
+    content = content.gsub(/<\/?[^>]*>/, "")
+    words = content.split(/ /)
+    # clean up the matches
+    words.collect! { |x|
+      begin
+        x.downcase.match(/[a-zA-Z0-9]+/)[0].chomp
+      rescue
+        #print "Failed on: #{x} - #{e}\n"
+      end
+    }
+    words.compact!
+
+    occurrences = []
+    for w in words
+      #p "#{w}: " + self.count_occurrences(w, content).to_s
+      occurrences << [count_occurrences(w, content), w] if !@@exclude.include?(w)
+    end
+
+    keywords = []
+
+    counter = 0
+    for o in occurrences.uniq.sort.reverse
+      if counter == n then
+        break
+      end
+
+      #p "#{o[0]} => #{o[1]}"
+      keywords << o[1]
+
+      counter+=1
+    end
+
+
+    return keywords
+  end
+</pre>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2010/09/centos-gcc-not-found-other-weird-errors-after-hdd-cloned/">CentOS GCC Not Found + Other Weird Errors After Hdd Cloned</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-05T22:01:34-04:00" pubdate data-updated="true">Sep 5<sup>th</sup>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A week or so ago the HDD started failing on my web server, so I had the DC clone the HDD for me. Some files however got lost in transit (bad sectors) and when I was trying to install nginx to get some testing done, I kept getting this error:</p>
+
+<pre>./configure
+C compiler not found
+</pre>
+
+
+<p>Apparently it wasn&rsquo;t finding GCC, even though it was definitely installed. After looking around a bit at the system and talking with a few people on IRC #linux, found out that some header files and other files were missing from /usr/include. Here is an example of some of the errors  I got with a simple hello world C++ program:</p>
+
+<pre lang="cpp">
+[root@dispersion ~]# cat test.cpp 
+#include <iostream>
+
+using namespace std;
+
+int main(){ cout << "hello wolrd " << endl;  return 0; }
+[root@dispersion ~]# gcc test.cpp 
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/x86_64-redhat-linux/bits/os_defines.h:39,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/x86_64-redhat-linux/bits/c++config.h:1202,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/iostream:43,
+                 from test.cpp:1:
+/usr/include/features.h:329:25: error: sys/cdefs.h: No such file or directory
+In file included from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/cstdlib:71,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/stl_algobase.h:67,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/char_traits.h:46,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/ios:45,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/ostream:44,
+                 from /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/iostream:44,
+                 from test.cpp:1:
+/usr/include/stdlib.h:438:49: error: sys/types.h: No such file or directory
+/usr/include/string.h:28: error: â€˜__BEGIN_DECLSâ€™ does not name a type
+/usr/include/string.h:44: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:51: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:59: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:63: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:67: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:73: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:78: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:84: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:89: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:93: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:96: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:100: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:103: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:107: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:111: error: expected initializer before â€˜__THROWâ€™
+/usr/include/xlocale.h:28: error: expected constructor, destructor, or type conversion before â€˜typedefâ€™
+/usr/include/xlocale.h:40: error: expected constructor, destructor, or type conversion before â€˜;â€™ token
+/usr/include/string.h:121: error: â€˜__locale_tâ€™ has not been declared
+/usr/include/string.h:122: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:125: error: â€˜__locale_tâ€™ has not been declared
+/usr/include/string.h:125: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:131: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:139: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:167: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:171: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:177: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:184: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:189: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:192: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:195: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:200: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:205: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:212: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:218: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:227: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:233: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:236: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:242: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:249: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:256: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:281: error: expected constructor, destructor, or type conversion before â€˜externâ€™
+/usr/include/string.h:288: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:293: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:296: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:300: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:304: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:308: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:312: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:317: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:320: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:326: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:330: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:337: error: â€˜__locale_tâ€™ has not been declared
+/usr/include/string.h:338: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:341: error: â€˜__locale_tâ€™ has not been declared
+/usr/include/string.h:342: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:350: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:356: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:359: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:363: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:365: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:371: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:374: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:377: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:380: error: expected initializer before â€˜__THROWâ€™
+/usr/include/string.h:387: error: expected initializer before â€˜__THROWâ€™
+/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/cstring:78: error: expected constructor, destructor, or type conversion before â€˜namespaceâ€™
+/usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/x86_64-redhat-linux/bits/gthr.h:33: error: expected declaration before end of line
+[root@dispersion ~]#
+</pre>
+
+
+<p>The solution was to go to another server (which I have several) of the same architecture, and SCP (or rsync, take your pick) the /usr/include directory over.</p>
+
+<p>Problem solved.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page7">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/page5">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Projects & Software</h1>
+  <ul>
+    <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+    <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+    <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple &#8216;what is my IP&#8217; service with a few extra RESTful endpoints.</li>
+
+    <li><a href="/projects/">View More</a>
+
+    <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+    <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+  </ul>
+</section>
+
+<section>
+  <h1>Other Blogs</h1>
+  <ul>
+    <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+    <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2016/06/building-honeypots-and-analyzing-linux-malware/">Building Honeypots and Analyzing Linux Malware</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a Distributed WaitGroup With Go and Redis</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and Ping: Sendmsg: Operation Not Permitted</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/10/influx-alert/">Influx Alert</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/getting-upstart-to-log-to-syslog-with-tags/">Getting Upstart to Log to Syslog With Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/golang-performance-tips/">Golang Performance Tips</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Josh Rendek -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bluescripts';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

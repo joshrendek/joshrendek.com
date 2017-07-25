@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Uptime on Josh Rendek</title>
+    <link>https://joshrendek.com/categories/uptime/</link>
+    <description>Recent content in Uptime on Josh Rendek</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Copyright 2008-2017 Josh Rendek</copyright>
+    <lastBuildDate>Sun, 22 Jul 2012 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://joshrendek.com/categories/uptime/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The problem with Pingdom</title>
+      <link>https://joshrendek.com/2012/07/the-problem-with-pingdom/</link>
+      <pubDate>Sun, 22 Jul 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2012/07/the-problem-with-pingdom/</guid>
+      <description>{% codeblock Time to be Awesome - awesome.rb %} puts &amp;ldquo;Awesome!&amp;rdquo; unless lame {% endcodeblock %}
+The problem with pingdom.
+My money&amp;rsquo;s in that office, right? If she start giving me some bullshit about it ain&amp;rsquo;t there, and we got to go someplace else and get it, I&amp;rsquo;m gonna shoot you in the head then and there. Then I&amp;rsquo;m gonna shoot that bitch in the kneecaps, find out where my goddamn money is.</description>
+    </item>
+    
+  </channel>
+</rss>

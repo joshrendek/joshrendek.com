@@ -1,0 +1,2914 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Josh Rendek</title>
+  <meta name="author" content="Josh Rendek">
+
+  
+  <meta name="description" content="Let&rsquo;s start out with a simple directory structure: 1
+2
+3
+4
+5
+6
+7
+8
+.
+├── plugin.rb
+├── main.rb
+└── plugins ├── cat.rb └── dog.rb 1 directory, 3 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://joshrendek.com/page3">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Josh Rendek" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3754808-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">
+      <span class="blue-brace">{</span>Josh Rendek<span class="blue-brace">}</span>
+  </a></h1>
+  
+  <div class="subtitle">
+  <h2>
+    <span class="heart"><3</span> Ruby &amp; Go
+  </h2>
+  </div>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:joshrendek.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects/">Projects</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://devopsbyvideo.com/">Screen Casts</a></li>
+  <li><a href="/categories">Categories</a></li>
+  <li><a href="/resume/">Resumé</a></li>
+  <li><a href="/about/">About</a></li>
+  <li><a href="https://github.com/joshrendek">Github</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2013/07/a-simple-ruby-plugin-system/">A Simple Ruby Plugin System</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-04T15:00:00-04:00" pubdate data-updated="true">Jul 4<sup>th</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Let&rsquo;s start out with a simple directory structure:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>.
+</span><span class='line'>├── plugin.rb
+</span><span class='line'>├── main.rb
+</span><span class='line'>└── plugins
+</span><span class='line'>    ├── cat.rb
+</span><span class='line'>    └── dog.rb
+</span><span class='line'>
+</span><span class='line'>1 directory, 3 files
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>All the plugins we will use for our library will be loaded from <code>plugins</code>. Now lets make a simple
+<code>Plugin</code> class and register our plugins.</p>
+
+<figure class='code'><figcaption><span>plugin.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Plugin</span>
+</span><span class='line'>  <span class="c1"># Keep the plugin list inside a set so we don&#39;t double-load plugins</span>
+</span><span class='line'>  <span class="vi">@plugins</span> <span class="o">=</span> <span class="no">Set</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">plugins</span>
+</span><span class='line'>    <span class="vi">@plugins</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">register_plugins</span>
+</span><span class='line'>    <span class="c1"># Iterate over each symbol in the object space</span>
+</span><span class='line'>    <span class="no">Object</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">klass</span><span class="o">|</span>
+</span><span class='line'>      <span class="c1"># Get the constant from the Kernel using the symbol</span>
+</span><span class='line'>      <span class="n">const</span> <span class="o">=</span> <span class="no">Kernel</span><span class="o">.</span><span class="n">const_get</span><span class="p">(</span><span class="n">klass</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1"># Check if the plugin has a super class and if the type is Plugin</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">const</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:superclass</span><span class="p">)</span> <span class="ow">and</span> <span class="n">const</span><span class="o">.</span><span class="n">superclass</span> <span class="o">==</span> <span class="no">Plugin</span>
+</span><span class='line'>        <span class="vi">@plugins</span> <span class="o">&lt;&lt;</span> <span class="n">const</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;ve now made a simple class that will contain all of our plugin data when we call <code>register_plugins</code>.</p>
+
+<p>Now for our Dog and Cat classes:</p>
+
+<figure class='code'><figcaption><span>dog.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">DogPlugin</span> <span class="o">&lt;</span> <span class="no">Plugin</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">handle_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">p</span> <span class="s2">&quot;Command received </span><span class="si">#{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>cat.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">CatPlugin</span> <span class="o">&lt;</span> <span class="no">Plugin</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">handle_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">p</span> <span class="s2">&quot;Command received </span><span class="si">#{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now combine this all together in one main entry point and we have a simple plugin system that lets us
+send messages to each plugin through a set method ( <code>handle_command</code> ).</p>
+
+<figure class='code'><figcaption><span>main.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;./plugin&#39;</span>
+</span><span class='line'><span class="no">Dir</span><span class="o">[</span><span class="s2">&quot;./plugins/*.rb&quot;</span><span class="o">].</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="nb">require</span> <span class="n">f</span> <span class="p">}</span>
+</span><span class='line'><span class="no">Plugin</span><span class="o">.</span><span class="n">register_plugins</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Test that we can send a message to each plugin</span>
+</span><span class='line'><span class="no">Plugin</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">plugin</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">plugin</span><span class="o">.</span><span class="n">handle_command</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is a very simple but useful way to make a plugin system to componentize projects like a chat bot for IRC.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2013/06/tywin-lannister-quote/">Tywin Lannister Quote</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-15T09:28:00-04:00" pubdate data-updated="true">Jun 15<sup>th</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A nice quote by Tywin Lannister taken from <em>A Storm of Sword</em> book.</p>
+
+<blockquote><p>The greatest fools are ofttimes more clever then the men who laugh at them.</p><footer><strong>Tywin Lannister</strong> <cite>A Storm of Swords</cite></footer></blockquote>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2013/02/why-setuid-is-bad-and-what-you-can-do/">Why Setuid Is Bad and What You Can Do</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-26T22:28:00-05:00" pubdate data-updated="true">Feb 26<sup>th</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Why <code>setuid</code> is Bad</h2>
+
+<p><code>setuid</code> allows a binary to be run as a different user then the one invoking it. For example, ping needs to use low level system interfaces (<code>socket</code>, <code>PF_INET</code>, <code>SOCK_RAW</code>, etc) in order to function properly. We can watch this in action by starting ping in another terminal window ( <code>ping google.com</code> ) and then using <code>strace</code> to see the syscall&rsquo;s being made:</p>
+
+<p><code>sudo strace -p PID</code> and we get the following:</p>
+
+<figure class='code'><figcaption><span>strace output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>munmap<span class="o">(</span>0x7f329e7ea000, 4096<span class="o">)</span>            <span class="o">=</span> 0stat<span class="o">(</span><span class="s2">&quot;/etc/resolv.conf&quot;</span>, <span class="o">{</span><span class="nv">st_mode</span><span class="o">=</span>S_IFREG|0644, <span class="nv">st_size</span><span class="o">=</span>185, ...<span class="o">})</span> <span class="o">=</span> 0
+</span><span class='line'>socket<span class="o">(</span>PF_INET, SOCK_DGRAM|SOCK_NONBLOCK, IPPROTO_IP<span class="o">)</span> <span class="o">=</span> 4
+</span><span class='line'>connect<span class="o">(</span>4, <span class="o">{</span><span class="nv">sa_family</span><span class="o">=</span>AF_INET, <span class="nv">sin_port</span><span class="o">=</span>htons<span class="o">(</span>53<span class="o">)</span>, <span class="nv">sin_addr</span><span class="o">=</span>inet_addr<span class="o">(</span><span class="s2">&quot;8.8.8.8&quot;</span><span class="o">)}</span>, 16<span class="o">)</span> <span class="o">=</span> 0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can find all setuid programs installed by issuing the command:</p>
+
+<figure class='code'><figcaption><span>How to find all setuid programs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo find / -xdev <span class="se">\(</span> -perm -4000 <span class="se">\)</span> -type f -print0 -exec ls -l <span class="o">{}</span> <span class="se">\;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will find all commands that have the root setuid bit set in their permission bit.</p>
+
+<p><a name="top"></a></p>
+
+<h4><code>setuid</code> list for a few popular operating systems:</h4>
+
+<p>Of particular interest in OpenBSD, where a lot of work was done to remove and switch programs from needing to use setuid/gid permissions. OpenIndiana is the worst offender and has the widest vector for attack.</p>
+
+<ul>
+<li><a href="#ubuntu">Ubuntu</a> (22 binaries)</li>
+<li><a href="#centos">CentOS</a> (21 binaries)</li>
+<li><a href="#openbsd">OpenBSD</a> (3 binaries)</li>
+<li><a href="#openindiana">OpenIndiana</a> (53 binaries)</li>
+</ul>
+
+
+<p><code>setuid</code> escalation is a common attack vector and can allow unprivileged code to be executed by a regular user, and then escalate itself to root and drop you in on the root shell.</p>
+
+<p><strong><em>Here are a few examples:</em></strong></p>
+
+<h4>CVE-2012-0056: Exploiting /proc/pid/mem</h4>
+
+<p><a href="http://blog.zx2c4.com/749">http://blog.zx2c4.com/749</a> - C code that uses a bug in the way the Linux kernel checked permissions on /proc/pid/mem and then uses that to exploit the su binary to give a root shell.</p>
+
+<h4>CVE-2010-3847: Exploiting via $ORIGIN and file descriptors</h4>
+
+<p><a href="http://www.exploit-db.com/exploits/15274/">http://www.exploit-db.com/exploits/15274/</a> - By exploiting a hole in the way the $ORIGIN is checked, a symlink can be made to a program that uses <code>setuid</code> and <code>exec</code>&rsquo;d &lsquo;to obtain the file descriptors which then lets arbitrary code injection (in this case a call to <code>system("/bin/bash")</code>).</p>
+
+<p>More of these can be found at <a href="http://www.exploit-db.com/shellcode/">http://www.exploit-db.com/shellcode/</a> and just <a href="https://www.google.com/search?q=setuid+exploits">searching google for <code>setuid</code> exploits</a>.</p>
+
+<p>So you may not want to completely disable the <code>setuid</code> flag on all the binaries for your distribution, but we can turn on some logging to watch when they&rsquo;re getting called and install a kernel patch that will secure the OS and help prevent 0-days that may prey on <code>setuid</code> vulnerabilities.</p>
+
+<h2>How to log setuid calls</h2>
+
+<p>I will detail the steps to do this on Ubuntu, but they should apply to the other audit daemons on CentOS.</p>
+
+<p>Let&rsquo;s first install auditd: <code>sudo apt-get install auditd</code></p>
+
+<p>Let&rsquo;s open up <code>/etc/audit/audit.rules</code>, and with a few tweaks with vim, we can insert the list we generated with find into the audit rule set (explanation of each flag after the jump):</p>
+
+<figure class='code'><figcaption><span>/etc/audit/audit.rules </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># This file contains the auditctl rules that are loaded# whenever the audit daemon is started via the initscripts.</span>
+</span><span class='line'><span class="c"># The rules are simply the parameters that would be passed</span>
+</span><span class='line'><span class="c"># to auditctl.</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># First rule - delete all</span>
+</span><span class='line'>-D
+</span><span class='line'>
+</span><span class='line'><span class="c"># Increase the buffers to survive stress events.</span>
+</span><span class='line'><span class="c"># Make this bigger for busy systems</span>
+</span><span class='line'>-b 320
+</span><span class='line'>
+</span><span class='line'><span class="c"># Feel free to add below this line. See auditctl man page</span>
+</span><span class='line'>
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/lib/pt_chown -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/lib/eject/dmcrypt-get-device -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/lib/dbus-1.0/dbus-daemon-launch-helper -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/lib/openssh/ssh-keysign -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/sbin/uuidd -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/sbin/pppd -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/at -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/passwd -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/mtr -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/sudoedit -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/traceroute6.iputils -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/chsh -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/sudo -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/chfn -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/gpasswd -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/usr/bin/newgrp -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/fusermount -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/umount -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/ping -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/ping6 -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/su -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span><span class='line'>-a always,exit -F <span class="nv">path</span><span class="o">=</span>/bin/mount -F <span class="nv">perm</span><span class="o">=</span>x -F auid&gt;<span class="o">=</span>500 -F auid!<span class="o">=</span>4294967295 -k privileged
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>audtid Options Explained</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>-a: appends the always, and exit rules. This says to always make a log at syscall entry and syscall exit.
+</span><span class='line'>-F
+</span><span class='line'>     path= says filter to the executable being called
+</span><span class='line'>     perm=x says filter on the program being executable
+</span><span class='line'>     auid&gt;= says log all calls for users who have a UID above 500 (regular user accounts start at 1000 generally)
+</span><span class='line'>     auid!=4294967295 sometimes a process may start before the auditd, in which case it will get a auid of 4294967295
+</span><span class='line'>-k passes a filter key that will be put into the record log, in this case its &quot;privileged&quot;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So now when we run ping google.com we can see a full audit trail in <code>/var/log/audit/audit.log</code>:</p>
+
+<figure class='code'><figcaption><span>auditd output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">type</span><span class="o">=</span>SYSCALL <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">arch</span><span class="o">=</span>c000003e <span class="nv">syscall</span><span class="o">=</span>59 <span class="nv">success</span><span class="o">=</span>yes <span class="nb">exit</span><span class="o">=</span>0 <span class="nv">a0</span><span class="o">=</span>f43de8 <span class="nv">a1</span><span class="o">=</span>d40488 <span class="nv">a2</span><span class="o">=</span>ed8008 <span class="nv">a3</span><span class="o">=</span>7fffc9c9a150 <span class="nv">items</span><span class="o">=</span>2 <span class="nv">ppid</span><span class="o">=</span>1464 <span class="nv">pid</span><span class="o">=</span>1631 <span class="nv">auid</span><span class="o">=</span>1000 <span class="nv">uid</span><span class="o">=</span>1000 <span class="nv">gid</span><span class="o">=</span>1000 <span class="nv">euid</span><span class="o">=</span>0 <span class="nv">suid</span><span class="o">=</span>0 <span class="nv">fsuid</span><span class="o">=</span>0 <span class="nv">egid</span><span class="o">=</span>1000 <span class="nv">sgid</span><span class="o">=</span>1000 <span class="nv">fsgid</span><span class="o">=</span>1000 <span class="nv">tty</span><span class="o">=</span>pts1 <span class="nv">ses</span><span class="o">=</span>6 <span class="nv">comm</span><span class="o">=</span><span class="s2">&quot;ping&quot;</span> <span class="nv">exe</span><span class="o">=</span><span class="s2">&quot;/bin/ping&quot;</span> <span class="nv">key</span><span class="o">=</span><span class="s2">&quot;privileged&quot;</span><span class="nb">type</span><span class="o">=</span>EXECVE <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">argc</span><span class="o">=</span>2 <span class="nv">a0</span><span class="o">=</span><span class="s2">&quot;ping&quot;</span> <span class="nv">a1</span><span class="o">=</span><span class="s2">&quot;google.com&quot;</span>
+</span><span class='line'><span class="nb">type</span><span class="o">=</span>BPRM_FCAPS <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">fver</span><span class="o">=</span>0 <span class="nv">fp</span><span class="o">=</span>0000000000000000 <span class="k">fi</span><span class="o">=</span>0000000000000000 <span class="nv">fe</span><span class="o">=</span>0 <span class="nv">old_pp</span><span class="o">=</span>0000000000000000 <span class="nv">old_pi</span><span class="o">=</span>0000000000000000 <span class="nv">old_pe</span><span class="o">=</span>0000000000000000 <span class="nv">new_pp</span><span class="o">=</span>ffffffffffffffff <span class="nv">new_pi</span><span class="o">=</span>0000000000000000 <span class="nv">new_pe</span><span class="o">=</span>ffffffffffffffff
+</span><span class='line'><span class="nb">type</span><span class="o">=</span>CWD <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>:  <span class="nv">cwd</span><span class="o">=</span><span class="s2">&quot;/home/ubuntu&quot;</span>
+</span><span class='line'><span class="nb">type</span><span class="o">=</span>PATH <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">item</span><span class="o">=</span>0 <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;/bin/ping&quot;</span> <span class="nv">inode</span><span class="o">=</span>131711 <span class="nv">dev</span><span class="o">=</span>08:01 <span class="nv">mode</span><span class="o">=</span>0104755 <span class="nv">ouid</span><span class="o">=</span>0 <span class="nv">ogid</span><span class="o">=</span>0 <span class="nv">rdev</span><span class="o">=</span>00:00
+</span><span class='line'><span class="nb">type</span><span class="o">=</span>PATH <span class="nv">msg</span><span class="o">=</span>audit<span class="o">(</span>1361852594.621:48<span class="o">)</span>: <span class="nv">item</span><span class="o">=</span>1 <span class="nv">name</span><span class="o">=(</span>null<span class="o">)</span> <span class="nv">inode</span><span class="o">=</span>934 <span class="nv">dev</span><span class="o">=</span>08:01 <span class="nv">mode</span><span class="o">=</span>0100755 <span class="nv">ouid</span><span class="o">=</span>0 <span class="nv">ogid</span><span class="o">=</span>0 <span class="nv">rdev</span><span class="o">=</span>00:00
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Next steps: Patching and upgrading the kernel with GRSecurity</h2>
+
+<p>GRSecurity is an awesome tool in the security-minded system administrators toolbag. It will prevent zero days (like the proc mem exploit explained above <a href="http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options#Remove_addresses_from_.2Fproc.2F.3Cpid.3E.2F.5Bsmaps.7Cmaps.7Cstat.5D"><sup>1</sup></a> ) by securing which areas a user can access. A full list can be seen at <a href="http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options">http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options</a> and <a href="http://en.wikipedia.org/wiki/Grsecurity#Miscellaneous_features">http://en.wikipedia.org/wiki/Grsecurity#Miscellaneous_features</a>, I suggest going through these and seeing if you want to continue with this.</p>
+
+<p><strong>The following below is for advanced users. Not responsible for any issues you may run into, please make sure to test this in a staging/test environment.</strong></p>
+
+<p>Here are the steps I followed to install the patch:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Start by downloading the latest kernel</span>
+</span><span class='line'>wget http://www.kernel.org/pub/linux/kernel/v3.0/linux-3.2.39.tar.bz2
+</span><span class='line'>
+</span><span class='line'><span class="c"># Next extract it</span>
+</span><span class='line'>tar xjvf linux-3.2.39.tar.bz2
+</span><span class='line'><span class="nb">cd </span>linux-3.2.39
+</span><span class='line'>
+</span><span class='line'><span class="c"># Copy over your current kernel configuration:</span>
+</span><span class='line'>cp -vi /boot/config-<span class="sb">`</span>uname -r<span class="sb">`</span> .config
+</span><span class='line'>
+</span><span class='line'><span class="c"># Updates the config file to match old config and prompts for any new kernel options.</span>
+</span><span class='line'>make oldconfig
+</span><span class='line'>
+</span><span class='line'><span class="c"># This will make sure only modules get compiled only if they are in your kernel. </span>
+</span><span class='line'>make localmodconfig
+</span><span class='line'>
+</span><span class='line'><span class="c"># Bring up the configuration menu</span>
+</span><span class='line'>make menuconfig
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once your in the menu config you can browse to the <code>Security</code> section and go to <code>Grsecurity</code> and enable it. I set the configuration method to automatic and then went to Customize. For example, you can now go to <code>Kernel Auditing -&gt; Exec logging</code> to turn on some additional logging to shell activities (<strong>WARNING: this will generate a lot of log activity, decide if you want to use this or not). I suggest going through all of these and reading through their menu help descriptions (when selecting one, press the <code>?</code> key to bring up the help</strong>).</p>
+
+<p>Now we&rsquo;ll finish making the kernel and compiling it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Now we can compile the kernel</span>
+</span><span class='line'>make -j2 <span class="c"># where 2 is the # of CPU&#39;s + 1</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Install and load the dynamic kernel modules</span>
+</span><span class='line'>sudo make modules_install
+</span><span class='line'>
+</span><span class='line'><span class="c"># Finally install kernel</span>
+</span><span class='line'>sudo make install
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can now reboot and boot into our GRsecurity patched kernel!</p>
+
+<p>Hopefully this article has provided some insight into what the <code>setuid</code> flag does, how it has and can be exploited, and what we can do to prevent this in the future.</p>
+
+<p>Here are a few links to useful books on the subject of shellcode and exploits that I reccomend:</p>
+
+<center>
+    <iframe src="http://rcm.amazon.com/e/cm?lt1=_blank&bc1=FFFFFF&IS1=1&npa=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=blues0c3-20&o=1&p=8&l=as1&m=amazon&f=ifr&ref=qf_sp_asin_til&asins=1597490059" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>
+
+    <iframe src="http://rcm.amazon.com/e/cm?t=blues0c3-20&o=1&p=8&l=as1&asins=1597494860&IS1=1&ref=qf_sp_asin_til&fc1=000000&lt1=_blank&m=amazon&lc1=0000FF&bc1=FFFFFF&bg1=FFFFFF&npa=1&f=ifr" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>
+</center>
+
+
+<h3>Below is the list of <code>setuid</code> binaries on each OS</h3>
+
+<p><a name="ubuntu"></a></p>
+
+<h4>Ubuntu 12.04 LTS (22)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>-rwsr-xr-x 1 root    root        31304 Mar  2  2012 /bin/fusermount-rwsr-xr-x 1 root    root        94792 Mar 30  2012 /bin/mount
+</span><span class='line'>-rwsr-xr-x 1 root    root        35712 Nov  8  2011 /bin/ping
+</span><span class='line'>-rwsr-xr-x 1 root    root        40256 Nov  8  2011 /bin/ping6
+</span><span class='line'>-rwsr-xr-x 1 root    root        36832 Sep 12 18:29 /bin/su
+</span><span class='line'>-rwsr-xr-x 1 root    root        69096 Mar 30  2012 /bin/umount
+</span><span class='line'>-rwsr-sr-x 1 daemon  daemon      47928 Oct 25  2011 /usr/bin/at
+</span><span class='line'>-rwsr-xr-x 1 root    root        41832 Sep 12 18:29 /usr/bin/chfn
+</span><span class='line'>-rwsr-xr-x 1 root    root        37096 Sep 12 18:29 /usr/bin/chsh
+</span><span class='line'>-rwsr-xr-x 1 root    root        63848 Sep 12 18:29 /usr/bin/gpasswd
+</span><span class='line'>-rwsr-xr-x 1 root    root        62400 Jul 28  2011 /usr/bin/mtr
+</span><span class='line'>-rwsr-xr-x 1 root    root        32352 Sep 12 18:29 /usr/bin/newgrp
+</span><span class='line'>-rwsr-xr-x 1 root    root        42824 Sep 12 18:29 /usr/bin/passwd
+</span><span class='line'>-rwsr-xr-x 2 root    root        71288 May 31  2012 /usr/bin/sudo
+</span><span class='line'>-rwsr-xr-x 2 root    root        71288 May 31  2012 /usr/bin/sudoedit
+</span><span class='line'>-rwsr-xr-x 1 root    root        18912 Nov  8  2011 /usr/bin/traceroute6.iputils
+</span><span class='line'>-rwsr-xr-- 1 root    messagebus 292944 Oct  3 13:03 /usr/lib/dbus-1.0/dbus-daemon-launch-helper
+</span><span class='line'>-rwsr-xr-x 1 root    root        10408 Dec 13  2011 /usr/lib/eject/dmcrypt-get-device
+</span><span class='line'>-rwsr-xr-x 1 root    root       240984 Apr  2  2012 /usr/lib/openssh/ssh-keysign
+</span><span class='line'>-rwsr-xr-x 1 root    root        10592 Oct  5 16:08 /usr/lib/pt_chown
+</span><span class='line'>-rwsr-xr-- 1 root    dip        325744 Feb  4  2011 /usr/sbin/pppd
+</span><span class='line'>-rwsr-sr-x 1 libuuid libuuid     18856 Mar 30  2012 /usr/sbin/uuidd
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="centos"></a></p>
+
+<h4>CentOS 6.3 (21)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>-rwsr-xr-x. 1 root root  76056 Nov  5 05:21 /bin/mount-rwsr-xr-x. 1 root root  40760 Jul 19  2011 /bin/ping
+</span><span class='line'>-rwsr-xr-x. 1 root root  36488 Jul 19  2011 /bin/ping6
+</span><span class='line'>-rwsr-xr-x. 1 root root  34904 Jun 22  2012 /bin/su
+</span><span class='line'>-rwsr-xr-x. 1 root root  50496 Nov  5 05:21 /bin/umount
+</span><span class='line'>-rwsr-x---. 1 root dbus  46232 Sep 13 13:04 /lib64/dbus-1/dbus-daemon-launch-helper
+</span><span class='line'>-rwsr-xr-x. 1 root root  10272 Apr 16  2012 /sbin/pam_timestamp_check
+</span><span class='line'>-rwsr-xr-x. 1 root root  34840 Apr 16  2012 /sbin/unix_chkpwd
+</span><span class='line'>-rwsr-xr-x. 1 root root  54240 Jan 30  2012 /usr/bin/at
+</span><span class='line'>-rwsr-xr-x. 1 root root  66352 Dec  7  2011 /usr/bin/chage
+</span><span class='line'>-rws--x--x. 1 root root  20184 Nov  5 05:21 /usr/bin/chfn
+</span><span class='line'>-rws--x--x. 1 root root  20056 Nov  5 05:21 /usr/bin/chsh
+</span><span class='line'>-rwsr-xr-x. 1 root root  47520 Jul 19  2011 /usr/bin/crontab
+</span><span class='line'>-rwsr-xr-x. 1 root root  71480 Dec  7  2011 /usr/bin/gpasswd
+</span><span class='line'>-rwsr-xr-x. 1 root root  36144 Dec  7  2011 /usr/bin/newgrp
+</span><span class='line'>-rwsr-xr-x. 1 root root  30768 Feb 22  2012 /usr/bin/passwd
+</span><span class='line'>---s--x--x. 2 root root 219272 Aug  6  2012 /usr/bin/sudo
+</span><span class='line'>---s--x--x. 2 root root 219272 Aug  6  2012 /usr/bin/sudoedit
+</span><span class='line'>-rwsr-xr-x. 1 root root 224912 Nov  9 07:49 /usr/libexec/openssh/ssh-keysign
+</span><span class='line'>-rws--x--x. 1 root root  14280 Jan 31 06:30 /usr/libexec/pt_chown
+</span><span class='line'>-rwsr-xr-x. 1 root root   9000 Sep 17 05:55 /usr/sbin/usernetctl
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="openbsd"></a></p>
+
+<h4>OpenBSD 5.2 (3)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>-r-sr-xr-x  1 root  bin       242808 Aug  1  2012 /sbin/ping-r-sr-xr-x  1 root  bin       263288 Aug  1  2012 /sbin/ping6
+</span><span class='line'>-r-sr-x---  1 root  operator  222328 Aug  1  2012 /sbin/shutdown
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="openindiana"></a></p>
+
+<h4>OpenIndiana 11 (53)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>-rwsr-xr-x   1 root     bin        64232 Jun 30  2012 /sbin/wificonfig--wS--lr-x   1 root     root           0 Dec 11 15:20 /media/.hal-mtab-lock
+</span><span class='line'>-r-sr-xr-x   1 root     bin       206316 Dec 11 21:00 /usr/lib/ssh/ssh-keysign
+</span><span class='line'>-rwsr-xr-x   1 root     adm        12140 Jun 30  2012 /usr/lib/acct/accton
+</span><span class='line'>-r-sr-xr-x   1 root     bin        23200 Jun 30  2012 /usr/lib/fs/ufs/quota
+</span><span class='line'>-r-sr-xr-x   1 root     bin       111468 Jun 30  2012 /usr/lib/fs/ufs/ufsrestore
+</span><span class='line'>-r-sr-xr-x   1 root     bin       106964 Jun 30  2012 /usr/lib/fs/ufs/ufsdump
+</span><span class='line'>-r-sr-xr-x   1 root     bin        18032 Jun 30  2012 /usr/lib/fs/smbfs/umount
+</span><span class='line'>-r-sr-xr-x   1 root     bin        18956 Jun 30  2012 /usr/lib/fs/smbfs/mount
+</span><span class='line'>-r-sr-xr-x   1 root     bin        12896 Jun 30  2012 /usr/lib/utmp_update
+</span><span class='line'>-r-sr-xr-x   1 root     bin        35212 Jun 30  2012 /usr/bin/fdformat
+</span><span class='line'>-r-s--x--x   2 root     bin       188080 Jun 30  2012 /usr/bin/sudoedit
+</span><span class='line'>-r-sr-xr-x   1 root     sys        34876 Jun 30  2012 /usr/bin/su
+</span><span class='line'>-r-sr-xr-x   1 root     bin        42504 Jun 30  2012 /usr/bin/login
+</span><span class='line'>-r-sr-xr-x   1 root     bin       257288 Jun 30  2012 /usr/bin/pppd
+</span><span class='line'>-r-sr-xr-x   1 root     sys        46208 Jun 30  2012 /usr/bin/chkey
+</span><span class='line'>-r-sr-xr-x   1 root     sys        29528 Jun 30  2012 /usr/bin/amd64/newtask
+</span><span class='line'>-r-sr-xr-x   2 root     bin        24432 Jun 30  2012 /usr/bin/amd64/w
+</span><span class='line'>-r-sr-xr-x   1 root     bin      3224200 Jun 30  2012 /usr/bin/amd64/Xorg
+</span><span class='line'>-r-sr-xr-x   2 root     bin        24432 Jun 30  2012 /usr/bin/amd64/uptime
+</span><span class='line'>-rwsr-xr-x   1 root     sys        47804 Jun 30  2012 /usr/bin/at
+</span><span class='line'>-r-sr-xr-x   1 root     bin         8028 Jun 30  2012 /usr/bin/mailq
+</span><span class='line'>-r-sr-xr-x   1 root     bin        33496 Jun 30  2012 /usr/bin/rsh
+</span><span class='line'>-r-sr-xr-x   1 root     bin        68704 Jun 30  2012 /usr/bin/rmformat
+</span><span class='line'>-r-sr-sr-x   1 root     sys        31292 Jun 30  2012 /usr/bin/passwd
+</span><span class='line'>-rwsr-xr-x   1 root     sys        23328 Jun 30  2012 /usr/bin/atrm
+</span><span class='line'>-r-sr-xr-x   1 root     bin        97072 Jun 30  2012 /usr/bin/xlock
+</span><span class='line'>-r-sr-xr-x   1 root     bin        78672 Jun 30  2012 /usr/bin/rdist
+</span><span class='line'>-r-sr-xr-x   1 root     bin        27072 Jun 30  2012 /usr/bin/sys-suspend
+</span><span class='line'>-r-sr-xr-x   1 root     bin        29304 Jun 30  2012 /usr/bin/crontab
+</span><span class='line'>-r-sr-xr-x   1 root     bin        53080 Jun 30  2012 /usr/bin/rcp
+</span><span class='line'>-r-s--x--x   2 root     bin       188080 Jun 30  2012 /usr/bin/sudo
+</span><span class='line'>-r-s--x--x   1 uucp     bin        70624 Jun 30  2012 /usr/bin/tip
+</span><span class='line'>-rwsr-xr-x   1 root     sys        18824 Jun 30  2012 /usr/bin/atq
+</span><span class='line'>-r-sr-xr-x   1 root     bin       281732 Jun 30  2012 /usr/bin/xscreensaver
+</span><span class='line'>-r-sr-xr-x   1 root     bin      2767780 Jun 30  2012 /usr/bin/i86/Xorg
+</span><span class='line'>-r-sr-xr-x   1 root     sys        22716 Jun 30  2012 /usr/bin/i86/newtask
+</span><span class='line'>-r-sr-xr-x   2 root     bin        22020 Jun 30  2012 /usr/bin/i86/w
+</span><span class='line'>-r-sr-xr-x   2 root     bin        22020 Jun 30  2012 /usr/bin/i86/uptime
+</span><span class='line'>-rwsr-xr-x   1 root     sys        13636 Jun 30  2012 /usr/bin/newgrp
+</span><span class='line'>-r-sr-xr-x   1 root     bin        39224 Jun 30  2012 /usr/bin/rlogin
+</span><span class='line'>-rwsr-xr-x   1 svctag   daemon    108964 Jun 30  2012 /usr/bin/stclient
+</span><span class='line'>-r-sr-xr-x   1 root     bin        29324 Jun 30  2012 /usr/xpg4/bin/crontab
+</span><span class='line'>-rwsr-xr-x   1 root     sys        47912 Jun 30  2012 /usr/xpg4/bin/at
+</span><span class='line'>-r-sr-xr-x   3 root     bin        41276 Jun 30  2012 /usr/sbin/deallocate
+</span><span class='line'>-rwsr-xr-x   1 root     sys        32828 Jun 30  2012 /usr/sbin/sacadm
+</span><span class='line'>-r-sr-xr-x   1 root     bin        46512 Jun 30  2012 /usr/sbin/traceroute
+</span><span class='line'>-r-sr-xr-x   1 root     bin        18016 Jun 30  2012 /usr/sbin/i86/whodo
+</span><span class='line'>-r-sr-xr-x   1 root     bin        55584 Jun 30  2012 /usr/sbin/ping
+</span><span class='line'>-r-sr-xr-x   3 root     bin        41276 Jun 30  2012 /usr/sbin/allocate
+</span><span class='line'>-r-sr-xr-x   1 root     bin        37320 Jun 30  2012 /usr/sbin/pmconfig
+</span><span class='line'>-r-sr-xr-x   3 root     bin        41276 Jun 30  2012 /usr/sbin/list_devices
+</span><span class='line'>-r-sr-xr-x   1 root     bin        24520 Jun 30  2012 /usr/sbin/amd64/whodo
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2013/01/securing-ubuntu/">Securing Ubuntu</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-17T20:25:00-05:00" pubdate data-updated="true">Jan 17<sup>th</sup>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Table of Contents</h2>
+
+<h4><a href="#initial_setup">Initial Setup</a></h4>
+
+<h4><a href="#iptables_fail2ban">Setting up iptables and Fail2Ban</a></h4>
+
+<h5><span style='padding-left: 20px;'></span><a href="#fail2ban">Fail2Ban</a></h5>
+
+<h5><span style='padding-left: 20px;'></span><a href="#iptables_rules">iptables rules</a></h5>
+
+<h4><a href="#shared_memory">Make shared memory read-only</a></h4>
+
+<h4><a href="#bastille">Setting up Bastille Linux</a></h4>
+
+<h5><span style='padding-left: 20px;'></span><a href="#bastille_config">Configuring Bastille</a></h5>
+
+<h4><a href="#sysctl">sysctl hardening</a></h4>
+
+<h4><a href="#chroot">Setting up a chroot environment</a></h4>
+
+<h4><a href="#nginx">Securing nginx inside the chroot</a></h4>
+
+<h4><a href="#extras">Extras</a></h4>
+
+<p><a name="initial_setup"></a></p>
+
+<h2>Initial Setup</h2>
+
+<p>Let&rsquo;s login to our new machine and take some initial steps to secure our system. For this article I&rsquo;m going to assume your username is <code>ubuntu</code>.</p>
+
+<p>If you need to, setup your sudoers file by adding the following lines:</p>
+
+<figure class='code'><figcaption><span>/etc/sudoers</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ubuntu <span class="nv">ALL</span><span class="o">=(</span>ALL:ALL<span class="o">)</span> ALL <span class="c"># put this in the &quot;User privilege specification&quot; section</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Edit your <code>~/.ssh/authorized_keys</code> and put your public key inside it. Make sure you can login without a password now once your key is in place.</p>
+
+<p>Open up <code>/etc/ssh/sshd_config</code> and make sure these lines exist to secure SSH:</p>
+
+<figure class='code'><figcaption><span>/etc/ssh/sshd_config</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Only allow version 2 communications, version 1 has known vulnerabilities</span>
+</span><span class='line'>Protocol 2
+</span><span class='line'><span class="c"># Disable root login over ssh</span>
+</span><span class='line'>PermitRootLogin no
+</span><span class='line'><span class="c"># Load authorized keys files from a users home directory</span>
+</span><span class='line'>AuthorizedKeysFile  %h/.ssh/authorized_keys
+</span><span class='line'><span class="c"># Don&#39;t allow empty passwords to be used to authenticate</span>
+</span><span class='line'>PermitEmptyPasswords no
+</span><span class='line'><span class="c"># Disable password auth, you must use ssh keys</span>
+</span><span class='line'>PasswordAuthentication no
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Keep your current session open and restart sshd:</p>
+
+<figure class='code'><figcaption><span>/etc/ssh/sshd_config</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo service ssh restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Make sure you can login from another terminal. If you can, move on.</p>
+
+<p>Now we need to update and upgrade to make sure all of our packages are up to date and install two pre-requisites for later in the article: build-essential and ntp.</p>
+
+<figure class='code'><figcaption><span>apt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get update
+</span><span class='line'>sudo apt-get install build-essential ntp
+</span><span class='line'>sudo apt-get upgrade
+</span><span class='line'>sudo reboot
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="iptables_fail2ban"></a></p>
+
+<h2>Setting up iptables and Fail2Ban</h2>
+
+<p><a name="fail2ban"></a></p>
+
+<h3>Fail2Ban</h3>
+
+<figure class='code'><figcaption><span>apt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get install fail2ban
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Open up the fail2ban config and change the ban time, destemail, and maxretry:</p>
+
+<figure class='code'><figcaption><span>/etc/fail2ban/jail.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>DEFAULT<span class="o">]</span>
+</span><span class='line'><span class="nv">ignoreip</span> <span class="o">=</span> 127.0.0.1/8
+</span><span class='line'><span class="nv">bantime</span>  <span class="o">=</span> 3600
+</span><span class='line'><span class="nv">maxretry</span> <span class="o">=</span> 2
+</span><span class='line'><span class="nv">destemail</span> <span class="o">=</span> ubuntu@yourdomain.com
+</span><span class='line'><span class="nv">action</span> <span class="o">=</span> %<span class="o">(</span>action_mw<span class="o">)</span>s
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>ssh<span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">enabled</span>  <span class="o">=</span> <span class="nb">true</span>
+</span><span class='line'><span class="nv">port</span>     <span class="o">=</span> ssh
+</span><span class='line'><span class="nv">filter</span>   <span class="o">=</span> sshd
+</span><span class='line'><span class="nv">logpath</span>  <span class="o">=</span> /var/log/auth.log
+</span><span class='line'><span class="nv">maxretry</span> <span class="o">=</span> 2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now restart fail2ban.</p>
+
+<figure class='code'><figcaption><span>/etc/fail2ban/jail.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo service fail2ban restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you try and login from another machine and fail, you should see the ip in iptables.</p>
+
+<figure class='code'><figcaption><span>/etc/fail2ban/jail.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># sudo iptables -L</span>
+</span><span class='line'>Chain fail2ban-ssh <span class="o">(</span>1 references<span class="o">)</span>
+</span><span class='line'>target     prot opt <span class="nb">source               </span>destination
+</span><span class='line'>DROP       all  --  li203-XX.members.linode.com  anywhere
+</span><span class='line'>RETURN     all  --  anywhere             anywhere
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="iptables_rules"></a></p>
+
+<h3>iptables Rules</h3>
+
+<p>Here are my default iptables rules, it opens up port 80 and 443 for HTTP/HTTPS communication, and allows port 22.
+We also allow ping and then log all denied calls and then reject everything else. If you have other services you need to run, such as a game server or something else, you&rsquo;ll have to add the rules to open up the ports in the iptables config.</p>
+
+<figure class='code'><figcaption><span>/etc/iptables.up.rules </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>*filter
+</span><span class='line'>
+</span><span class='line'># Accepts all established inbound connections
+</span><span class='line'> -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+</span><span class='line'>
+</span><span class='line'># Allows all outbound traffic
+</span><span class='line'># You could modify this to only allow certain traffic
+</span><span class='line'> -A OUTPUT -j ACCEPT
+</span><span class='line'>
+</span><span class='line'># Allows HTTP and HTTPS connections from anywhere (the normal ports for websites)
+</span><span class='line'> -A INPUT -p tcp --dport 443 -j ACCEPT
+</span><span class='line'> -A INPUT -p tcp --dport 80 -j ACCEPT
+</span><span class='line'># Allows SSH connections for script kiddies
+</span><span class='line'># THE -dport NUMBER IS THE SAME ONE YOU SET UP IN THE SSHD_CONFIG FILE
+</span><span class='line'> -A INPUT -p tcp -m state --state NEW --dport 22 -j ACCEPT
+</span><span class='line'>
+</span><span class='line'># Now you should read up on iptables rules and consider whether ssh access
+</span><span class='line'># for everyone is really desired. Most likely you will only allow access from certain IPs.
+</span><span class='line'>
+</span><span class='line'># Allow ping
+</span><span class='line'> -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
+</span><span class='line'>
+</span><span class='line'># log iptables denied calls (access via &#39;dmesg&#39; command)
+</span><span class='line'> -A INPUT -m limit --limit 5/min -j LOG --log-prefix &quot;iptables denied: &quot; --log-level 7
+</span><span class='line'>
+</span><span class='line'># Reject all other inbound - default deny unless explicitly allowed policy:
+</span><span class='line'> -A INPUT -j REJECT
+</span><span class='line'> -A FORWARD -j REJECT
+</span><span class='line'>
+</span><span class='line'>COMMIT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can load that up into iptables:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo iptables-restore &lt; /etc/iptables.up.rules
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Make sure it loads on boot by putting it into the if-up scripts:</p>
+
+<figure class='code'><figcaption><span>/etc/network/if-up.d/iptables</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'>iptables-restore /etc/iptables.up.rules
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now make it executable:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chmod +x /etc/network/if-up.d/iptables
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Rebooting here is optional, I usually reboot after major changes to make sure everything boots up properly.</p>
+
+<p>If you&rsquo;re getting hit by scanners or brute-force attacks, you&rsquo;ll see a line similar to this in your <code>/var/log/syslog</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Jan 18 03:30:37 localhost kernel: <span class="o">[</span>   79.631680<span class="o">]</span> iptables denied: <span class="nv">IN</span><span class="o">=</span>eth0 <span class="nv">OUT</span><span class="o">=</span> <span class="nv">MAC</span><span class="o">=</span>04:01:01:40:70:01:00:12:f2:c6:e8:00:08:00 <span class="nv">SRC</span><span class="o">=</span>87.13.110.30 <span class="nv">DST</span><span class="o">=</span>192.34.XX.XX <span class="nv">LEN</span><span class="o">=</span>64 <span class="nv">TOS</span><span class="o">=</span>0x00 <span class="nv">PREC</span><span class="o">=</span>0x00 <span class="nv">TTL</span><span class="o">=</span>34 <span class="nv">ID</span><span class="o">=</span>57021 DF <span class="nv">PROTO</span><span class="o">=</span>TCP <span class="nv">SPT</span><span class="o">=</span>1253 <span class="nv">DPT</span><span class="o">=</span>135 <span class="nv">WINDOW</span><span class="o">=</span>53760 <span class="nv">RES</span><span class="o">=</span>0x00 SYN <span class="nv">URGP</span><span class="o">=</span>0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="shared_memory"></a></p>
+
+<h2>Read only shared memory</h2>
+
+<p>A common exploit vector is going through shared memory (which can let you change the UID of running programs and other malicious actions). It can also be used as a place to drop files once an initial breakin has been made. An example of one such exploit is available <a href="http://www.juniper.net/security/auto/vulnerabilities/vuln17587.html">here</a>.</p>
+
+<p>Open <code>/etc/fstab/</code>:</p>
+
+<figure class='code'><figcaption><span>/etc/fstab </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tmpfs     /dev/shm     tmpfs     defaults,ro     0     0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once you do this you need to reboot.</p>
+
+<p><a name="bastille"></a></p>
+
+<h2>Setting up Bastille Linux</h2>
+
+<blockquote><p>The Bastille Hardening program &#8220;locks down&#8221; an operating system, proactively configuring the system for increased security and decreasing its susceptibility to compromise. Bastille can also assess a system&#8217;s current state of hardening, granularly reporting on each of the security settings with which it works.</p><footer><strong>Bastille Linux</strong> <cite><a href='http://bastille-linux.sourceforge.net/'>bastille-linux.sourceforge.net/&hellip;</a></cite></footer></blockquote>
+
+
+
+
+<figure class='code'><figcaption><span>Bastille: Installation and Setup</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get install bastille <span class="c"># choose Internet site for postfix</span>
+</span><span class='line'><span class="c"># configure bastille</span>
+</span><span class='line'>sudo bastille
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After you run that command you&rsquo;ll be prompted to configure your system, here are the options I chose:</p>
+
+<p><a name="bastille_config"></a></p>
+
+<h3>Configuring Bastille</h3>
+
+<ul>
+<li>File permissions module: Yes (suid)</li>
+<li>Disable SUID for mount/umount: Yes</li>
+<li>Disable SUID on ping: Yes</li>
+<li>Disable clear-text r-protocols that use IP-based authentication? Yes</li>
+<li>Enforce password aging? No (situation dependent, I have no users accessing my machines except me, and I only allow ssh keys)</li>
+<li>Default umask: Yes</li>
+<li>Umask: 077</li>
+<li>Disable root login on tty&rsquo;s 1-6: No</li>
+<li>Password protect GRUB prompt: No (situation dependent, I&rsquo;m on a VPS and would like to get support in case I need it)</li>
+<li>Password protect su mode: Yes</li>
+<li>default-deny on tcp-wrappers and xinetd? No</li>
+<li>Ensure telnet doesn&rsquo;t run? Yes</li>
+<li>Ensure FTP does not run? Yes</li>
+<li>display authorized use message? No (situation dependent, if you had other users, Yes)</li>
+<li>Put limits on system resource usage? Yes</li>
+<li>Restrict console access to group of users? Yes (then choose root)</li>
+<li>Add additional logging? Yes</li>
+<li>Setup remote logging if you have a remote log host, I don&rsquo;t so I answered No</li>
+<li>Setup process accounting? Yes</li>
+<li>Disable acpid? Yes</li>
+<li>Deactivate nfs + samba? Yes (situation dependent)</li>
+<li>Stop sendmail from running in daemon mode? No (I have this firewalled off, so I&rsquo;m not concerned)</li>
+<li>Deactivate apache? Yes</li>
+<li>Disable printing? Yes</li>
+<li>TMPDIR/TMP scripts? No (if a multi-user system, yes)</li>
+<li>Packet filtering script? No (we configured the firewall previously)</li>
+<li>Finished? YES! &amp; reboot</li>
+</ul>
+
+
+<p>You can verify some of these changes by testing them out, for instance, the SUID change on ping:</p>
+
+<figure class='code'><figcaption><span>Bastille: Verifying changes</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ubuntu@app1:~<span class="nv">$ </span>ping google.com
+</span><span class='line'>ping: icmp open socket: Operation not permitted
+</span><span class='line'>ubuntu@app1:~<span class="nv">$ </span>sudo ping google.com
+</span><span class='line'>PING google.com <span class="o">(</span>74.125.228.72<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+</span><span class='line'>64 bytes from iad23s07-in-f8.1e100.net <span class="o">(</span>74.125.228.72<span class="o">)</span>: <span class="nv">icmp_req</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>55 <span class="nb">time</span><span class="o">=</span>9.06 ms
+</span><span class='line'>^C
+</span><span class='line'>--- google.com ping statistics ---
+</span><span class='line'>1 packets transmitted, 1 received, 0% packet loss, <span class="nb">time </span>0ms
+</span><span class='line'>rtt min/avg/max/mdev <span class="o">=</span> 9.067/9.067/9.067/0.000 ms
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="sysctl"></a></p>
+
+<h2>Sysctl hardening</h2>
+
+<p>Since our machine isn&rsquo;t running as a router and is going to be running as an application/web server, there are additional
+steps we can take to secure the machine. Many of these are from the NSA&rsquo;s security guide, which you can read in its entirety
+<a href="http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf">here</a>.</p>
+
+<figure class='code'><figcaption><span>/etc/sysctl.conf</span><a href='http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf'>Source</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Protect ICMP attacks</span>
+</span><span class='line'>net.ipv4.icmp_echo_ignore_broadcasts <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Turn on protection for bad icmp error messages</span>
+</span><span class='line'>net.ipv4.icmp_ignore_bogus_error_responses <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Turn on syncookies for SYN flood attack protection</span>
+</span><span class='line'>net.ipv4.tcp_syncookies <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Log suspcicious packets, such as spoofed, source-routed, and redirect</span>
+</span><span class='line'>net.ipv4.conf.all.log_martians <span class="o">=</span> 1
+</span><span class='line'>net.ipv4.conf.default.log_martians <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Disables these ipv4 features, not very legitimate uses</span>
+</span><span class='line'>net.ipv4.conf.all.accept_source_route <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.default.accept_source_route <span class="o">=</span> 0
+</span><span class='line'>
+</span><span class='line'><span class="c"># Enables RFC-reccomended source validation (dont use on a router)</span>
+</span><span class='line'>net.ipv4.conf.all.rp_filter <span class="o">=</span> 1
+</span><span class='line'>net.ipv4.conf.default.rp_filter <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Make sure no one can alter the routing tables</span>
+</span><span class='line'>net.ipv4.conf.all.accept_redirects <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.default.accept_redirects <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.all.secure_redirects <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.default.secure_redirects <span class="o">=</span> 0
+</span><span class='line'>
+</span><span class='line'><span class="c"># Host only (we&#39;re not a router)</span>
+</span><span class='line'>net.ipv4.ip_forward <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.all.send_redirects <span class="o">=</span> 0
+</span><span class='line'>net.ipv4.conf.default.send_redirects <span class="o">=</span> 0
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Turn on execshild</span>
+</span><span class='line'>kernel.exec-shield <span class="o">=</span> 1
+</span><span class='line'>kernel.randomize_va_space <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Tune IPv6</span>
+</span><span class='line'>net.ipv6.conf.default.router_solicitations <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.accept_ra_rtr_pref <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.accept_ra_pinfo <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.accept_ra_defrtr <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.autoconf <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.dad_transmits <span class="o">=</span> 0
+</span><span class='line'>net.ipv6.conf.default.max_addresses <span class="o">=</span> 1
+</span><span class='line'>
+</span><span class='line'><span class="c"># Optimization for port usefor LBs</span>
+</span><span class='line'><span class="c"># Increase system file descriptor limit</span>
+</span><span class='line'>fs.file-max <span class="o">=</span> 65535
+</span><span class='line'>
+</span><span class='line'><span class="c"># Allow for more PIDs (to reduce rollover problems); may break some programs 32768</span>
+</span><span class='line'>kernel.pid_max <span class="o">=</span> 65536
+</span><span class='line'>
+</span><span class='line'><span class="c"># Increase system IP port limits</span>
+</span><span class='line'>net.ipv4.ip_local_port_range <span class="o">=</span> 2000 65000
+</span><span class='line'>
+</span><span class='line'><span class="c"># Increase TCP max buffer size setable using setsockopt()</span>
+</span><span class='line'>net.ipv4.tcp_rmem <span class="o">=</span> 4096 87380 8388608
+</span><span class='line'>net.ipv4.tcp_wmem <span class="o">=</span> 4096 87380 8388608
+</span><span class='line'>
+</span><span class='line'><span class="c"># Increase Linux auto tuning TCP buffer limits</span>
+</span><span class='line'><span class="c"># min, default, and max number of bytes to use</span>
+</span><span class='line'><span class="c"># set max to at least 4MB, or higher if you use very high BDP paths</span>
+</span><span class='line'>net.core.rmem_max <span class="o">=</span> 8388608
+</span><span class='line'>net.core.wmem_max <span class="o">=</span> 8388608
+</span><span class='line'>net.core.netdev_max_backlog <span class="o">=</span> 5000
+</span><span class='line'>net.ipv4.tcp_window_scaling <span class="o">=</span> 1
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After making these changes you should reboot.</p>
+
+<p><a name="chroot"></a></p>
+
+<h2>Setting up a chroot environment</h2>
+
+<p>We&rsquo;ll be setting up a chroot environment to run our web server and applications in. Chroot&rsquo;s provide isolation from the rest of the operating system, so even in the event of a application compromise, damage can be mitigated.</p>
+
+<figure class='code'><figcaption><span>chroot: Installation and Setup </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get install debootstrap dchroot
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now add this to your <code>/etc/schroot/schroot.conf</code> file, precise is the release of Ubuntu I&rsquo;m using, so change it if you need to:</p>
+
+<figure class='code'><figcaption><span>/etc/schroot/schroot.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>precise<span class="o">]</span>
+</span><span class='line'><span class="nv">description</span><span class="o">=</span>Ubuntu Precise LTS
+</span><span class='line'><span class="nv">location</span><span class="o">=</span>/var/chroot
+</span><span class='line'><span class="nv">priority</span><span class="o">=</span>3
+</span><span class='line'><span class="nv">users</span><span class="o">=</span>ubuntu
+</span><span class='line'><span class="nv">groups</span><span class="o">=</span>sbuild
+</span><span class='line'>root-groups<span class="o">=</span>root
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now bootstrap the chroot with a minimal Ubuntu installation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo debootstrap --variant<span class="o">=</span>buildd --arch amd64 precise /var/chroot/ http://mirror.anl.gov/pub/ubuntu/
+</span><span class='line'>sudo cp /etc/resolv.conf /var/chroot/etc/resolv.conf
+</span><span class='line'>sudo mount -o <span class="nb">bind</span> /proc /var/chroot/proc
+</span><span class='line'>sudo chroot /var/chroot/
+</span><span class='line'>apt-get install ubuntu-minimal
+</span><span class='line'>apt-get update
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Add the following to <code>/etc/apt/sources.list</code> inside the chroot:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>deb http://archive.ubuntu.com/ubuntu precise main
+</span><span class='line'>deb http://archive.ubuntu.com/ubuntu precise-updates main
+</span><span class='line'>deb http://security.ubuntu.com/ubuntu precise-security main
+</span><span class='line'>deb http://archive.ubuntu.com/ubuntu precise universe
+</span><span class='line'>deb http://archive.ubuntu.com/ubuntu precise-updates universe
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s test out our chroot and install nginx inside of it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>apt-get update
+</span><span class='line'>apt-get install nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="nginx"></a></p>
+
+<h2>Securing nginx inside the chroot</h2>
+
+<p>First thing we will do is add a www user for nginx to run under:</p>
+
+<figure class='code'><figcaption><span>Adding a application user </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo chroot /var/chroot
+</span><span class='line'>useradd www -d /home/www
+</span><span class='line'>mkdir /home/www
+</span><span class='line'>chown -R www.www /home/www
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Open up <code>/etc/nginx/nginx.conf</code> and make sure you change user to www inside the chroot:</p>
+
+<figure class='code'><figcaption><span>/etc/nginx/nginx.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>user www;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can now start nginx inside the chroot:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo chroot /var/chroot
+</span><span class='line'>service nginx start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now if you go to <a href="http://your_vm_ip/">http://your_vm_ip/</a> you should see &ldquo;Welcome to nginx!&rdquo; running inside your fancy new chroot.</p>
+
+<p>We also need to setup ssh to run inside the chroot so we can deploy our applications more easily.</p>
+
+<figure class='code'><figcaption><span>Chroot: sshd </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo chroot /var/chroot
+</span><span class='line'>apt-get install openssh-server udev
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since we already have SSH for the main host running on 22, we&rsquo;re going to run SSH for the chroot on port 2222. We&rsquo;ll copy over our config from outside the chroot to the chroot.</p>
+
+<figure class='code'><figcaption><span>sshd config</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo cp /etc/ssh/sshd_config /var/chroot/etc/ssh/sshd_config
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now open the config and change the bind port to 2222.</p>
+
+<p>We also need to add the rules to our firewall script:</p>
+
+<figure class='code'><figcaption><span>/etc/iptables.up.rules </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Chroot ssh</span>
+</span><span class='line'> -A INPUT -p tcp -m state --state NEW --dport 2222 -j ACCEPT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now make a startup script for chroot-precise in `/etc/init.d/chroot-precise:</p>
+
+<figure class='code'><figcaption><span>/etc/init.d/chroot-precise</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mount -o <span class="nb">bind</span> /proc /var/chroot/proc
+</span><span class='line'>mount -o <span class="nb">bind</span> /dev /var/chroot/dev
+</span><span class='line'>mount -o <span class="nb">bind</span> /sys /var/chroot/sys
+</span><span class='line'>mount -o <span class="nb">bind</span> /dev/pts /var/chroot/dev/pts
+</span><span class='line'>chroot /var/chroot service nginx start
+</span><span class='line'>chroot /var/chroot service ssh start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Set it to executable and to start at boot:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo chmod +x /etc/init.d/chroot-precise
+</span><span class='line'>sudo update-rc.d chroot-precise defaults
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next is to put your public key inside the <code>.ssh/authorized_keys</code> file for the www user inside the chroot so you can ssh and deploy your applications.</p>
+
+<p>If you want, you can test your server and reboot it now to ensure nginx and ssh boot up properly. If it&rsquo;s not running right now, you start it: <code>sudo /etc/init.d/chroot-precise</code>.</p>
+
+<p>You should now be able to ssh into your chroot and main server without a password.</p>
+
+<p><a name="extras"></a></p>
+
+<h2>Extras</h2>
+
+<p>I would like to also mention the <a href="http://grsecurity.net/">GRSecurity kernel patch</a>. I had tried several times to install this (two different versions were released while I was writing this) and both make the kernel unable to compile. Hopefully they&rsquo;ll fix these bugs and I&rsquo;ll be able to update this article with notes on setting GRSecurity up as well.</p>
+
+<p>I hope this article proved useful to anyone trying to secure a Ubuntu system, and if you liked it please share it!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2012/12/rb-rfo-status-simple-system-status-page-in-ruby/">Rb RFO Status: A Simple System Status Page in Ruby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-25T13:39:00-05:00" pubdate data-updated="true">Dec 25<sup>th</sup>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>Rb RFO Status</em> is a simple system to post status updates to your team or customers in a easy to understand format so there is no delay in reporting a reason for outage.
+It is modeled slightly after the <a href="http://status.heroku.com/">Heroku Status Page</a>.</p>
+
+<p><strong>Source</strong>: <a href="https://github.com/bluescripts/rb_rfo_status">https://github.com/bluescripts/rb_rfo_status</a></p>
+
+<p><strong>Download</strong>: <a href="https://s3.amazonaws.com/josh-opensource/rb_rfo_status-0.1.war">https://s3.amazonaws.com/josh-opensource/rb_rfo_status-0.1.war</a></p>
+
+<p>It is licensed under the <em>MIT License</em> so do whatever you want with it!</p>
+
+<p>I&rsquo;ve already opened up a few issues on Github that are enhancements, but this serves as a super simple application to deploy to keep your customers and team informed of system states.</p>
+
+<h2>Installation</h2>
+
+<p>Download the .war file and deploy it in your favorite container (Tomcat, etc). Once the war file is extracted you can modify the config settings and start it.</p>
+
+<p>To run migrations on an extracted WAR file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd rb_rfo_status/WEB-INF
+</span><span class='line'>sudo RAILS_ENV=production BUNDLE_WITHOUT=development:test BUNDLE_GEMFILE=Gemfile GEM_HOME=gems java -cp lib/jruby-core-1.7.1.jar:lib/jruby-stdlib-1.7.1.jar:lib/gems-gems-activerecord-jdbc-adapter-1.2.2.1-lib-arjdbc-jdbc-adapter_java.jar:lib/gems-gems-jdbc-mysql-5.1.13-lib-mysql-connector-java-5.1.13.jar org.jruby.Main -S rake db:migrate</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Screenshots</h2>
+
+<h3>Homepage</h3>
+
+<p><img src="https://www.evernote.com/shard/s4/sh/dd1aa9b9-cfcf-4257-af11-3d17d3f1e8dd/c7917a5540f04a60eacad189479e799c/res/6a125eeb-21c8-4f96-9ced-21169a89c527/skitch.png"></p>
+
+<h3>Creating an Incident</h3>
+
+<p><img src="https://www.evernote.com/shard/s4/sh/29176e2c-d770-4c6d-a593-369786d9079d/4c564af13979ba3d5e272c836cc830a2/res/bd810786-94fc-4652-86e1-27885f12bad8/skitch.png?resizeSmall&width=832"></p>
+
+<h3>Updating an incident</h3>
+
+<p><img src="https://www.evernote.com/shard/s4/sh/84afb640-b46c-40eb-9b30-00583685b7a5/915d77b53e7755498e1ef98a86c1ee57/res/8eabf163-959c-4f31-bf88-cbeb6d97dc77/skitch.png?resizeSmall&width=832"></p>
+
+<h3>A resolved incident</h3>
+
+<p><img src="https://www.evernote.com/shard/s4/sh/d0449a09-75e1-47bc-8bc9-7073b76bfdaa/7c68e52c97dc1b912c408f9f0c5bded0/res/b077981e-37e0-4e2b-a8e4-abc1ae092033/skitch.png?resizeSmall&width=832"></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2012/12/dealing-with-cascading-failures-with-chef-server/">Dealing With Cascading Failures With Chef Server</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-06T23:23:00-05:00" pubdate data-updated="true">Dec 6<sup>th</sup>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.opscode.com/">Chef</a> is awesome. Being able to recreate your entire environment from a recipe is an inredibly powerful tool, and I had started using Chef a few months ago. When I had initially configured the Chef server I hadn&rsquo;t paid much attention to the couchdb portion of it until I had a chef-server hiccup. Here are a few things to watch out for when running chef-server:</p>
+
+<ul>
+<li>Setup CouchDB <a href="http://wiki.apache.org/couchdb/Compaction">compaction</a> - Chef had a CouchDB size of 30+GB (after compaction it was only a few megabytes).</li>
+<li>When resizing instances, make sure you setup RabbitMQ to use a <a href="http://www.rabbitmq.com/configure.html">NODENAME</a>. If you don&rsquo;t you&rsquo;ll run into an issue with RabbitMQ losing the database&rsquo;s that were setup (by default, they&rsquo;re based on hostname&hellip; so if you resize a EC2 instance the hostname may change, and you&rsquo;ll either have to do some moving around or manually set the NODENAME to the previous hostname).</li>
+<li>Client&rsquo;s may fail to validate after this - requiring a regeneration of the validation.pem, which is fine since this file is only used for the initial bootstrap of a server.</li>
+<li>Make sure you run your chef recipes you setup (for instance monitoring) on your chef-server.</li>
+</ul>
+
+
+<p>I hope these tips will be helpful to other people when they run into a Chef/CouchDB/RabbitMQ issue after a server resize or hostname change. Another really helpful place is #chef on freenode&rsquo;s IRC servers.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2012/11/sidekiq-vs-resque/">Sidekiq vs Resque, With MRI and JRuby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-03T19:51:00-04:00" pubdate data-updated="true">Nov 3<sup>rd</sup>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Before we dive into the benchmarks of Resque vs Sidekiq it will first help to have a better understanding of how forking and threading works in Ruby.</p>
+
+<h1>Threading vs Forking</h1>
+
+<h2>Forking</h2>
+
+<p>When you fork a process you are creating an entire copy of that process: the address space and all open file descriptors. You get a separate copy of the address space of the parent process, isolating any work done to that fork. If the forked child process does a lot of work and uses a lot of memory, when that child exits the memory gets free&rsquo;d back to the operating system. If your programming language (MRI Ruby) doesn&rsquo;t support actual kernel level threading, then this is the only way to spread work out across multiple cores since each process will get scheduled to a different core. You also gain some stability since if a child crashes the parent can just respawn a new fork, however there is a caveat. If the parent dies while there are children that haven&rsquo;t exited, then those children become zombies.</p>
+
+<h3>Forking and Ruby</h3>
+
+<p>One important note about forking with Ruby is that the maintainers have done a good job on keeping memory usage down when forking. Ruby implements a copy on write system for memory allocation with child forks.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;benchmark&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">fork_pids</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Lets fill up some memory</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">objs</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'><span class="n">objs</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'><span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">objs</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">]</span> <span class="o">&lt;&lt;</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="mi">50</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">fork_pids</span> <span class="o">&lt;&lt;</span> <span class="no">Process</span><span class="o">.</span><span class="n">fork</span> <span class="k">do</span>
+</span><span class='line'>        <span class="nb">sleep</span> <span class="mi">0</span><span class="o">.</span><span class="mi">1</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="n">fork_pids</span><span class="o">.</span><span class="n">map</span><span class="p">{</span><span class="o">|</span><span class="nb">p</span><span class="o">|</span> <span class="no">Process</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="nb">p</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can see this in action here:</p>
+
+<p><img src="/images/showdown/copy_on_write.png"></p>
+
+<p>However when we start modifying memory inside the child forks, memory quickly grows.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="mi">50</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">fork_pids</span> <span class="o">&lt;&lt;</span> <span class="no">Process</span><span class="o">.</span><span class="n">fork</span> <span class="k">do</span>
+</span><span class='line'>      <span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">objs</span> <span class="o">&lt;&lt;</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="n">fork_pids</span><span class="o">.</span><span class="n">map</span><span class="p">{</span><span class="o">|</span><span class="nb">p</span><span class="o">|</span> <span class="no">Process</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="nb">p</span><span class="p">)</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;re now creating a million new objects in each forked child:</p>
+
+<p><img src="/images/showdown/forced_copy_on_write.png"></p>
+
+<h2>Threading</h2>
+
+<p>Threads on the other hand have considerably less overhead since they share address space, memory, and allow easier communication (versus inter-process communication with forks). Context switching between threads inside the same process is also generally cheaper than scheduling switches between processes. Depending on the runtime being used, any issues that might occur using threads (for instance needing to use lots of memory for a task) can be handled by the garbage collector for the most part. One of the benefits of threading is that you do not have to worry about zombie processes since all threads die when the process dies, avoiding the issue of zombies.</p>
+
+<h2>Threading with Ruby</h2>
+
+<p>As of 1.9 the GIL (Global Interpreter Lock) is gone! But it&rsquo;s only been renamed to the GVL (Global VM Lock). The GVL in MRI ruby uses a lock called <code>rb_thread_lock_t</code> which is a mutex around when ruby code can be run. When no ruby objects are being touched, you can actually run ruby threads in parallel before the GVL kicks in again (ie: system level blocking call, IO blocking outside of ruby). After these blocking calls each thread checks the interrupt <code>RUBY_VM_CHECK_INTS</code>.</p>
+
+<p>With MRI ruby threads are pre-emptively scheduled using a function called <code>rb_thread_schedule</code> which schedules an &ldquo;interrupt&rdquo; that lets each thread get a fair amount of execution time (every 10 microseconds). <a href="http://svn.ruby-lang.org/cgi-bin/viewvc.cgi/trunk/thread.c?view=markup">[source: thread.c:1018]</a></p>
+
+<p>We can see an example of the GIL/GVL in action here:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">threads</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">objs</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'><span class="n">objs</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'><span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">objs</span> <span class="o">&lt;&lt;</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">50</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span> <span class="o">|</span><span class="n">num</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">threads</span> <span class="o">&lt;&lt;</span> <span class="no">Thread</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span>
+</span><span class='line'>    <span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">objs</span> <span class="o">&lt;&lt;</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">threads</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:join</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Normally this would be an unsafe operation, but since the GIL/GVL exists we don&rsquo;t have to worry about two threads adding to the same ruby object at once since only one thread can run on the VM at once and it ends up being an atomic operation <em>(although don&rsquo;t rely on this quirk for thread safety, it definitely doesn&rsquo;t apply to any other VMs)</em>.</p>
+
+<p>Another important note is that the Ruby GC is doing a really horrible job during this benchmark.</p>
+
+<p><img src="/images/showdown/threading_leak.png"></p>
+
+<p>The memory kept growing so I had to kill the process after a few seconds.</p>
+
+<h2>Threading with JRuby on the JVM</h2>
+
+<p>JRuby specifies the use of native threads based on the operating system support using the <code>getNativeThread</code> call <a href="https://github.com/jruby/jruby/blob/master/src/org/jruby/RubyThread.java#L216">[2]</a>. JRuby&rsquo;s implementation of threads using the JVM means there is no GIL/GVL. This allows CPU bound processes to utilize all cores of a machine without having to deal with forking (which, in the case of resque, can be <em>very</em> expensive).</p>
+
+<p>When trying to execute the GIL safe code above JRuby spits out a concurrency error: <code>ConcurrencyError: Detected invalid array contents due to unsynchronized modifications with concurrent users</code></p>
+
+<p>We can either add a mutex around this code or modify it to not worry about concurrent access. I chose the latter:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">threads</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">objs</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'><span class="n">objs</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'><span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">objs</span><span class="o">[</span><span class="s1">&#39;test&#39;</span><span class="o">]</span> <span class="o">&lt;&lt;</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">50</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span> <span class="o">|</span><span class="n">num</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">threads</span> <span class="o">&lt;&lt;</span> <span class="no">Thread</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span>
+</span><span class='line'>    <span class="mi">1_000_000</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">objs</span><span class="o">[</span><span class="n">num</span><span class="o">]</span> <span class="o">=</span> <span class="o">[]</span> <span class="k">if</span> <span class="n">objs</span><span class="o">[</span><span class="n">num</span><span class="o">].</span><span class="n">nil?</span>
+</span><span class='line'>      <span class="n">objs</span><span class="o">[</span><span class="n">num</span><span class="o">]</span> <span class="o">&lt;&lt;</span> <span class="no">Object</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">threads</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:join</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Compared to the MRI version, ruby running on the JVM was able to make some optimizations and keep memory usage around 800MB for the duration of the test:</p>
+
+<p><img src="/images/showdown/jvm_threading.png"></p>
+
+<p>Now that we have a better understanding of the differences between forking and threading in Ruby, lets move on to Sidekiq and Resque.</p>
+
+<h1>Sidekiq and Resque</h1>
+
+<h2>Resque&rsquo;s view of the world</h2>
+
+<p>Resque assumes chaos in your environment. It follows the forking model with C and ruby and makes a complete copy of each resque parent when a new job needs to be run. This has its advantages in preventing memory leaks, long running workers, and locking. You run into an issue with forking though when you need to increase the amount of workers on a machine. You end up not having enough spare CPU cycles since the majority are being taken up handling all the forking.</p>
+
+<p>Resque follows a simple fork and do work model, each worker will take a job off the queue and fork a new process to do the job.</p>
+
+<p><a href="https://github.com/defunkt/resque">Resque @ Github</a></p>
+
+<h2>Sidekiq&rsquo;s view of the world</h2>
+
+<p>Unlike Resque, Sidekiq uses threads and is extremely easy to use as a drop in replacement to Resque since they both work on the same <code>perform</code> method. When you dig into the results below you can see that Sidekiq&rsquo;s claim of being able to handle a larger number of workers and amount of work is true. Due to using threads and not having to allocate a new stack and address space for each fork, you get that overhead back and are able to do more work with a threaded model.</p>
+
+<p>Sidekiq follows the actor pattern. So compared to Resque which has N workers that fork, Sidekiq has an Actor manager, with N threads and one Fetcher actor which will pop jobs off Redis and hand them to the Manager. Sidekiq handles the &ldquo;chaos&rdquo; portion of Resque by catching all exceptions and bubbling them up to an exception handler such as Airbrake or Errbit.</p>
+
+<p>Now that we know how Sidekiq and Resque work we can get on to testing them and comparing the results.</p>
+
+<p><a href="https://github.com/mperham/sideki://github.com/mperham/sidekiq">Sidekiq @ Github</a></p>
+
+<h1>The Test Code</h1>
+
+<p>The idea behind the test was to pick a CPU bound processing task, in this case SHA256 and apply it across a set of 20 numbers, 150,000 times.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;sidekiq&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;resque&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;digest&#39;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Running: </span>
+</span><span class='line'><span class="c1"># sidekiq -r ./por.rb -c 240 </span>
+</span><span class='line'><span class="c1">#</span>
+</span><span class='line'><span class="c1"># require &#39;sidekiq&#39; </span>
+</span><span class='line'><span class="c1"># require &#39;./por&#39;</span>
+</span><span class='line'><span class="c1"># queueing: 150_000.times { Sidekiq::Client.enqueue(POR, [rand(123098)]*20) }</span>
+</span><span class='line'><span class="c1"># queueing: 150_000.times { Resque.enqueue(POR, [rand(123098)]*20) }</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">POR</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">Sidekiq</span><span class="o">::</span><span class="no">Worker</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="vi">@queue</span> <span class="o">=</span> <span class="ss">:por</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">arr</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">a</span><span class="o">|</span>
+</span><span class='line'>      <span class="no">Digest</span><span class="o">::</span><span class="no">SHA2</span><span class="o">.</span><span class="n">new</span> <span class="o">&lt;&lt;</span> <span class="n">a</span><span class="o">.</span><span class="n">to_s</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">perform</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">arr</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">a</span><span class="o">|</span>
+</span><span class='line'>      <span class="no">Digest</span><span class="o">::</span><span class="no">SHA2</span><span class="o">.</span><span class="n">new</span> <span class="o">&lt;&lt;</span> <span class="n">a</span><span class="o">.</span><span class="n">to_s</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Test Machine</h1>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>  Model Name: Mac Pro
+</span><span class='line'>  Model Identifier: MacPro4,1
+</span><span class='line'>  Processor Name: Quad-Core Intel Xeon
+</span><span class='line'>  Processor Speed: 2.26 GHz
+</span><span class='line'>  Number of Processors: 2
+</span><span class='line'>  Total Number of Cores: 8
+</span><span class='line'>  L2 Cache (per Core): 256 KB
+</span><span class='line'>  L3 Cache (per Processor): 8 MB
+</span><span class='line'>  Memory: 12 GB
+</span><span class='line'>  Processor Interconnect Speed: 5.86 GT/s</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This gives us a total of 16 cores to use for our testing. I&rsquo;m also using a <a href="http://www.amazon.com/gp/product/B004W2JKZI/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=B004W2JKZI&amp;linkCode=as2&amp;tag=josren-20">Crucial M4 SSD</a></p>
+
+<h1>Results</h1>
+
+<h2>Time to Process 150,000 sets of 20 numbers</h2>
+
+<p><img src="/images/showdown/time_to_process.png"></p>
+
+<center>
+<table width="100%" style="text-align: center;">
+<tr>
+<td><strong>Type</strong></td><td><strong>Time to Completion (seconds)</strong></td>
+</tr>
+<tr>
+<td>Sidekiq (JRuby) 150 Threads</td><td>88</td>
+</tr>
+<tr>
+<td>Sidekiq (JRuby) 240 Threads</td><td>89</td>
+</tr>
+<tr>
+<td>Sidekiq (JRuby) 50 Threads</td><td>91</td>
+</tr>
+<tr>
+<td>Sidekiq (MRI) 5x50</td><td>98</td>
+</tr>
+<tr>
+<td>Sidekiq (MRI) 3x50</td><td>120</td>
+</tr>
+<tr>
+<td>Sidekiq (MRI) 50</td><td>312</td>
+</tr>
+<tr>
+<td>Resque 50</td><td>396</td>
+</tr>
+</table>
+</center>
+
+
+
+
+<hr> 
+
+
+<h2>All about the CPU</h2>
+
+<h3>Resque: 50 workers</h3>
+
+<p><img src="/images/showdown/resque_50.png"></p>
+
+<p>Here we can see that the forking is taking its toll on the available CPU we have for processing. Roughly 50% of the CPU is being wasted on forking and scheduling those new processes. Resque took 396 seconds to finish and process 150,000 jobs.</p>
+
+<h3>Sidekiq (MRI) 1 process, 50 threads</h3>
+
+<p><img src="/images/showdown/mri_50.png"></p>
+
+<p>We&rsquo;re not fully utilizing the CPU. When running this test it pegged one CPU at 100% usage and kept it there for the duration of the test. We have a slight overhead with system CPU usage. Sidekiq took 312 seconds with 50 threads using MRI Ruby. Lets now take a look at doing things a bit resque-ish, and use multiple sidekiq processes to get more threads scheduled across multiple CPUs.</p>
+
+<h3>Sidekiq (MRI) 3 processes, 50 threads</h3>
+
+<p><img src="/images/showdown/mri_3x50.png"></p>
+
+<p>We&rsquo;re doing better. We&rsquo;ve cut our processing time roughly in third and we&rsquo;re utilizing more of our resources (CPUs). 3 Sidekiq processes with 50 threads each (for a total of 150 threads) took 120 seconds to complete 150,000 jobs.</p>
+
+<h3>Sidekiq (MRI) 5 processes, 50 threads</h3>
+
+<p><img src="/images/showdown/mri_5x50.png"></p>
+
+<p>As we keep adding more processes that get scheduled to different cores we&rsquo;re seeing the CPU usage go up even further, however with more processes comes more overhead for process scheduling (versus thread scheduling). We&rsquo;re still wasting CPU cycles, but we&rsquo;re completing 150,000 jobs in 98 seconds.</p>
+
+<h3>Sidekiq (JRuby) 50 threads</h3>
+
+<p><img src="/images/showdown/jruby_50.png"></p>
+
+<p>We&rsquo;re doing much better now with native threads. With 50 OS level threads, we&rsquo;re completing our set of jobs in 91 seconds.</p>
+
+<h3>Sidekiq (JRuby) 150 threads &amp; 240 Threads</h3>
+
+<p><img src="/images/showdown/jruby_150.png">
+<img src="/images/showdown/jruby_240.png"></p>
+
+<p>We&rsquo;re no longer seeing a increase in (much) CPU usage and only a slight decrease in processing time. As we keep adding more and more threads we end up running into some thread contention issues with accessing redis and how quickly we can pop things off the queue.</p>
+
+<h1>Overview</h1>
+
+<p>Even if we stick with the stock MRI ruby and go with Sidekiq, we&rsquo;re going to see a huge decrease in CPU usage while also gaining a little bit of performance as well.</p>
+
+<p>Sidekiq, overall, provides a cleaner, more object oriented interface (in my opinion) to inspecting jobs and what is going on in the processing queue.</p>
+
+<p>In Resque you would do something like: <code>Resque.size("queue_name")</code>. However, in Sidekiq you would take your class, in this case, <code>POR</code> and call <code>POR.jobs</code> to get the list of jobs for that worker queue. (note: you need to <code>require 'sidekiq/testing'</code> to get access to the jobs method).</p>
+
+<p>The only thing I find missing from Sidekiq that I enjoyed in Resque was the ability to inspect failed jobs in the web UI. However Sidekiq more than makes up for that with the ability to automatically retry failed jobs (although be careful you don&rsquo;t introduce race conditions and accidentally DOS yourself).</p>
+
+<p>And of course, JRuby comes out on top and gives us the best performance and bang for the buck (although your mileage may vary, depending on the task).</p>
+
+<h1>Further Reading</h1>
+
+<p><a href="http://www.amazon.com/gp/product/1934356972/ref=as_li_qf_sp_asin_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1934356972&linkCode=as2&tag=josren-20">Deploying with JRuby: Deliver Scalable Web Apps using the JVM (Pragmatic Programmers)</a><img src="http://www.assoc-amazon.com/e/ir?t=josren-20&l=as2&o=1&a=1934356972" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
+
+<p><a href="http://www.amazon.com/gp/product/B005SNJF28/ref=as_li_qf_sp_asin_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B005SNJF28&linkCode=as2&tag=josren-20">JRuby Cookbook</a><img src="http://www.assoc-amazon.com/e/ir?t=josren-20&l=as2&o=1&a=B005SNJF28" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
+
+<h1>Sidekiq &amp; Resque</h1>
+
+<p><a href="https://github.com/mperham/sidekiq">Sidekiq</a></p>
+
+<p><a href="https://github.com/defunkt/resque">Resque</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2012/08/preventing-a-ruby-class-from-being-reopened/">Preventing a Ruby Class From Being Reopened</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-28T00:21:00-04:00" pubdate data-updated="true">Aug 28<sup>th</sup>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I saw the question of &ldquo;How can I prevent a class from being reopened again in Ruby?&rdquo; pop up on the Ruby mailing list. While this is somewhat against the nature of ruby, it can be accomplished:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Foo</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">Foo</span><span class="o">.</span><span class="nf">method_added</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">raise</span> <span class="s2">&quot;This class is closed for modification&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Foo</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">testing</span>
+</span><span class='line'>    <span class="nb">p</span> <span class="s2">&quot;test&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will raise an exception anytime someone tries to reopen the class.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2012/08/writing-dependable-ruby-and-a-reddit-cli/">Writing Dependable Ruby & a Reddit CLI</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-20T21:36:00-04:00" pubdate data-updated="true">Aug 20<sup>th</sup>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><center>
+    <a href="https://github.com/bluescripts/reddit-cli">View Source on Github</a>
+</center>
+
+
+<p>When you work on your code and are finished for the day, is what you have committed worry free? If another developer were to push your code in the middle of the night, would they be calling you at 3am?</p>
+
+<p>Let&rsquo;s see how we can improve our development cycle with testing so we can avoid those early morning calls. We&rsquo;ll go over some of the basics with a simple project to start.</p>
+
+<p>The most important part about TDD is getting quick feedback based on our desired design (the feedback loop).</p>
+
+<p>Here is an example of how fast the tests run:</p>
+
+<object width="640" height="480"><param name="movie" value="http://www.youtube.com/v/GFQMT246FOg?version=3&amp;hl=en_US&hd=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/GFQMT246FOg?version=3&amp;hl=en_US&hd=1" type="application/x-shockwave-flash" width="640" height="480" allowscriptaccess="always" allowfullscreen="true"></embed></object>
+
+
+<p>While this is a somewhat contrived example for the reddit cli we&rsquo;re making, this can be applied equally as well when writing Rails applications. Only load the parts you need (ActionMailer, ActiveSupport, etc), usually you don&rsquo;t need to load the entire rails stack. This can make your tests run in milliseconds instead of seconds. This lets you get feedback right away.</p>
+
+<p>Before we go further into the testing discussion, lets setup a spec helper.</p>
+
+<figure class='code'><figcaption><span>spec/spec_helper.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;rspec&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;vcr&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;pry&#39;</span>
+</span><span class='line'><span class="no">VCR</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">c</span><span class="o">.</span><span class="n">cassette_library_dir</span> <span class="o">=</span> <span class="s1">&#39;fixtures/vcr_cassettes&#39;</span>
+</span><span class='line'>  <span class="n">c</span><span class="o">.</span><span class="n">hook_into</span> <span class="ss">:fakeweb</span><span class="c1"># or :fakeweb</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now how do we start doing TDD? We first start with a failing test.</p>
+
+<figure class='code'><figcaption><span>Reddit API Spec (Pass 1) - spec/lib/reddit_api_spec </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">RedditApi</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:reddit</span><span class="p">)</span> <span class="p">{</span> <span class="no">RedditApi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;ProgrammerHumor&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#initializing&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should form the correct endpoint&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="n">reddit</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span> <span class="s2">&quot;http://reddit.com/r/ProgrammerHumor/.json?after=&quot;</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When we create a new instance of the Reddit API we want to pass it a subreddit, and then we want to make sure it builds the URL properly.</p>
+
+<figure class='code'><figcaption><span>Reddit API (Pass 1) - lib/reddit_api.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;rest-client&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">RedditApi</span>
+</span><span class='line'>    <span class="no">REDDIT_URL</span> <span class="o">=</span> <span class="s2">&quot;http://reddit.com/r/&quot;</span>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:url</span><span class="p">,</span> <span class="ss">:stories</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">subreddit</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@subreddit</span> <span class="o">=</span> <span class="n">subreddit</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>        <span class="vi">@url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">REDDIT_URL</span><span class="si">}#{</span><span class="n">subreddit</span><span class="si">}</span><span class="s2">/.json?after=</span><span class="si">#{</span><span class="vi">@after</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next we want to make the actual HTTP request to the Reddit api and process it.</p>
+
+<figure class='code'><figcaption><span>Reddit API Spec (Pass 2) - spec/lib/reddit_api_spec </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">RedditApi</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:reddit</span><span class="p">)</span> <span class="p">{</span> <span class="no">RedditApi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;ProgrammerHumor&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#initializing&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should form the correct endpoint&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span> <span class="s2">&quot;http://reddit.com/r/ProgrammerHumor/.json?after=&quot;</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#fetching&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should fetch the first page of stories&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">stories</span><span class="o">.</span><span class="n">count</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;ve now added a VCR wrapper and added an expectation that the reddit api will return a list of stories. We use VCR here to again ensure that our tests run fast. Once we make the first request, future runs will take milliseconds and will hit our VCR tape instead of the API.</p>
+
+<p>Now we need to introduce three new areas: requesting, processing, and a Story object class.</p>
+
+<figure class='code'><figcaption><span>Story - lib/story.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Story</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:title</span><span class="p">,</span> <span class="ss">:score</span><span class="p">,</span> <span class="ss">:comments</span><span class="p">,</span> <span class="ss">:url</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Reddit API (Pass 2) - lib/reddit_api.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;rest-client&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/story&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">RedditApi</span>
+</span><span class='line'>    <span class="no">REDDIT_URL</span> <span class="o">=</span> <span class="s2">&quot;http://reddit.com/r/&quot;</span>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:url</span><span class="p">,</span> <span class="ss">:stories</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">subreddit</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@subreddit</span> <span class="o">=</span> <span class="n">subreddit</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>        <span class="vi">@url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">REDDIT_URL</span><span class="si">}#{</span><span class="n">subreddit</span><span class="si">}</span><span class="s2">/.json?after=</span><span class="si">#{</span><span class="vi">@after</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="n">request</span>
+</span><span class='line'>        <span class="n">process_request</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">request</span>
+</span><span class='line'>        <span class="vi">@request_response</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="no">RestClient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="vi">@url</span><span class="p">))</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">process_request</span>
+</span><span class='line'>        <span class="vi">@stories</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>        <span class="vi">@request_response</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">][</span><span class="s1">&#39;children&#39;</span><span class="o">].</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">red</span><span class="o">|</span>
+</span><span class='line'>            <span class="n">d</span> <span class="o">=</span> <span class="n">red</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">]</span>
+</span><span class='line'>            <span class="vi">@stories</span> <span class="o">&lt;&lt;</span> <span class="no">Story</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">d</span><span class="o">[</span><span class="s1">&#39;title&#39;</span><span class="o">]</span><span class="p">,</span> <span class="n">d</span><span class="o">[</span><span class="s1">&#39;score&#39;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                                  <span class="n">d</span><span class="o">[</span><span class="s1">&#39;num_comments&#39;</span><span class="o">]</span><span class="p">,</span> <span class="n">d</span><span class="o">[</span><span class="s1">&#39;url&#39;</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="vi">@request_response</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">][</span><span class="s1">&#39;after&#39;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What can we do now? The API lets us make a full request and get a list of Story struct objects back. We&rsquo;ll be using this array of structs later on to build the CLi.</p>
+
+<p>The only thing left for this simple CLI a way to get to the next page. Let&rsquo;s add our failing spec:</p>
+
+<figure class='code'><figcaption><span>Reddit API Spec (Pass 3) - spec/lib/reddit_api_spec </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">RedditApi</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:reddit</span><span class="p">)</span> <span class="p">{</span> <span class="no">RedditApi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;ProgrammerHumor&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#initializing&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should form the correct endpoint&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span> <span class="s2">&quot;http://reddit.com/r/ProgrammerHumor/.json?after=&quot;</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#fetching&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should fetch the first page of stories&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">stories</span><span class="o">.</span><span class="n">count</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should fetch the second page of stories&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="no">VCR</span><span class="o">.</span><span class="n">use_cassette</span><span class="p">(</span><span class="s1">&#39;reddit_programmer_humor_p2&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>                <span class="n">reddit</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">stories</span><span class="o">.</span><span class="n">count</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And let&rsquo;s make the test pass:</p>
+
+<figure class='code'><figcaption><span>Reddit API (Pass 3) - lib/reddit_api.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;rest-client&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/story&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">RedditApi</span>
+</span><span class='line'>    <span class="no">REDDIT_URL</span> <span class="o">=</span> <span class="s2">&quot;http://reddit.com/r/&quot;</span>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:url</span><span class="p">,</span> <span class="ss">:stories</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">subreddit</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@subreddit</span> <span class="o">=</span> <span class="n">subreddit</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>        <span class="vi">@url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">REDDIT_URL</span><span class="si">}#{</span><span class="n">subreddit</span><span class="si">}</span><span class="s2">/.json?after=</span><span class="si">#{</span><span class="vi">@after</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="n">request</span>
+</span><span class='line'>        <span class="n">process_request</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">next</span>
+</span><span class='line'>        <span class="vi">@url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">REDDIT_URL</span><span class="si">}#{</span><span class="vi">@subreddit</span><span class="si">}</span><span class="s2">/.json?after=</span><span class="si">#{</span><span class="vi">@after</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="n">request</span>
+</span><span class='line'>        <span class="n">process_request</span>
+</span><span class='line'>        <span class="nb">self</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">request</span>
+</span><span class='line'>        <span class="vi">@request_response</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="no">RestClient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="vi">@url</span><span class="p">))</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">process_request</span>
+</span><span class='line'>        <span class="vi">@stories</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>        <span class="vi">@request_response</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">][</span><span class="s1">&#39;children&#39;</span><span class="o">].</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">red</span><span class="o">|</span>
+</span><span class='line'>            <span class="n">d</span> <span class="o">=</span> <span class="n">red</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">]</span>
+</span><span class='line'>            <span class="vi">@stories</span> <span class="o">&lt;&lt;</span> <span class="no">Story</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">d</span><span class="o">[</span><span class="s1">&#39;title&#39;</span><span class="o">]</span><span class="p">,</span> <span class="n">d</span><span class="o">[</span><span class="s1">&#39;score&#39;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                                  <span class="n">d</span><span class="o">[</span><span class="s1">&#39;num_comments&#39;</span><span class="o">]</span><span class="p">,</span> <span class="n">d</span><span class="o">[</span><span class="s1">&#39;url&#39;</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="vi">@after</span> <span class="o">=</span> <span class="vi">@request_response</span><span class="o">[</span><span class="s1">&#39;data&#39;</span><span class="o">][</span><span class="s1">&#39;after&#39;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We also allow method chaining since we return self after calling next (so you could chain next&rsquo;s for instance).</p>
+
+<p>Another important principal to keep in mind is the &ldquo;Tell, Dont Ask&rdquo; rule. Without tests, we might have gone this route:</p>
+
+<figure class='code'><figcaption><span>bad_example.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vi">@reddit</span> <span class="o">=</span> <span class="no">Reddit</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;ProgrammerHumor&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="c1"># User presses next </span>
+</span><span class='line'><span class="vi">@reddit</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://reddit.com/r/ProgrammerHumor/.json?after=sometoken&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Not only would we not be telling the object what we want, we would be modifying the internal state of an object as well. By implementing a <code>next</code> method we abstract the idea of a URL and any tokens we may need to keep track of away from the consumer. Doing TDD adds a little extra step of &ldquo;Thinking&rdquo; more about what we want our interfaces to be. What&rsquo;s easier? Calling <code>next</code> or modifying the internal state?</p>
+
+<p>I&rsquo;m kind of cheating a bit here. I found a nice &ldquo;table&rdquo; gem that outputs what you send in as a formatted table (think MySQL console output). Let&rsquo;s just make sure everything is being sent around properly and STDOUT is printing the correct contents:</p>
+
+<figure class='code'><figcaption><span>Reddit CLI Spec (Pass 1) - spec/lib/reddit-cli.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;stringio&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit-cli&#39;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">RedditCli</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:subreddit</span><span class="p">)</span> <span class="p">{</span> <span class="s2">&quot;ProgrammerHumor&quot;</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;#initializing&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">before</span><span class="p">(</span><span class="ss">:all</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>            <span class="vg">$stdout</span> <span class="o">=</span> <span class="vi">@fakeout</span> <span class="o">=</span> <span class="no">StringIO</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">it</span> <span class="s2">&quot;should print out a story&quot;</span> <span class="k">do</span>
+</span><span class='line'>            <span class="n">api_response</span> <span class="o">=</span> <span class="n">double</span><span class="p">(</span><span class="no">RedditApi</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">api_response</span><span class="o">.</span><span class="n">stub!</span><span class="p">(</span><span class="ss">:stories</span> <span class="o">=&gt;</span>
+</span><span class='line'>                               <span class="o">[</span><span class="no">Story</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;StoryTitle&quot;</span><span class="p">,</span> <span class="s2">&quot;Score&quot;</span><span class="p">,</span>
+</span><span class='line'>                                          <span class="s2">&quot;Comments&quot;</span><span class="p">,</span> <span class="s2">&quot;URL&quot;</span><span class="p">)</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>            <span class="vg">$stdin</span><span class="o">.</span><span class="n">should_receive</span><span class="p">(</span><span class="ss">:gets</span><span class="p">)</span><span class="o">.</span><span class="n">and_return</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">cli</span> <span class="o">=</span> <span class="no">RedditCli</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">api_response</span><span class="p">)</span>
+</span><span class='line'>            <span class="vg">$stdout</span> <span class="o">=</span> <span class="no">STDOUT</span>
+</span><span class='line'>            <span class="vi">@fakeout</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="s1">&#39;StoryTitle&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">should</span> <span class="n">be_true</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;re doing several things here. First we&rsquo;re taking <code>$stdout</code> and putting it (temporarily) into a instance variable so we can see what gets outputted. Next we&rsquo;re mocking out the <code>RedditApi</code> since we dont actually need to hit that class or the VCR tapes, we just need to stub out the expected results (stories) and pass the response object along to the CLI class. And finally once we&rsquo;re finished we set <code>$stdout</code> back to the proper constant.</p>
+
+<p>And the class for output:</p>
+
+<figure class='code'><figcaption><span>Reddit CLI (Pass 1) - lib/reddit-cli.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;terminal-table&#39;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">RedditCli</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@rows</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>        <span class="vi">@api</span> <span class="o">=</span> <span class="n">api</span>
+</span><span class='line'>        <span class="vi">@stories</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">stories</span>
+</span><span class='line'>        <span class="n">print_stories</span>
+</span><span class='line'>        <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Type ? for help</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span class='line'>        <span class="n">prompt</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">print_stories</span>
+</span><span class='line'>        <span class="vi">@stories</span><span class="o">.</span><span class="n">each_with_index</span> <span class="p">{</span><span class="o">|</span><span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="o">|</span> <span class="vi">@rows</span> <span class="o">&lt;&lt;</span> <span class="o">[</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">score</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">comments</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">title</span><span class="o">[</span><span class="mi">0</span><span class="o">.</span><span class="n">.</span><span class="mi">79</span><span class="o">]</span> <span class="o">]</span> <span class="p">}</span>
+</span><span class='line'>        <span class="nb">puts</span> <span class="no">Terminal</span><span class="o">::</span><span class="no">Table</span><span class="o">.</span><span class="n">new</span> <span class="ss">:headings</span><span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;Score&#39;</span><span class="p">,</span> <span class="s1">&#39;Comments&#39;</span><span class="p">,</span> <span class="s1">&#39;Title&#39;</span><span class="o">]</span><span class="p">,</span> <span class="ss">:rows</span> <span class="o">=&gt;</span> <span class="vi">@rows</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">prompt</span>
+</span><span class='line'>        <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">?&gt; &quot;</span>
+</span><span class='line'>        <span class="n">input</span> <span class="o">=</span> <span class="no">STDIN</span><span class="o">.</span><span class="n">gets</span><span class="o">.</span><span class="n">chomp</span>
+</span><span class='line'>        <span class="k">case</span> <span class="n">input</span>
+</span><span class='line'>        <span class="k">when</span> <span class="s2">&quot;?&quot;</span>
+</span><span class='line'>            <span class="nb">p</span> <span class="s2">&quot;Type the # of a story to open it in your browser&quot;</span>
+</span><span class='line'>            <span class="nb">p</span> <span class="s2">&quot;Type n to go to the next page&quot;</span>
+</span><span class='line'>            <span class="n">prompt</span>
+</span><span class='line'>        <span class="k">when</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span>
+</span><span class='line'>        <span class="k">when</span> <span class="s2">&quot;n&quot;</span>
+</span><span class='line'>            <span class="vi">@rows</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>            <span class="vi">@stories</span> <span class="o">=</span> <span class="vi">@api</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">stories</span>
+</span><span class='line'>            <span class="n">print_stories</span>
+</span><span class='line'>            <span class="n">prompt</span>
+</span><span class='line'>        <span class="k">else</span>
+</span><span class='line'>            <span class="nb">print</span> <span class="s2">&quot;#=&gt; Oepning: </span><span class="si">#{</span><span class="vi">@stories</span><span class="o">[</span><span class="n">input</span><span class="o">.</span><span class="n">to_i</span><span class="o">].</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>            <span class="sb">`open </span><span class="si">#{</span><span class="vi">@stories</span><span class="o">[</span><span class="n">input</span><span class="o">.</span><span class="n">to_i</span><span class="o">].</span><span class="n">url</span><span class="si">}</span><span class="sb">`</span>
+</span><span class='line'>            <span class="n">prompt</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And finally, a little wrapper in the root directory:</p>
+
+<figure class='code'><figcaption><span>Wrapper - reddit-cli.rb </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit_api&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;./lib/reddit-cli&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">subreddit</span> <span class="o">=</span> <span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="no">RedditCli</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">RedditApi</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">subreddit</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>An Important Note</h2>
+
+<p>When working with external resources, whether it be a gem or a remote API, it&rsquo;s important to wrap those endpoints in your own abstraction. For instance, with our Reddit CLI we could have avoided those first 2 classes entirely, written everything in the CLI display class, and worked with the raw JSON. But what happens when Reddit changes their API? If this CLI class was huge or incoporated many other components, this could be quite a big code change. Instead, what we wrote encapsulates the API inside a <code>RedditApi</code> class that returns a generic <code>Story</code> struct we can work with and pass around. We don&rsquo;t care if the API changes in the CLI, or in any other code. If the API changes, we only have to update the one API class to mold the new API to the output we were already generating.</p>
+
+<h2>End Result  &amp; Source Code</h2>
+
+<p><img src="https://img.skitch.com/20120821-bc2b49nued2e38tt3cekppeq1i.jpg"></p>
+
+<center>
+    <a href="https://github.com/bluescripts/reddit-cli">View Source on Github</a>
+</center>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2012/08/moved-domains-to-my-name/">Moved Domains to My Name</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-19T21:26:00-04:00" pubdate data-updated="true">Aug 19<sup>th</sup>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Moved everything over to my other domain, joshrendek.com incase you&rsquo;re wondering why you got redirected.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page4">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/page2">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Projects & Software</h1>
+  <ul>
+    <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+    <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+    <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple &#8216;what is my IP&#8217; service with a few extra RESTful endpoints.</li>
+
+    <li><a href="/projects/">View More</a>
+
+    <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+    <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+  </ul>
+</section>
+
+<section>
+  <h1>Other Blogs</h1>
+  <ul>
+    <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+    <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2016/06/building-honeypots-and-analyzing-linux-malware/">Building Honeypots and Analyzing Linux Malware</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a Distributed WaitGroup With Go and Redis</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and Ping: Sendmsg: Operation Not Permitted</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/10/influx-alert/">Influx Alert</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/getting-upstart-to-log-to-syslog-with-tags/">Getting Upstart to Log to Syslog With Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/golang-performance-tips/">Golang Performance Tips</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Josh Rendek -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bluescripts';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

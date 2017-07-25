@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Josh Rendek" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://joshrendek.com/" />
+
+
+
+<meta property="og:updated_time" content="2011-11-17T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Josh Rendek">
+<meta itemprop="description" content="">
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+    Josh Rendek
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item active" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    
+    
+    <article class="post">
+      <div class="date"> Nov 17, 2011 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2011/11/rails-bundler-installing-into-a-directory/'> Rails: bundler installing into a directory</a> </h1>
+      <div class="content"> <p>If you run into an issue with bundler always installing into a directory then you may have accidentily run:</p>
+
+<p><div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="n">bundle</span> <span class="n">install</span> <span class="n">foobar</span>
+</code></pre></div>
+
+and now its installing into foobar.</p>
+
+<p>You can run:
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="n">bundle</span> <span class="n">install</span> <span class="o">--</span><span class="nb">system</span>
+</code></pre></div>
+</p>
+
+<p>To go back to installing gems to the system/RVM path.</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Nov 9, 2011 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2011/11/rails-rendering-a-view-in-a-model-to-generate-a-pdf/'> Rails: Rendering a view in a model to generate a pdf</a> </h1>
+      <div class="content"> 
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1 </span><span class="k">class</span> <span class="nc">RenderHelper</span>
+<span class="lineno"> 2 </span>  <span class="k">class</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span>
+<span class="lineno"> 3 </span>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="n">assigns</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">request</span> <span class="o">=</span> <span class="p">{})</span>
+<span class="lineno"> 4 </span>      <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+<span class="lineno"> 5 </span>        <span class="s2">&quot;SERVER_PROTOCOL&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;http&quot;</span><span class="p">,</span>
+<span class="lineno"> 6 </span>        <span class="s2">&quot;REQUEST_URI&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+<span class="lineno"> 7 </span>        <span class="s2">&quot;SERVER_NAME&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+<span class="lineno"> 8 </span>        <span class="s2">&quot;SERVER_PORT&quot;</span> <span class="o">=&gt;</span> <span class="mi">80</span>
+<span class="lineno"> 9 </span>      <span class="p">}</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+<span class="lineno">10 </span>
+<span class="lineno">11 </span>      <span class="n">av</span> <span class="o">=</span> <span class="no">ActionView</span><span class="o">::</span><span class="no">Base</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">ActionController</span><span class="o">::</span><span class="no">Base</span><span class="o">.</span><span class="n">view_paths</span><span class="p">,</span> <span class="n">assigns</span><span class="p">)</span>
+<span class="lineno">12 </span>
+<span class="lineno">13 </span>      <span class="n">av</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">action_controller</span>
+<span class="lineno">14 </span>      <span class="n">av</span><span class="o">.</span><span class="n">extend</span> <span class="no">ApplicationController</span><span class="o">.</span><span class="n">_helpers</span>
+<span class="lineno">15 </span>      <span class="n">av</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">Base</span><span class="o">.</span><span class="n">new</span>
+<span class="lineno">16 </span>      <span class="n">av</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+<span class="lineno">17 </span>      <span class="n">av</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="no">ActionController</span><span class="o">::</span><span class="no">Response</span><span class="o">.</span><span class="n">new</span>
+<span class="lineno">18 </span>      <span class="n">av</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="no">Rack</span><span class="o">::</span><span class="no">Utils</span><span class="o">::</span><span class="no">HeaderHash</span><span class="o">.</span><span class="n">new</span>
+<span class="lineno">19 </span>
+<span class="lineno">20 </span>      <span class="n">av</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+<span class="lineno">21 </span>        <span class="kp">include</span> <span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">url_helpers</span>
+<span class="lineno">22 </span>      <span class="k">end</span>
+<span class="lineno">23 </span>
+<span class="lineno">24 </span>      <span class="n">av</span><span class="o">.</span><span class="n">render</span> <span class="n">options</span>
+<span class="lineno">25 </span>    <span class="k">end</span>
+<span class="lineno">26 </span>  <span class="k">end</span>
+<span class="lineno">27 </span><span class="k">end</span>
+</code></pre></div>
+
+
+<h3 id="usage">Usage</h3>
+
+<p><div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span> <span class="n">html_output</span> <span class="o">=</span> <span class="no">RenderHelper</span><span class="o">.</span><span class="n">render</span><span class="p">({</span><span class="ss">:instance_variable1</span> <span class="o">=&gt;</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span>
+<span class="lineno">2 </span>                                                <span class="ss">:instance_variable2</span> <span class="o">=&gt;</span> <span class="s2">&quot;bar&quot;</span><span class="p">},</span>
+<span class="lineno">3 </span>                                                <span class="ss">:template</span> <span class="o">=&gt;</span> <span class="s1">&#39;view_to/render&#39;</span><span class="p">)</span>
+</code></pre></div>
+</p>
+
+<p>You can then use you&rsquo;re favorite PDF generator (I use PDFKit) to take the html output and parse it to a PDF.</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Aug 25, 2011 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2011/08/mysql-slave-not-syncing-after-reboot/'> MySQL Slave not syncing after reboot</a> </h1>
+      <div class="content"> <p>Earlier today I had a MySQL slave go down for a few hours, which wasn&rsquo;t a big deal. When it was brought back up it wasn&rsquo;t syncing properly:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="ss">Seconds_Behind_Master</span><span class="p">:</span> <span class="no">NULL</span>
+</code></pre></div>
+
+
+<p>Apparently there was an issue with a query that was showing up under LAST_ERROR; running</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="no">STOP</span> <span class="no">SLAVE</span><span class="p">;</span>
+<span class="lineno">2 </span><span class="no">SET</span> <span class="no">GLOBAL</span> <span class="no">SQL_SLAVE_SKIP_COUNTER</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="lineno">3 </span><span class="no">START</span> <span class="no">SLAVE</span><span class="p">;</span>
+</code></pre></div>
+
+
+<p>fixed the issue and then issued another SHOW SLAVE STATUS\G; and got the correct output:
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="ss">Seconds_Behind_Master</span><span class="p">:</span> <span class="mi">27269</span>
+</code></pre></div>
+</p>
+
+<p>About half an hour later the slave was all caught up and replication was working again.</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Aug 19, 2011 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2011/08/jekyll-static-vs-old-wordpress-site-quite-amazing/'> Jekyll (static) vs old Wordpress site, quite amazing</a> </h1>
+      <div class="content"> 
+
+<p>One of the interesting things about switching to a static site (even when I had cacheing and everything tuned in WP) is the load times.</p>
+
+<h3 id="requests-per-second">Requests per second</h3>
+
+<ul>
+<li>Wordpress: 9.5</li>
+<li>Jekyll: 182.96</li>
+</ul>
+
+<h3 id="time-per-request">Time per request</h3>
+
+<ul>
+<li>Wordpress: 2631.395 ms</li>
+<li>Jekyll: 245.954 ms</li>
+</ul>
+
+<h3 id="time-per-request-across-all-concurrent">Time per request (across all concurrent)</h3>
+
+<ul>
+<li>Wordpress: 105.256 ms</li>
+<li>Jekyll: 5.466 ms</li>
+</ul>
+
+<p>Basically jekyll is about 1000-2000% faster at rendering pages.</p>
+
+<p>Thats about it on what I really cared about&hellip; the website now loads blazingly fast and Jekyll is awesome to write in with markdown.</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Aug 18, 2011 - 2 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2011/08/migration-from-wordpress-to-jekyll/'> Migration from WordPress to Jekyll</a> </h1>
+      <div class="content"> 
+
+<p>While I love WordPress - I think it was a bit of overkill for what I was doing on this blog so I converted everything to Jekyll, and threw all my images up on Amazon&rsquo;s S3. I&rsquo;ve also migrated all the comments over to Disqus.</p>
+
+<p>One of the problems I ran into was getting the URLs to map the same; the _config.yml that worked for me was:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="ss">pygments</span><span class="p">:</span> <span class="kp">true</span>
+<span class="lineno">2 </span><span class="ss">markdown</span><span class="p">:</span> <span class="n">rdiscount</span>
+<span class="lineno">3 </span><span class="ss">permalink</span><span class="p">:</span> <span class="sr">/:year/</span><span class="ss">:month</span><span class="o">/</span><span class="ss">:title</span>
+<span class="lineno">4 </span><span class="ss">paginate</span><span class="p">:</span> <span class="mi">10</span>
+</code></pre></div>
+
+
+<p>And then to get my /apps/ working again I made a directory structure like this:
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1 </span><span class="n">apps</span><span class="o">//</span><span class="ss">bluebug</span><span class="p">:</span>
+<span class="lineno"> 2 </span><span class="no">BlueBug</span><span class="o">.</span><span class="n">zip</span>	<span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno"> 3 </span>
+<span class="lineno"> 4 </span><span class="n">apps</span><span class="o">//</span><span class="ss">greenmail</span><span class="p">:</span>
+<span class="lineno"> 5 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno"> 6 </span>
+<span class="lineno"> 7 </span><span class="n">apps</span><span class="o">//</span><span class="ss">light_logify</span><span class="p">:</span>
+<span class="lineno"> 8 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno"> 9 </span>
+<span class="lineno">10 </span><span class="n">apps</span><span class="o">//</span><span class="ss">pyultradns</span><span class="p">:</span>
+<span class="lineno">11 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">12 </span>
+<span class="lineno">13 </span><span class="n">apps</span><span class="o">//</span><span class="n">quote</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">the</span><span class="o">-</span><span class="n">day</span><span class="o">-</span><span class="ss">tweeter</span><span class="p">:</span>
+<span class="lineno">14 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">15 </span>
+<span class="lineno">16 </span><span class="n">apps</span><span class="o">//</span><span class="ss">rails_rrdtool</span><span class="p">:</span>
+<span class="lineno">17 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">18 </span>
+<span class="lineno">19 </span><span class="n">apps</span><span class="o">//</span><span class="n">server</span><span class="o">-</span><span class="n">setup</span><span class="o">-</span><span class="ss">fu</span><span class="p">:</span>
+<span class="lineno">20 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">21 </span>
+<span class="lineno">22 </span><span class="n">apps</span><span class="o">//</span><span class="ss">servly</span><span class="p">:</span>
+<span class="lineno">23 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+<span class="lineno">24 </span>
+<span class="lineno">25 </span><span class="n">apps</span><span class="o">//</span><span class="n">ventrilo</span><span class="o">-</span><span class="n">ping</span><span class="o">-</span><span class="ss">analyzer</span><span class="p">:</span>
+<span class="lineno">26 </span><span class="n">index</span><span class="o">.</span><span class="n">markdown</span>
+</code></pre></div>
+</p>
+
+<p>Some nice helper scripts I&rsquo;ve found:</p>
+
+<h3 id="creating-a-new-post">Creating a new post</h3>
+
+<p><div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1 </span><span class="c1">#!/usr/bin/env ruby</span>
+<span class="lineno"> 2 </span>
+<span class="lineno"> 3 </span><span class="c1"># Script to create a jekyll blog post using a template. It takes one input parameter</span>
+<span class="lineno"> 4 </span><span class="c1"># which is the title of the blog post</span>
+<span class="lineno"> 5 </span><span class="c1"># e.g. command:</span>
+<span class="lineno"> 6 </span><span class="c1"># $ ./new.rb &quot;helper script to create new posts using jekyll&quot;</span>
+<span class="lineno"> 7 </span><span class="c1">#</span>
+<span class="lineno"> 8 </span><span class="c1"># Author:Khaja Minhajuddin (http://minhajuddin.com)</span>
+<span class="lineno"> 9 </span>
+<span class="lineno">10 </span><span class="c1"># Some constants</span>
+<span class="lineno">11 </span><span class="no">TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;template.markdown&quot;</span>
+<span class="lineno">12 </span><span class="no">TARGET_DIR</span> <span class="o">=</span> <span class="s2">&quot;_posts&quot;</span>
+<span class="lineno">13 </span>
+<span class="lineno">14 </span><span class="c1"># Get the title which was passed as an argument</span>
+<span class="lineno">15 </span><span class="n">title</span> <span class="o">=</span> <span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+<span class="lineno">16 </span><span class="c1"># Get the filename</span>
+<span class="lineno">17 </span><span class="n">filename</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+<span class="lineno">18 </span><span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-%d&#39;</span><span class="p">)</span> <span class="si">}</span><span class="s2">-</span><span class="si">#{</span><span class="n">filename</span><span class="o">.</span><span class="n">downcase</span><span class="si">}</span><span class="s2">.markdown&quot;</span>
+<span class="lineno">19 </span><span class="n">filepath</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="no">TARGET_DIR</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+<span class="lineno">20 </span>
+<span class="lineno">21 </span><span class="c1"># Create a copy of the template with the title replaced</span>
+<span class="lineno">22 </span><span class="n">new_post</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="no">TEMPLATE</span><span class="p">)</span>
+<span class="lineno">23 </span><span class="n">new_post</span><span class="o">.</span><span class="n">gsub!</span><span class="p">(</span><span class="s1">&#39;TITLE&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">);</span>
+<span class="lineno">24 </span>
+<span class="lineno">25 </span><span class="c1"># Write out the file to the target directory</span>
+<span class="lineno">26 </span><span class="n">new_post_file</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="lineno">27 </span><span class="n">new_post_file</span><span class="o">.</span><span class="n">puts</span> <span class="n">new_post</span>
+<span class="lineno">28 </span><span class="n">new_post_file</span><span class="o">.</span><span class="n">close</span>
+<span class="lineno">29 </span>
+<span class="lineno">30 </span><span class="nb">puts</span> <span class="s2">&quot;created =&gt; </span><span class="si">#{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div>
+</p>
+
+<h3 id="publishing-a-new-post">Publishing a new post</h3>
+
+<p><div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="n">jekyll</span> <span class="o">&amp;&amp;</span> <span class="n">rsync</span> <span class="o">-</span><span class="n">avz</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;ssh -p SSHPORT&#39;</span> <span class="o">--</span><span class="n">delete</span> <span class="o">.</span> <span class="no">USERNAME</span><span class="vi">@DOMAIN</span><span class="o">.</span><span class="n">com</span><span class="ss">:/</span><span class="n">home</span><span class="o">/</span><span class="no">YOURPATH</span><span class="o">/</span>
+</code></pre></div>
+</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Aug 10, 2011 - 3 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2011/08/ruby-rails-delayed-job-issues/'> Ruby on Rails: Delayed Job issues</a> </h1>
+      <div class="content"> <p>Thankfully the <a href="https://github.com/collectiveidea/delayed_job/issues?sort=created&amp;direction=desc&amp;state=open">issue tracker</a> on Github was a great help, but I recently ran into two issues I&rsquo;ve never had the pleasure of encountering before while using DJ:</p>
+
+<p>&ldquo;nil is not a symbol&rdquo; as a failure message. When running the background jobs for Servly, this was occurring on the status checks (its a pretty long list of checks on a server to reduce false positives, including distributed pings).Â  The problem with having the longer definition was the way DJ serializes the ruby code to store in the database. It was originally using a TEXT(65535) field as the data type in MySQL &ndash; <em><strong>changing this to LongText fixed the issue.</strong></em> The mysterious part about this whole issue was it would run fine from the console, but not from the workers (which makes sense in hindsight because of the limited space available for the serialized object in the delayed_job table).</p>
+
+<p>Here is a snippet of the stack trace (for anyone who might Google it), and <a href="https://github.com/collectiveidea/delayed_job/issues/264">the link to the Github Issue</a>:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="kp">nil</span> <span class="n">is</span> <span class="ow">not</span> <span class="n">a</span> <span class="n">symbol</span>
+<span class="lineno">2 </span> <span class="sr">/usr/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ruby</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">1</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="n">delayed_job</span><span class="o">-</span><span class="mi">2</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="mi">4</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">delayed</span><span class="o">/</span><span class="n">performable_method</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">20</span><span class="ss">:in</span> <span class="o">&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">perform</span><span class="s1">&#39;</span>
+<span class="lineno">3 </span><span class="s1"> /usr/local/lib/ruby/gems/1.9.1/gems/delayed_job-2.1.4/lib/delayed/backend/base.rb:87:in&lt;/code&gt;invoke_job&#39;</span>
+<span class="lineno">4 </span> <span class="sr">/usr/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ruby</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">1</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="n">delayed_job</span><span class="o">-</span><span class="mi">2</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="mi">4</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">delayed</span><span class="o">/</span><span class="n">worker</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">120</span><span class="ss">:in</span> <span class="o">&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">block</span> <span class="p">(</span><span class="mi">2</span> <span class="n">levels</span><span class="p">)</span> <span class="k">in</span> <span class="n">run</span><span class="s1">&#39;</span>
+<span class="lineno">5 </span><span class="s1"> /usr/local/lib/ruby/1.9.1/timeout.rb:57:in&lt;/code&gt;timeout&#39;</span>
+<span class="lineno">6 </span> <span class="sr">/usr/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ruby</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">1</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="n">delayed_job</span><span class="o">-</span><span class="mi">2</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="mi">4</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">delayed</span><span class="o">/</span><span class="n">worker</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">120</span><span class="ss">:in</span> <span class="o">&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">block</span> <span class="k">in</span> <span class="n">run</span><span class="s1">&#39;</span>
+<span class="lineno">7 </span><span class="s1"> /usr/local/lib/ruby/1.9.1/benchmark.rb:309:in&lt;/code&gt;realtime&#39;</span>
+<span class="lineno">8 </span> <span class="sr">/usr/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ruby</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">1</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="n">delayed_job</span><span class="o">-</span><span class="mi">2</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="mi">4</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">delayed</span><span class="o">/</span><span class="n">worker</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">119</span><span class="ss">:in</span> <span class="o">&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">run</span><span class="s1">&#39;</span>
+<span class="lineno">9 </span><span class="s1"> /usr/local/lib/ruby/gems/1.9.1/gems/delayed_job-2.1.4/lib/delayed/worker.rb:177:in&lt;/code&gt;reserve_and_run_one_job&#39;</span>
+</code></pre></div>
+
+
+<p>The <a href="https://github.com/collectiveidea/delayed_job/issues/277">second issue</a> was a combination of things:</p>
+
+<p>The worker resides on a separate node from the main application stack and connects to the database remotely (still over a private LAN). The first thing I noticed was workers dieing silently; a lot of hits on Google pointed to MySQL losing its connection (the default in database.yml/ActiveRecordÂ  is reconnect: false) &ndash; changing this to reconnect: true fixed that issue of workers dieing silently.</p>
+
+<p>Another problem with workers dieing off silently was a lack of information; adding these two lines to the delayed_job_config initializer produced a lot more meaningful errors:</p>
+
+<p><div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="no">Delayed</span><span class="o">::</span><span class="no">Worker</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="no">Rails</span><span class="o">.</span><span class="n">logger</span>
+<span class="lineno">2 </span><span class="no">Delayed</span><span class="o">::</span><span class="no">Worker</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">auto_flushing</span> <span class="o">=</span> <span class="mi">1</span>
+</code></pre></div>
+</p>
+
+<p>And finally &ndash; a version specific bug; delayed_job was running into race conditions on locking jobs it was working on:</p>
+
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1 </span><span class="no">Mysql2</span><span class="o">::</span><span class="ss">Error</span><span class="p">:</span> <span class="no">Deadlock</span> <span class="n">found</span> <span class="k">when</span> <span class="n">trying</span> <span class="n">to</span> <span class="n">get</span> <span class="n">lock</span><span class="p">;</span> <span class="n">try</span> <span class="n">restarting</span> <span class="ss">transaction</span><span class="p">:</span> <span class="no">UPDATE</span> <span class="o">&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">delayed_jobs</span><span class="o">&lt;</span><span class="sr">/code&gt; SET locked_at = &#39;2011-08-08 21:30:10&#39;, locked_by = &#39;delayed_job.10 host:226237 pid:27929&#39; WHERE ((run_at &lt;= &#39;2011-08-08 21:30:10&#39; AND (locked_at IS NULL OR locked_at &lt; &#39;2011-08-08 21:15:10&#39;) OR locked_by = &#39;delayed_job.10 host:226237 pid:27929&#39;) AND failed_at IS NULL) ORDER BY priority ASC, run_at ASC LIMIT 1 Mysql2::Error: Deadlock found when trying to get lock; try restarting transaction: UPDATE &lt;code&gt;delayed_jobs&lt;/</span><span class="n">code</span><span class="o">&gt;</span> <span class="no">SET</span> <span class="n">locked_at</span> <span class="o">=</span> <span class="s1">&#39;2011-08-08 21:30:10&#39;</span><span class="p">,</span> <span class="n">locked_by</span> <span class="o">=</span> <span class="s1">&#39;delayed_job.0 host:226237 pid:27869&#39;</span> <span class="no">WHERE</span> <span class="p">((</span><span class="n">run_at</span> <span class="o">&lt;=</span> <span class="s1">&#39;2011-08-08 21:30:10&#39;</span> <span class="no">AND</span> <span class="p">(</span><span class="n">locked_at</span> <span class="no">IS</span> <span class="no">NULL</span> <span class="no">OR</span> <span class="n">locked_at</span> <span class="o">&lt;</span> <span class="s1">&#39;2011-08-08 21:15:10&#39;</span><span class="p">)</span> <span class="no">OR</span> <span class="n">locked_by</span> <span class="o">=</span> <span class="s1">&#39;delayed_job.0 host:226237 pid:27869&#39;</span><span class="p">)</span> <span class="no">AND</span> <span class="n">failed_at</span> <span class="no">IS</span> <span class="no">NULL</span><span class="p">)</span> <span class="no">ORDER</span> <span class="no">BY</span> <span class="n">priority</span> <span class="no">ASC</span><span class="p">,</span> <span class="n">run_at</span> <span class="no">ASC</span> <span class="no">LIMIT</span> <span class="mi">1</span>
+</code></pre></div>
+
+
+<p>Upgrading from delayed_job 2.1.2 to 2.1.4 fixed the issue; apparently 2.1.3 may have also been affected.</p>
+
+<p>Aside from these few issues delayed job has been wonderful to use in production and will continue to be used for handling all of Servly&rsquo;s background tasks and processes.</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Jun 17, 2011 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2011/06/random-pandora-rant/'> Pandora&#39;s horrible interface</a> </h1>
+      <div class="content"> <p>Its 2011 and Pandora hasn&rsquo;t heard about expandable layouts&hellip; I love pandora, but their interface just sucks. It especially sucks when you have a huge list of stations.</p>
+
+<p>Do something with all my screen real estate, please!</p>
+
+<p><a href="https://img.skitch.com/20110617-jmwa2nwrbd34fspgwgcxdnjd31.jpg"><img class="alignnone" src="https://img.skitch.com/20110617-jmwa2nwrbd34fspgwgcxdnjd31.jpg" alt="" width="487" height="290" /></a></p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Jun 15, 2011 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2011/06/ruby-on-rails-averaging-large-data-sets/'> Ruby on Rails: Averaging Large Data Sets</a> </h1>
+      <div class="content"> <p>Graphing objects client side is a great way to avoid generating them server side (since client side scales infinitely). You do however run into issue when you get into thousands, or hundreds of thousands of points (for example displaying 5 minute intervals in a month: 8928). When graphing this many points javascript can hang or cause the browser to seem like its not responding.</p>
+
+<p>This is a simple solution that I&rsquo;ve been using for a while to average data points from a Active Record model:
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno"> 1 </span><span class="k">def</span> <span class="nf">generic_graph</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">hours</span><span class="p">,</span> <span class="n">multiplier</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="lineno"> 2 </span>    <span class="n">beginning</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">advance</span><span class="p">(</span><span class="ss">:hours</span> <span class="o">=&gt;</span> <span class="o">-</span><span class="n">hours</span><span class="p">)</span>
+<span class="lineno"> 3 </span>    <span class="n">x</span> <span class="o">=</span> <span class="no">YourModel</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="s2">&quot;created_at &gt; ?&quot;</span><span class="p">,</span> <span class="n">beginning</span>
+<span class="lineno"> 4 </span>    <span class="n">arr</span> <span class="o">=</span> <span class="o">[]</span>
+<span class="lineno"> 5 </span>    <span class="n">timeoffset</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">zone</span><span class="o">.</span><span class="n">utc_offset</span><span class="o">/</span><span class="p">(</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="lineno"> 6 </span>    <span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">dst?</span> <span class="p">?</span> <span class="n">timeoffset</span> <span class="o">+=</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span>
+<span class="lineno"> 7 </span>
+<span class="lineno"> 8 </span>    <span class="k">if</span> <span class="n">hours</span> <span class="o">&gt;=</span> <span class="mi">48</span> <span class="c1">#or whatever number works for you</span>
+<span class="lineno"> 9 </span>      <span class="n">x</span><span class="o">.</span><span class="n">collect</span><span class="o">.</span><span class="n">each_with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="p">,</span><span class="n">y</span><span class="o">|</span>
+<span class="lineno">10 </span>        <span class="n">tmp_averaged</span> <span class="o">=</span> <span class="n">x</span><span class="o">[</span><span class="n">y</span><span class="o">..</span><span class="n">y</span><span class="o">+</span><span class="mi">24</span><span class="o">].</span><span class="n">map</span><span class="p">{</span><span class="o">|</span><span class="n">ss</span><span class="o">|</span> <span class="n">ss</span><span class="o">[</span><span class="n">column</span><span class="o">]</span> <span class="p">}</span> <span class="c1"># collect 24 (or however many you want) records, then average them</span>
+<span class="lineno">11 </span>        <span class="n">arr</span> <span class="o">&lt;&lt;</span> <span class="o">[</span><span class="n">s</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">advance</span><span class="p">(</span><span class="ss">:hours</span><span class="o">=&gt;</span><span class="n">timeoffset</span><span class="p">)</span><span class="o">.</span><span class="n">to_i</span><span class="o">*</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tmp_averaged</span><span class="o">.</span><span class="n">average</span><span class="o">]</span> <span class="c1"># this is for going into the flot.js graphing library</span>
+<span class="lineno">12 </span>      <span class="k">end</span>
+<span class="lineno">13 </span>    <span class="k">else</span>
+<span class="lineno">14 </span>      <span class="n">x</span><span class="o">.</span><span class="n">collect</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span> <span class="n">arr</span> <span class="o">&lt;&lt;</span> <span class="o">[</span><span class="n">s</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">advance</span><span class="p">(</span><span class="ss">:hours</span><span class="o">=&gt;</span><span class="n">timeoffset</span><span class="p">)</span><span class="o">.</span><span class="n">to_i</span><span class="o">*</span><span class="mi">1000</span><span class="p">,</span> <span class="n">s</span><span class="o">[</span><span class="n">column</span><span class="o">]</span> <span class="o">]</span> <span class="p">}</span>
+<span class="lineno">15 </span>    <span class="k">end</span>
+<span class="lineno">16 </span>
+<span class="lineno">17 </span>    <span class="n">arr</span><span class="o">.</span><span class="n">to_s</span> <span class="c1">#output for flot</span>
+<span class="lineno">18 </span>  <span class="k">end</span>
+</code></pre></div>
+</p>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Dec 25, 2010 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2010/12/rails-implementing-fine-grained-acls-while-staying-dry/'> Rails: Implementing fine grained ACLs while staying DRY</a> </h1>
+      <div class="content"> <p>There don&rsquo;t seem to be any &lsquo;dynamic&rsquo; ACL modules for rails ( CanCan is kind of there, but not quite ) &ndash; I want to be able to modify permissions on the fly, preferably from an administration page.</p>
+
+<p>This is done simply with a Role table and a few methods in application_controller and your User model. This allows you to easily check the serialized Role hash {&ldquo;foo&rdquo; =&gt; [&ldquo;edit&rdquo;, &ldquo;update&rdquo;]} by calling current_user.can?(&ldquo;foo&rdquo;, &ldquo;edit&rdquo;) and you&rsquo;ll know if they can edit the foo object.</p>
+
+<script src="https://gist.github.com/754956.js"> </script>
+ </div>
+    </article>
+    
+    <article class="post">
+      <div class="date"> Dec 24, 2010 - 1 minutes</div>
+      <h1 class="title"> <a href='https://joshrendek.com/2010/12/rails-polymorphic-routes-models-and-forms/'> Rails: Polymorphic routes, models, and forms</a> </h1>
+      <div class="content"> <p>I&rsquo;m currently working on a project where I&rsquo;m trying to make everything as extensible as possible. I have a Ticket model and I want everything to be ticketable (thats my polymorphic association).</p>
+
+<p>The problem is that I want the URLs to be sensible and still have my polymorphic attribute loaded automatically without having to do <em>to</em> much hacking / un-dry code, so I wanted the URLs to be: /users/1/tickets/new.</p>
+
+<p>This needs to be applied to any arbitrary number of models that has_many :tickets, :as =&gt; :ticketable .</p>
+
+<p>The tickets controller needs to be able to get the object, and set it for a user to access it for the polymorphic form. <em>instance_set_variable</em> is the magic that lets this happen very easily. By having the before filter on create and new requests, the :get_object is called each request for those actions and the nested resources parent object is found and loaded into a variable called @ticketable .</p>
+
+<p>The last bit of magic is the form_for that lets you create the ticket and have ticketable be automatically filled in by the rails engine with one little modification in the ticket_controllers.rb create method. Thats it!</p>
+
+<script src="https://gist.github.com/754505.js"> </script>
+ </div>
+    </article>
+    
+  </div>
+
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+
+<div class="page-nav">
+  <div class="page-prev">
+    
+        <a href="/page/4/" title="Previous page" > &lt;&lt; </a>
+    
+  </div>
+
+  <div class="page-num">
+    5/12
+  </div>
+
+  <div class="page-next">
+    
+    <a href="/page/6/" title="Next page"> >> </a>
+    
+  </div>
+</div> 
+
+
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

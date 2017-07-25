@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Go Golang on Josh Rendek</title>
+    <link>https://joshrendek.com/categories/go-golang/</link>
+    <description>Recent content in Go Golang on Josh Rendek</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Copyright 2008-2017 Josh Rendek</copyright>
+    <lastBuildDate>Wed, 18 Jun 2014 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://joshrendek.com/categories/go-golang/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Go-lang: mocking exec.Command using interfaces</title>
+      <link>https://joshrendek.com/2014/06/go-lang-mocking-exec-dot-command-using-interfaces/</link>
+      <pubDate>Wed, 18 Jun 2014 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2014/06/go-lang-mocking-exec-dot-command-using-interfaces/</guid>
+      <description>This is a short example showing how to use an interface to ease testing, and how to use an interface with running shell commands / other programs and providing mock output.
+ Source on Github 
+Here is our main file that actually runs the commands and prints out &amp;ldquo;hello&amp;rdquo;.
+1 package main 2  3 import ( 4 	&amp;quot;fmt&amp;quot; 5 	&amp;quot;os/exec&amp;quot; 6 ) 7  8 // first argument is the command, like cat or echo, 9 // the second is the list of args to pass to it 10 type Runner interface { 11 	Run(string, .</description>
+    </item>
+    
+    <item>
+      <title>A useful logger in Go</title>
+      <link>https://joshrendek.com/2014/06/a-useful-logger-in-go/</link>
+      <pubDate>Mon, 09 Jun 2014 00:00:00 +0000</pubDate>
+      
+      <guid>https://joshrendek.com/2014/06/a-useful-logger-in-go/</guid>
+      <description>Small function that will print out useful information when invoked:
+1 func logMsg(msg string) { 2 	pc, _, _, _ := runtime.Caller(1) 3 	caller := runtime.FuncForPC(pc).Name() 4 	_, file, line, _ := runtime.Caller(0) 5 	sp := strings.Split(file, &amp;quot;/&amp;quot;) 6 	short_path := sp[len(sp)-2 : len(sp)] 7 	path_line := fmt.Sprintf(&amp;quot;[%s/%s:%d]&amp;quot;, short_path[0], short_path[1], line) 8 	log_string := fmt.Sprintf(&amp;quot;[%s]%s %s:: %s&amp;quot;, time.Now(), path_line, caller, msg) 9 	fmt.</description>
+    </item>
+    
+  </channel>
+</rss>

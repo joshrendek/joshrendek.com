@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Why setuid Is Bad and What You Can Do" />
+<meta property="og:description" content="Why setuid is Bad setuid allows a binary to be run as a different user then the one invoking it. For example, ping needs to use low level system interfaces (socket, PF_INET, SOCK_RAW, etc) in order to function properly. We can watch this in action by starting ping in another terminal window ( ping google.com ) and then using strace to see the syscall&rsquo;s being made:
+sudo strace -p PID and we get the following:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2013/02/why-setuid-is-bad-and-what-you-can-do/" />
+
+
+
+<meta property="article:published_time" content="2013-02-26T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2013-02-26T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Why setuid Is Bad and What You Can Do"/>
+<meta name="twitter:title" content="Why setuid Is Bad and What You Can Do"/>
+<meta name="twitter:description" content="Why setuid is Bad setuid allows a binary to be run as a different user then the one invoking it. For example, ping needs to use low level system interfaces (socket, PF_INET, SOCK_RAW, etc) in order to function properly. We can watch this in action by starting ping in another terminal window ( ping google.com ) and then using strace to see the syscall&rsquo;s being made:
+sudo strace -p PID and we get the following:"/>
+
+
+
+
+<meta itemprop="name" content="Why setuid Is Bad and What You Can Do">
+<meta itemprop="description" content="Why setuid is Bad setuid allows a binary to be run as a different user then the one invoking it. For example, ping needs to use low level system interfaces (socket, PF_INET, SOCK_RAW, etc) in order to function properly. We can watch this in action by starting ping in another terminal window ( ping google.com ) and then using strace to see the syscall&rsquo;s being made:
+sudo strace -p PID and we get the following:">
+
+
+<meta itemprop="dateModified" content="2013-02-26T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="2260">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Why setuid Is Bad and What You Can Do 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Feb 26, 2013 - 11 minutes</div>
+      <h1 class="title"> Why setuid Is Bad and What You Can Do </h1>
+      <div class="content"> 
+
+<h2 id="why-setuid-is-bad">Why <code>setuid</code> is Bad</h2>
+
+<p><code>setuid</code> allows a binary to be run as a different user then the one invoking it. For example, ping needs to use low level system interfaces (<code>socket</code>, <code>PF_INET</code>, <code>SOCK_RAW</code>, etc) in order to function properly. We can watch this in action by starting ping in another terminal window ( <code>ping google.com</code> ) and then using <code>strace</code> to see the syscall&rsquo;s being made:</p>
+
+<p><code>sudo strace -p PID</code> and we get the following:</p>
+
+<pre><code class="language-bash">munmap(0x7f329e7ea000, 4096)            = 0stat(&quot;/etc/resolv.conf&quot;, {st_mode=S_IFREG|0644, st_size=185, ...}) = 0
+socket(PF_INET, SOCK_DGRAM|SOCK_NONBLOCK, IPPROTO_IP) = 4
+connect(4, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr(&quot;8.8.8.8&quot;)}, 16) = 0
+</code></pre>
+
+<p>We can find all setuid programs installed by issuing the command:</p>
+
+<pre><code class="language-bash">sudo find / -xdev \( -perm -4000 \) -type f -print0 -exec ls -l {} \;
+</code></pre>
+
+<p>This will find all commands that have the root setuid bit set in their permission bit.</p>
+
+<p><a name="top"></a></p>
+
+<h4 id="setuid-list-for-a-few-popular-operating-systems"><code>setuid</code> list for a few popular operating systems:</h4>
+
+<p>Of particular interest in OpenBSD, where a lot of work was done to remove and switch programs from needing to use setuid/gid permissions. OpenIndiana is the worst offender and has the widest vector for attack.</p>
+
+<ul>
+<li><a href="#ubuntu">Ubuntu</a> (22 binaries)</li>
+<li><a href="#centos">CentOS</a> (21 binaries)</li>
+<li><a href="#openbsd">OpenBSD</a> (3 binaries)</li>
+<li><a href="#openindiana">OpenIndiana</a> (53 binaries)</li>
+</ul>
+
+<p><code>setuid</code> escalation is a common attack vector and can allow unprivileged code to be executed by a regular user, and then escalate itself to root and drop you in on the root shell.</p>
+
+<p><strong><em>Here are a few examples:</em></strong></p>
+
+<h4 id="cve-2012-0056-exploiting-proc-pid-mem">CVE-2012-0056: Exploiting /proc/pid/mem</h4>
+
+<p><a href="http://blog.zx2c4.com/749">http://blog.zx2c4.com/749</a> - C code that uses a bug in the way the Linux kernel checked permissions on /proc/pid/mem and then uses that to exploit the su binary to give a root shell.</p>
+
+<h4 id="cve-2010-3847-exploiting-via-origin-and-file-descriptors">CVE-2010-3847: Exploiting via $ORIGIN and file descriptors</h4>
+
+<p><a href="http://www.exploit-db.com/exploits/15274/">http://www.exploit-db.com/exploits/15274/</a> - By exploiting a hole in the way the $ORIGIN is checked, a symlink can be made to a program that uses <code>setuid</code> and <code>exec</code>&rsquo;d &lsquo;to obtain the file descriptors which then lets arbitrary code injection (in this case a call to <code>system(&quot;/bin/bash&quot;)</code>).</p>
+
+<p>More of these can be found at <a href="http://www.exploit-db.com/shellcode/">http://www.exploit-db.com/shellcode/</a> and just <a href="https://www.google.com/search?q=setuid+exploits">searching google for <code>setuid</code> exploits</a>.</p>
+
+<p>So you may not want to completely disable the <code>setuid</code> flag on all the binaries for your distribution, but we can turn on some logging to watch when they&rsquo;re getting called and install a kernel patch that will secure the OS and help prevent 0-days that may prey on <code>setuid</code> vulnerabilities.</p>
+
+<h2 id="how-to-log-setuid-calls">How to log setuid calls</h2>
+
+<p>I will detail the steps to do this on Ubuntu, but they should apply to the other audit daemons on CentOS.</p>
+
+<p>Let&rsquo;s first install auditd: <code>sudo apt-get install auditd</code></p>
+
+<p>Let&rsquo;s open up <code>/etc/audit/audit.rules</code>, and with a few tweaks with vim, we can insert the list we generated with find into the audit rule set (explanation of each flag after the jump):</p>
+
+<pre><code class="language-bash"># This file contains the auditctl rules that are loaded# whenever the audit daemon is started via the initscripts.
+# The rules are simply the parameters that would be passed
+# to auditctl.
+
+# First rule - delete all
+-D
+
+# Increase the buffers to survive stress events.
+# Make this bigger for busy systems
+-b 320
+
+# Feel free to add below this line. See auditctl man page
+
+-a always,exit -F path=/usr/lib/pt_chown -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/lib/eject/dmcrypt-get-device -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/lib/dbus-1.0/dbus-daemon-launch-helper -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/lib/openssh/ssh-keysign -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/sbin/uuidd -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/sbin/pppd -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/at -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/passwd -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/mtr -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/sudoedit -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/traceroute6.iputils -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/chsh -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/sudo -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/chfn -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/usr/bin/newgrp -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/bin/fusermount -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/bin/umount -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/bin/ping -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/bin/ping6 -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/bin/su -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+-a always,exit -F path=/bin/mount -F perm=x -F auid&gt;=500 -F auid!=4294967295 -k privileged
+</code></pre>
+
+<pre><code class="language-text">-a: appends the always, and exit rules. This says to always make a log at syscall entry and syscall exit.
+-F
+     path= says filter to the executable being called
+     perm=x says filter on the program being executable
+     auid&gt;= says log all calls for users who have a UID above 500 (regular user accounts start at 1000 generally)
+     auid!=4294967295 sometimes a process may start before the auditd, in which case it will get a auid of 4294967295
+-k passes a filter key that will be put into the record log, in this case its &quot;privileged&quot;
+</code></pre>
+
+<p>So now when we run ping google.com we can see a full audit trail in <code>/var/log/audit/audit.log</code>:</p>
+
+<pre><code class="language-bash">type=SYSCALL msg=audit(1361852594.621:48): arch=c000003e syscall=59 success=yes exit=0 a0=f43de8 a1=d40488 a2=ed8008 a3=7fffc9c9a150 items=2 ppid=1464 pid=1631 auid=1000 uid=1000 gid=1000 euid=0 suid=0 fsuid=0 egid=1000 sgid=1000 fsgid=1000 tty=pts1 ses=6 comm=&quot;ping&quot; exe=&quot;/bin/ping&quot; key=&quot;privileged&quot;type=EXECVE msg=audit(1361852594.621:48): argc=2 a0=&quot;ping&quot; a1=&quot;google.com&quot;
+type=BPRM_FCAPS msg=audit(1361852594.621:48): fver=0 fp=0000000000000000 fi=0000000000000000 fe=0 old_pp=0000000000000000 old_pi=0000000000000000 old_pe=0000000000000000 new_pp=ffffffffffffffff new_pi=0000000000000000 new_pe=ffffffffffffffff
+type=CWD msg=audit(1361852594.621:48):  cwd=&quot;/home/ubuntu&quot;
+type=PATH msg=audit(1361852594.621:48): item=0 name=&quot;/bin/ping&quot; inode=131711 dev=08:01 mode=0104755 ouid=0 ogid=0 rdev=00:00
+type=PATH msg=audit(1361852594.621:48): item=1 name=(null) inode=934 dev=08:01 mode=0100755 ouid=0 ogid=0 rdev=00:00
+</code></pre>
+
+<h2 id="next-steps-patching-and-upgrading-the-kernel-with-grsecurity">Next steps: Patching and upgrading the kernel with GRSecurity</h2>
+
+<p>GRSecurity is an awesome tool in the security-minded system administrators toolbag. It will prevent zero days (like the proc mem exploit explained above <a href="http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options#Remove_addresses_from_.2Fproc.2F.3Cpid.3E.2F.5Bsmaps.7Cmaps.7Cstat.5D"><sup>1</sup></a> ) by securing which areas a user can access. A full list can be seen at <a href="http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options">http://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options</a> and <a href="http://en.wikipedia.org/wiki/Grsecurity#Miscellaneous_features">http://en.wikipedia.org/wiki/Grsecurity#Miscellaneous_features</a>, I suggest going through these and seeing if you want to continue with this.</p>
+
+<p><strong>The following below is for advanced users. Not responsible for any issues you may run into, please make sure to test this in a staging/test environment.</strong></p>
+
+<p>Here are the steps I followed to install the patch:</p>
+
+<pre><code class="language-bash"># Start by downloading the latest kernel
+wget http://www.kernel.org/pub/linux/kernel/v3.0/linux-3.2.39.tar.bz2
+
+# Next extract it
+tar xjvf linux-3.2.39.tar.bz2
+cd linux-3.2.39
+
+# Copy over your current kernel configuration:
+cp -vi /boot/config-`uname -r` .config
+
+# Updates the config file to match old config and prompts for any new kernel options.
+make oldconfig
+
+# This will make sure only modules get compiled only if they are in your kernel.
+make localmodconfig
+
+# Bring up the configuration menu
+make menuconfig
+</code></pre>
+
+<p>Once your in the menu config you can browse to the <code>Security</code> section and go to <code>Grsecurity</code> and enable it. I set the configuration method to automatic and then went to Customize. For example, you can now go to <code>Kernel Auditing -&gt; Exec logging</code> to turn on some additional logging to shell activities (<strong>WARNING: this will generate a lot of log activity, decide if you want to use this or not). I suggest going through all of these and reading through their menu help descriptions (when selecting one, press the <code>?</code> key to bring up the help</strong>).</p>
+
+<p>Now we&rsquo;ll finish making the kernel and compiling it:</p>
+
+<pre><code class="language-bash"># Now we can compile the kernel
+make -j2 # where 2 is the # of CPU's + 1
+
+# Install and load the dynamic kernel modules
+sudo make modules_install
+
+# Finally install kernel
+sudo make install
+</code></pre>
+
+<p>We can now reboot and boot into our GRsecurity patched kernel!</p>
+
+<p>Hopefully this article has provided some insight into what the <code>setuid</code> flag does, how it has and can be exploited, and what we can do to prevent this in the future.</p>
+
+<p>Here are a few links to useful books on the subject of shellcode and exploits that I reccomend:</p>
+
+<h3 id="below-is-the-list-of-setuid-binaries-on-each-os">Below is the list of <code>setuid</code> binaries on each OS</h3>
+
+<p><a name="ubuntu"></a></p>
+
+<h4 id="ubuntu-12-04-lts-22">Ubuntu 12.04 LTS (22)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<pre><code class="language-bash">-rwsr-xr-x 1 root    root        31304 Mar  2  2012 /bin/fusermount-rwsr-xr-x 1 root    root        94792 Mar 30  2012 /bin/mount
+-rwsr-xr-x 1 root    root        35712 Nov  8  2011 /bin/ping
+-rwsr-xr-x 1 root    root        40256 Nov  8  2011 /bin/ping6
+-rwsr-xr-x 1 root    root        36832 Sep 12 18:29 /bin/su
+-rwsr-xr-x 1 root    root        69096 Mar 30  2012 /bin/umount
+-rwsr-sr-x 1 daemon  daemon      47928 Oct 25  2011 /usr/bin/at
+-rwsr-xr-x 1 root    root        41832 Sep 12 18:29 /usr/bin/chfn
+-rwsr-xr-x 1 root    root        37096 Sep 12 18:29 /usr/bin/chsh
+-rwsr-xr-x 1 root    root        63848 Sep 12 18:29 /usr/bin/gpasswd
+-rwsr-xr-x 1 root    root        62400 Jul 28  2011 /usr/bin/mtr
+-rwsr-xr-x 1 root    root        32352 Sep 12 18:29 /usr/bin/newgrp
+-rwsr-xr-x 1 root    root        42824 Sep 12 18:29 /usr/bin/passwd
+-rwsr-xr-x 2 root    root        71288 May 31  2012 /usr/bin/sudo
+-rwsr-xr-x 2 root    root        71288 May 31  2012 /usr/bin/sudoedit
+-rwsr-xr-x 1 root    root        18912 Nov  8  2011 /usr/bin/traceroute6.iputils
+-rwsr-xr-- 1 root    messagebus 292944 Oct  3 13:03 /usr/lib/dbus-1.0/dbus-daemon-launch-helper
+-rwsr-xr-x 1 root    root        10408 Dec 13  2011 /usr/lib/eject/dmcrypt-get-device
+-rwsr-xr-x 1 root    root       240984 Apr  2  2012 /usr/lib/openssh/ssh-keysign
+-rwsr-xr-x 1 root    root        10592 Oct  5 16:08 /usr/lib/pt_chown
+-rwsr-xr-- 1 root    dip        325744 Feb  4  2011 /usr/sbin/pppd
+-rwsr-sr-x 1 libuuid libuuid     18856 Mar 30  2012 /usr/sbin/uuidd
+</code></pre>
+
+<p><a name="centos"></a></p>
+
+<h4 id="centos-6-3-21">CentOS 6.3 (21)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<pre><code class="language-bash">-rwsr-xr-x. 1 root root  76056 Nov  5 05:21 /bin/mount-rwsr-xr-x. 1 root root  40760 Jul 19  2011 /bin/ping
+-rwsr-xr-x. 1 root root  36488 Jul 19  2011 /bin/ping6
+-rwsr-xr-x. 1 root root  34904 Jun 22  2012 /bin/su
+-rwsr-xr-x. 1 root root  50496 Nov  5 05:21 /bin/umount
+-rwsr-x---. 1 root dbus  46232 Sep 13 13:04 /lib64/dbus-1/dbus-daemon-launch-helper
+-rwsr-xr-x. 1 root root  10272 Apr 16  2012 /sbin/pam_timestamp_check
+-rwsr-xr-x. 1 root root  34840 Apr 16  2012 /sbin/unix_chkpwd
+-rwsr-xr-x. 1 root root  54240 Jan 30  2012 /usr/bin/at
+-rwsr-xr-x. 1 root root  66352 Dec  7  2011 /usr/bin/chage
+-rws--x--x. 1 root root  20184 Nov  5 05:21 /usr/bin/chfn
+-rws--x--x. 1 root root  20056 Nov  5 05:21 /usr/bin/chsh
+-rwsr-xr-x. 1 root root  47520 Jul 19  2011 /usr/bin/crontab
+-rwsr-xr-x. 1 root root  71480 Dec  7  2011 /usr/bin/gpasswd
+-rwsr-xr-x. 1 root root  36144 Dec  7  2011 /usr/bin/newgrp
+-rwsr-xr-x. 1 root root  30768 Feb 22  2012 /usr/bin/passwd
+---s--x--x. 2 root root 219272 Aug  6  2012 /usr/bin/sudo
+---s--x--x. 2 root root 219272 Aug  6  2012 /usr/bin/sudoedit
+-rwsr-xr-x. 1 root root 224912 Nov  9 07:49 /usr/libexec/openssh/ssh-keysign
+-rws--x--x. 1 root root  14280 Jan 31 06:30 /usr/libexec/pt_chown
+-rwsr-xr-x. 1 root root   9000 Sep 17 05:55 /usr/sbin/usernetctl
+</code></pre>
+
+<p><a name="openbsd"></a></p>
+
+<h4 id="openbsd-5-2-3">OpenBSD 5.2 (3)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<pre><code class="language-bash">-r-sr-xr-x  1 root  bin       242808 Aug  1  2012 /sbin/ping-r-sr-xr-x  1 root  bin       263288 Aug  1  2012 /sbin/ping6
+-r-sr-x---  1 root  operator  222328 Aug  1  2012 /sbin/shutdown
+</code></pre>
+
+<p><a name="openindiana"></a></p>
+
+<h4 id="openindiana-11-53">OpenIndiana 11 (53)</h4>
+
+<p><a href="#top">back to top</a></p>
+
+<pre><code class="language-bash">-rwsr-xr-x   1 root     bin        64232 Jun 30  2012 /sbin/wificonfig--wS--lr-x   1 root     root           0 Dec 11 15:20 /media/.hal-mtab-lock
+-r-sr-xr-x   1 root     bin       206316 Dec 11 21:00 /usr/lib/ssh/ssh-keysign
+-rwsr-xr-x   1 root     adm        12140 Jun 30  2012 /usr/lib/acct/accton
+-r-sr-xr-x   1 root     bin        23200 Jun 30  2012 /usr/lib/fs/ufs/quota
+-r-sr-xr-x   1 root     bin       111468 Jun 30  2012 /usr/lib/fs/ufs/ufsrestore
+-r-sr-xr-x   1 root     bin       106964 Jun 30  2012 /usr/lib/fs/ufs/ufsdump
+-r-sr-xr-x   1 root     bin        18032 Jun 30  2012 /usr/lib/fs/smbfs/umount
+-r-sr-xr-x   1 root     bin        18956 Jun 30  2012 /usr/lib/fs/smbfs/mount
+-r-sr-xr-x   1 root     bin        12896 Jun 30  2012 /usr/lib/utmp_update
+-r-sr-xr-x   1 root     bin        35212 Jun 30  2012 /usr/bin/fdformat
+-r-s--x--x   2 root     bin       188080 Jun 30  2012 /usr/bin/sudoedit
+-r-sr-xr-x   1 root     sys        34876 Jun 30  2012 /usr/bin/su
+-r-sr-xr-x   1 root     bin        42504 Jun 30  2012 /usr/bin/login
+-r-sr-xr-x   1 root     bin       257288 Jun 30  2012 /usr/bin/pppd
+-r-sr-xr-x   1 root     sys        46208 Jun 30  2012 /usr/bin/chkey
+-r-sr-xr-x   1 root     sys        29528 Jun 30  2012 /usr/bin/amd64/newtask
+-r-sr-xr-x   2 root     bin        24432 Jun 30  2012 /usr/bin/amd64/w
+-r-sr-xr-x   1 root     bin      3224200 Jun 30  2012 /usr/bin/amd64/Xorg
+-r-sr-xr-x   2 root     bin        24432 Jun 30  2012 /usr/bin/amd64/uptime
+-rwsr-xr-x   1 root     sys        47804 Jun 30  2012 /usr/bin/at
+-r-sr-xr-x   1 root     bin         8028 Jun 30  2012 /usr/bin/mailq
+-r-sr-xr-x   1 root     bin        33496 Jun 30  2012 /usr/bin/rsh
+-r-sr-xr-x   1 root     bin        68704 Jun 30  2012 /usr/bin/rmformat
+-r-sr-sr-x   1 root     sys        31292 Jun 30  2012 /usr/bin/passwd
+-rwsr-xr-x   1 root     sys        23328 Jun 30  2012 /usr/bin/atrm
+-r-sr-xr-x   1 root     bin        97072 Jun 30  2012 /usr/bin/xlock
+-r-sr-xr-x   1 root     bin        78672 Jun 30  2012 /usr/bin/rdist
+-r-sr-xr-x   1 root     bin        27072 Jun 30  2012 /usr/bin/sys-suspend
+-r-sr-xr-x   1 root     bin        29304 Jun 30  2012 /usr/bin/crontab
+-r-sr-xr-x   1 root     bin        53080 Jun 30  2012 /usr/bin/rcp
+-r-s--x--x   2 root     bin       188080 Jun 30  2012 /usr/bin/sudo
+-r-s--x--x   1 uucp     bin        70624 Jun 30  2012 /usr/bin/tip
+-rwsr-xr-x   1 root     sys        18824 Jun 30  2012 /usr/bin/atq
+-r-sr-xr-x   1 root     bin       281732 Jun 30  2012 /usr/bin/xscreensaver
+-r-sr-xr-x   1 root     bin      2767780 Jun 30  2012 /usr/bin/i86/Xorg
+-r-sr-xr-x   1 root     sys        22716 Jun 30  2012 /usr/bin/i86/newtask
+-r-sr-xr-x   2 root     bin        22020 Jun 30  2012 /usr/bin/i86/w
+-r-sr-xr-x   2 root     bin        22020 Jun 30  2012 /usr/bin/i86/uptime
+-rwsr-xr-x   1 root     sys        13636 Jun 30  2012 /usr/bin/newgrp
+-r-sr-xr-x   1 root     bin        39224 Jun 30  2012 /usr/bin/rlogin
+-rwsr-xr-x   1 svctag   daemon    108964 Jun 30  2012 /usr/bin/stclient
+-r-sr-xr-x   1 root     bin        29324 Jun 30  2012 /usr/xpg4/bin/crontab
+-rwsr-xr-x   1 root     sys        47912 Jun 30  2012 /usr/xpg4/bin/at
+-r-sr-xr-x   3 root     bin        41276 Jun 30  2012 /usr/sbin/deallocate
+-rwsr-xr-x   1 root     sys        32828 Jun 30  2012 /usr/sbin/sacadm
+-r-sr-xr-x   1 root     bin        46512 Jun 30  2012 /usr/sbin/traceroute
+-r-sr-xr-x   1 root     bin        18016 Jun 30  2012 /usr/sbin/i86/whodo
+-r-sr-xr-x   1 root     bin        55584 Jun 30  2012 /usr/sbin/ping
+-r-sr-xr-x   3 root     bin        41276 Jun 30  2012 /usr/sbin/allocate
+-r-sr-xr-x   1 root     bin        37320 Jun 30  2012 /usr/sbin/pmconfig
+-r-sr-xr-x   3 root     bin        41276 Jun 30  2012 /usr/sbin/list_devices
+-r-sr-xr-x   1 root     bin        24520 Jun 30  2012 /usr/sbin/amd64/whodo
+</code></pre>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+

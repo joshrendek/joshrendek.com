@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.25.1" />
+
+<meta property="og:title" content="Docker and ping: sendmsg: Operation not permitted" />
+<meta property="og:description" content="You&rsquo;ve raised your file descriptor limits, updated security limits, tweaked your network settings and done everything else in preperation to launch your shiny new dockerized application.
+Then you have performance issues and you can&rsquo;t understand why, it looks to be network related. Alright! Let&rsquo;s see what&rsquo;s going on:
+ping google.com unknown host google.com  Maybe its DNS related&hellip;. Let&rsquo;s try again:
+ping 8.8.8.8 ping: sendmsg: Operation not permitted  That&rsquo;s odd, maybe it&rsquo;s a networking issue outside of our servers." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/" />
+
+
+
+<meta property="article:published_time" content="2015-11-02T21:30:07&#43;00:00"/>
+<meta property="article:modified_time" content="2015-11-02T21:30:07&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <meta name="twitter:card" content="summary"/>
+
+
+
+<meta name="twitter:text:title" content="Docker and ping: sendmsg: Operation not permitted"/>
+<meta name="twitter:title" content="Docker and ping: sendmsg: Operation not permitted"/>
+<meta name="twitter:description" content="You&rsquo;ve raised your file descriptor limits, updated security limits, tweaked your network settings and done everything else in preperation to launch your shiny new dockerized application.
+Then you have performance issues and you can&rsquo;t understand why, it looks to be network related. Alright! Let&rsquo;s see what&rsquo;s going on:
+ping google.com unknown host google.com  Maybe its DNS related&hellip;. Let&rsquo;s try again:
+ping 8.8.8.8 ping: sendmsg: Operation not permitted  That&rsquo;s odd, maybe it&rsquo;s a networking issue outside of our servers."/>
+
+
+
+
+<meta itemprop="name" content="Docker and ping: sendmsg: Operation not permitted">
+<meta itemprop="description" content="You&rsquo;ve raised your file descriptor limits, updated security limits, tweaked your network settings and done everything else in preperation to launch your shiny new dockerized application.
+Then you have performance issues and you can&rsquo;t understand why, it looks to be network related. Alright! Let&rsquo;s see what&rsquo;s going on:
+ping google.com unknown host google.com  Maybe its DNS related&hellip;. Let&rsquo;s try again:
+ping 8.8.8.8 ping: sendmsg: Operation not permitted  That&rsquo;s odd, maybe it&rsquo;s a networking issue outside of our servers.">
+
+
+<meta itemprop="dateModified" content="2015-11-02T21:30:07&#43;00:00" />
+<meta itemprop="wordCount" content="497">
+
+
+
+<meta itemprop="keywords" content="" />
+
+
+<link rel="stylesheet" type="text/css" href="/css/layout.css" />
+<link rel="stylesheet" type="text/css" href="/css/pygments.css" />
+<link rel="stylesheet" type="text/css" href="/css/color-dark.css" />
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-3754808-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Docker and ping: sendmsg: Operation not permitted 
+
+</title>
+
+<script src="/js/highlight.min.js"></script>
+<link rel="stylesheet" href="/css/tomorrow-night.min.css" />
+<script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://joshrendek.com">
+        <span class='blue-brace'>{</span>
+        Josh Rendek
+        <span class='blue-brace'>}</span>
+      </a>
+      <div class="header-subtitle">
+        <h2>
+          <span class="heart">&lt;3</span> Ruby &amp; Go
+        </h2>
+      </div>
+    </div> 
+  </nav>
+  <nav>
+      
+      
+      <a class="nav-item" href="/"><div class="nav-item-title">Home</div></a>
+      
+      <a class="nav-item" href="/projects/"><div class="nav-item-title">Projects</div></a>
+      
+      <a class="nav-item" href="/archives/"><div class="nav-item-title">Archives</div></a>
+      
+      <a class="nav-item" href="https://devopsbyvideo.com/"><div class="nav-item-title">Screen Casts</div></a>
+      
+      <a class="nav-item" href="/about/"><div class="nav-item-title">About</div></a>
+      
+      <a class="nav-item" href="/categories/"><div class="nav-item-title">Categories</div></a>
+      
+      <a class="nav-item" href="https://github.com/joshrendek/"><div class="nav-item-title">GitHub</div></a>
+      
+      <a class="nav-item" href="/resume.pdf"><div class="nav-item-title">Resume</div></a>
+      
+   </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<main>
+  <div class="articles">
+    <article class="post">
+      <div class="date"> Nov 2, 2015 - 3 minutes</div>
+      <h1 class="title"> Docker and ping: sendmsg: Operation not permitted </h1>
+      <div class="content"> <p>You&rsquo;ve raised your file descriptor limits, updated security limits, tweaked your network settings and done everything else in preperation to
+launch your shiny new dockerized application.</p>
+
+<p>Then you have performance issues and you can&rsquo;t understand why, it looks to be network related. Alright! Let&rsquo;s see what&rsquo;s going on:</p>
+
+<pre><code class="language-bash">ping google.com
+unknown host google.com
+</code></pre>
+
+<p>Maybe its DNS related&hellip;. Let&rsquo;s try again:</p>
+
+<pre><code class="language-bash">ping 8.8.8.8
+ping: sendmsg: Operation not permitted
+</code></pre>
+
+<p>That&rsquo;s odd, maybe it&rsquo;s a networking issue outside of our servers. Lets try pinging another host on the subnet:</p>
+
+<pre><code class="language-bash">ping 10.10.0.50
+ping: sendmsg: Operation not permitted
+</code></pre>
+
+<p>That&rsquo;s even more odd, our other host isn&rsquo;t having network issues at all. Lets try going the other way:</p>
+
+<pre><code class="language-bash">ping 10.10.0.49 # the bad host
+# Lots of packet loss
+</code></pre>
+
+<p>We&rsquo;re getting a lot of packet loss going from Host B to Host A (the problem machine). Maybe it&rsquo;s a bad NIC?</p>
+
+<p>Just for fun I decided to try and ping localhost/127.0.0.1:</p>
+
+<pre><code class="language-bash">ping 127.0.0.1
+ping: sendmsg: Operation not permitted
+</code></pre>
+
+<p>That&rsquo;s a new one. What the heck is going on? Now at this point I derped out and didn&rsquo;t think to check <code>dmesg</code>. Lets assume you went down the road I went and derped.</p>
+
+<p>What&rsquo;s the different between host A and B? Well, host B doesn&rsquo;t have docker installed!</p>
+
+<pre><code class="language-bash">apt-get remove docker-engine; reboot
+
+# .... wait for reboot
+
+ping 127.0.0.1
+# working
+ping 8.8.8.8
+# working
+ping google.com
+# working
+</code></pre>
+
+<pre><code class="language-bash">apt-get install docker-engine
+ping 127.0.0.1
+ping: sendmsg: Operation not permitted
+
+ping 8.8.8.8
+ping: sendmsg: Operation not permitted
+</code></pre>
+
+<p>Okay so it happens when docker is installed. We&rsquo;ve isolated it. Kernel bug maybe? Queue swapping around kernels and still the same issue happens.</p>
+
+<p>Fun side note: Ubuntu 14.04 has a kernel bug that prevents booting into LVM or software raided grub. <a href="https://bugs.launchpad.net/ubuntu/+source/grub2/+bug/1274320">Launchpad Bug</a></p>
+
+<p>Switching back to the normal kernel (3.13) that comes with 14.04, we proceed. Docker bug? Hit up <code>#docker</code> on Freenode. Someone mentions checking dmesg and conntrack information.</p>
+
+<p>Lo-and-behold, <code>dmesg</code> has tons of these:</p>
+
+<pre><code class="language-bash">ip_conntrack: table full, dropping packet
+# x1000
+</code></pre>
+
+<p>How does docker networking work? NAT! That mean&rsquo;s <code>iptables</code> needs to keep track of all your connections, hence the full message.</p>
+
+<p>If you google the original message you&rsquo;ll see a lot of people telling you to check your iptables rules and ACCEPT/INPUT chains to make sure there isn&rsquo;t anything funky in there. If we combine this knowledge + the dmesg errors, we now know what to fix.</p>
+
+<p>Lets update <code>sysctl.conf</code> and reboot for good measure ( you could also apply them with <code>sysctl -p</code> but I wanted to make sure everything was fresh. )</p>
+
+<pre><code class="language-bash">net.ipv4.netfilter.ip_conntrack_tcp_timeout_established = 54000
+net.netfilter.nf_conntrack_generic_timeout = 120
+net.netfilter.nf_conntrack_max = 556000
+</code></pre>
+
+<p>Adjust the conntrack max until you hit a stable count (556k worked well for me) and don&rsquo;t get anymore connection errors. Start your shiny new docker application that makes tons of network connections and everything should be good now.</p>
+
+<p>Hope this helps someone in the future, as Google really didn&rsquo;t have a lot of useful information on this message + Docker.</p>
+ </div>
+      <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+</div>
+
+  </div>
+
+</footer>
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'bluescripts';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+    </article>
+  </div>
+  <div class="sidebar">
+  <section>
+    <h1>Projects & Software</h1>
+    <ul>
+      <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
+      <li><a href="http://sshpot.com/">sshpot.com</a> is a SSH honeypot service written in Go (both web service and client are open source).</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'> More on GitHub</a></li>
+      <li><a href="https://rubygems.org/profiles/joshrendek">Gems @ RubyGems</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Other Blogs</h1>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Recent Posts</h1>
+    <ul>
+      
+      <li><a href="https://joshrendek.com/2016/06/building-honeypots-and-analyzing-linux-malware/">Building honeypots and analyzing linux malware</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/understanding-elasticsearch-performance/">Understanding ElasticSearch Performance</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/building-a-distributed-waitgroup-with-go-and-redis/">Building a distributed WaitGroup with Go and Redis</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/11/docker-and-ping-sendmsg-operation-not-permitted/">Docker and ping: sendmsg: Operation not permitted</a></li>
+      
+      <li><a href="https://joshrendek.com/2015/10/influx-alert/">Influx Alert</a></li>
+      
+    </ul>
+  </section>
+
+</div>
+
+</main>
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://joshrendek.com/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> © Copyright 2008-2017 Josh Rendek </div>
+
+  </footer>
+
+</body>
+</html>
+
