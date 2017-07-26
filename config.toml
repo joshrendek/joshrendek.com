@@ -121,12 +121,16 @@ post = "/:year/:month/:title/"
 [[menu.main]]
     name = "Categories"
     url = "/categories/"
+    weight = 5
 [[menu.main]]
     name = "Resume"
     url = "/resume.pdf"
+    weight = 6
 [[menu.main]]
     name = "About"
     url = "/about/"
+    weight = 7
 [[menu.main]]
     name = "GitHub"
     url = "https://github.com/joshrendek/"
+    weight = 8
