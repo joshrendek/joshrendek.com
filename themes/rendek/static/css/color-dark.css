@@ -8,10 +8,10 @@ main { color: #222; }
 /*pre { background: #1D1F21; border: 1px solid #5C5C5C; border-radius: 5px; }*/
 /*code { background: #1D1F21; }*/
 blockquote { background: #1D1F21; border-left: 3px solid #388ED6; color: #efefef; }
-table { margin: 1em auto; border-collapse: collapse; }
-table, th, td { border: 1px solid #5C5C5C; }
-tr:hover { background: #1D1F21; }
-th { background: #1D1F21; }
+table { /*margin: 1em auto;*/ border-collapse: collapse; background: #fff; }
+table, th, td { border: 1px solid #ababab; }
+tr:hover { background: #efefef; }
+th { background: #cdcdcd; }
 .siteTitle a { color: #fff; }
 .post .content h1{ color: #22; }
 .post .content h2{ color: #22; }
