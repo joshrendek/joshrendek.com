@@ -3,7 +3,6 @@ categories: null
 comments: true
 date: 2017-07-23T11:26:57Z
 title: Security and Software of hosts on the Tor Network
-draft: true
 ---
 
 The goal of this project was to start with a base directory (in this case The Hidden Wiki) and start spidering out to discover all reachable Tor servers. Some restrictions were placed on this after a few trial runs:
