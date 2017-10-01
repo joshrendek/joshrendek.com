@@ -1,36 +1,37 @@
 <!DOCTYPE html>
 <html>
 
-{{ partial "head.html" . }}
+  {{ partial "head.html" . }}
 
-<body>
-<div class="main">
-<header>
-
-<div class="header-bar">
-
-  <nav>
-    <div class="siteTitle">
-      <a href="{{ .Site.BaseURL }}">
-        <span class='blue-brace'>{</span>
-        {{ .Site.Title }}
-        <span class='blue-brace'>}</span>
-      </a>
-      <div class="header-subtitle">
-        <h2>
-          <span class="heart">&lt;3</span> Ruby &amp; Go
-        </h2>
+  <body>
+    <header>
+      <div class="grid-x grid-padding-x">
+        <div class="cell large-6 large-offset-2">
+          <div class="blog-title">
+            <a href="{{ .Site.BaseURL }}">
+              <h1>
+                <span class='blue-brace'>{</span>
+                {{ .Site.Title }}
+                <span class='blue-brace'>}</span>
+              </h1>
+            </a>
+            <div class="blog-subtitle">
+              <span class="heart">&lt;3</span> Ruby &amp; Go
+            </div>
+          </div> <!--siteTitle-->
+        </div>
       </div>
-    </div> <!--siteTitle-->
-  </nav>
-  <nav>
-      {{ $currentPage := . }}
-      {{ range .Site.Menus.main }}
-      <a class="nav-item{{if or ($currentPage.IsMenuCurrent "main" .) ($currentPage.HasMenuCurrent "main" .) }} active{{end}}" href="{{.URL}}"><div class="nav-item-title">{{ .Name }}</div></a>
-      {{ end }}
-   </nav>
-</div>
+      <div class="grid-x grid-padding-x">
+        <div class="cell large-8 large-offset-2">
+          <ul class="menu">
+            {{ $currentPage := . }}
+            {{ range .Site.Menus.main }}
+            <li>
+              <a href="{{.URL}}">{{ .Name }}</a>
+            </li>
+            {{ end }}
+          </ul>
+        </div>
+      </div>
 
-  {{ partial "social-links.html" . }}
-
-</header>
+    </header>

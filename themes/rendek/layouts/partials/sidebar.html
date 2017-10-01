@@ -1,6 +1,8 @@
 <div class="sidebar">
   <section>
-    <h1>Projects & Software</h1>
+    <div class="box-title">
+      <h3>Projects & Software</h3>
+    </div>
     <ul>
       <li><a href="https://hnypots.com/">hnypots.com</a> is a honeypot service written in Go and Rails.</li>
       <li><a href="https://github.com/joshrendek/docker-conductor">Docker Conductor</a> is a docker orchestration tool.</li>
@@ -14,7 +16,9 @@
   </section>
 
   <section>
-    <h1>Other Blogs</h1>
+    <div class="box-title">
+      <h3>Other Blogs</h3>
+    </div>
     <ul>
       <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
       <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
@@ -22,7 +26,9 @@
   </section>
 
   <section>
-    <h1>Recent Posts</h1>
+    <div class="box-title">
+      <h3>Recent Posts</h3>
+    </div>
     <ul>
       {{ range first 5 (where .Site.Pages "Type" "post") }}
       <li><a href="{{ .Permalink }}">{{ .Title }}</a></li>

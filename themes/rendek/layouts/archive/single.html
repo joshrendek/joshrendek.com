@@ -1,24 +1,29 @@
 {{ partial "header.html" . }}
 
-<main>
-  <div class="articles">
-    <h2 class="content-list-title">
+<div class="grid-x grid-padding-x">
+  <div class="cell large-6 large-offset-2 small-12 medium-9">
+    <article>
       <a href="{{ .Permalink }}" class="linktopost">{{ .Title }}</a>
-    </h2>
     {{ range (where .Site.Pages "Type" "post") }}
 
     <div class="content-list">
       {{ range .Data.Pages.GroupByDate "2006" }}
-      <div class="content-list-date">{{ .Key }}</div>
+      <h3>{{ .Key }}</h3>
       {{ range .Pages }}
       {{ .Render "li"}}
       {{ end }}
       {{ end }}
     </div>
     {{ end }}
+  </article>
+  </div>
+
+
+  <div class="cell large-2 medium-2 sidebar">
+    {{ partial "sidebar.html" . }}
+  </div>
   </div>
 
   {{ partial "sidebar.html" . }}
-</main>
 
 {{ partial "footer.html" . }}
