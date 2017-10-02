@@ -21,14 +21,14 @@ header .blue-brace {
 }
 
 .menu {
-    margin-top: 15px;
-    border-top: 1px solid #efefef;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #efefef;
-    li {
-        font-weight: bold;
-        display: block;
-    }
+  margin-top: 15px;
+  border-top: 1px solid #efefef;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #efefef;
+}
+.menu li {
+  font-weight: bold;
+  display: block;
 }
 
 article {
