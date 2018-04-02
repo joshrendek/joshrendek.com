@@ -1,7 +1,6 @@
 ---
 title: "Kubernetes On Bare Metal"
 date: 2018-04-01T21:01:44-04:00
-draft: true
 ---
 
 <div class="toc">
