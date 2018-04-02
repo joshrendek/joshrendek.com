@@ -647,9 +647,49 @@ Lines 29-41 are going to depend on your app - if your server is slow to start up
 
 And provided you just have configuration changes to try out (container is already built and in a registry), you can iterate locally:
 
-{{< highlight yaml >}}
+{{< highlight bash >}}
 helm upgrade your_app_name . -i --namespace your_app_name --wait --debug
 {{< /highlight >}}
 
 <a name="cicd"></a>
 #### Integrating with GitLab / CICD Pipelines
+
+Here is a sample `.gitlab-ci.yaml` that you can use for deploying - this is building a small go binary for [ifcfg.net](http://ifcfg.net):
+
+{{< highlight yaml >}}
+stages:
+    - build
+    - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  IMAGE: registry.sub.yourdomain.com/project/web
+
+services:
+- docker:dind
+
+build:
+  image: docker:latest
+  stage: build
+  script:
+    - docker build -t $IMAGE:$CI_COMMIT_SHA .
+    - docker tag $IMAGE:$CI_COMMIT_SHA $IMAGE:latest
+    - docker push $IMAGE:$CI_COMMIT_SHA
+    - docker push $IMAGE:latest
+
+deploy:
+  image: ubuntu
+  stage: deploy
+  before_script:
+    - apt-get update && apt-get install -y curl
+    - curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+  script:
+    - cd deployment/ifcfg
+    - KUBECONFIG=<(echo "$KUBECONFIG") helm upgrade ifcfg . -i --namespace ifcfg --wait --debug --set "image.tag=$CI_COMMIT_SHA"
+{{< /highlight >}}
+
+Lines 16-19 are where we tag latest and our commited SHA and push both to our registry we made in the previous steps.
+
+Line 26 is installing helm.
+
+Line 29 is doing a few things. First thing to note is we have our `~/.kube/config` file set as a environment variable in gitlab. The `<(echo)...` stuff is a little shell trick that makes it look like a file on the file system (that way we don't have to write it out in a separate step). `upgrade -i` says to upgrade our app, and if it doesn't exist yet, to install it. The last important bit is `image.tag=$CI_COMMIT_SHA` - this helps you setup for deploying tagged releases instead of always deploying the `latest` from your repository. Thats it, you should now have an automated build pipeline setup for a project on your working kubernetes cluster.
