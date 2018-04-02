@@ -8,13 +8,28 @@ draft: true
 <strong>Table of Contents</strong>
 <ul>
     <li><a href="#goals">Goals</a></li>
-    <li><a href="#goals">Goals</a></li>
-    <li><a href="#goals">Goals</a></li>
+    <li><a href="#options">Options</a></li>
+    <li><a href="#servers">Servers</a></li>
+    <li><a href="#scripts">Init Scripts</a></li>
+    <li><a href="#nfs-server">NFS Server</a></li>
+    <li><a href="#master-node">Master Node</a></li>
+    <li><a href="#worker-node">Worker Node(s)</a></li>
+    <li><a href="#pod-networking">Pod Networking (Flannel)</a></li>
+    <li><a href="#dashboard">Kubernetes Dashboard</a></li>
+    <li><a href="#nfs-sc">NFS Storage Class</a></li>
+    <li><a href="#helm">Installing Helm</a></li>
+    <li><a href="#heapster">Installing Heapster</a></li>
+    <li><a href="#traefik">Installing Traefik</a></li>
+    <li><a href="#registry">Private Docker Registry</a></li>
+    <li><a href="#creds">Configuring Credentials</a></li>
+    <li><a href="#deploy">Deploying Your Applications</a></li>
+    <li><a href="#cicd">Integrating with GitLab/CICD</a></li>
 </ul>
 </div>
 
 If you've been following kubernetes, you'll understand theres a myriad of options available... I'll cover a few of them briefly and why I didn't choose them. Don't know what Kubernetes is? <a href="https://kubernetes.io/docs/getting-started-guides/minikube/" rel="nofollow">Minikube</a> is the best way to get going locally.
 
+<a name="goals"></a>
 ##### But first the goals for this cluster:
 
 * First-class SSL support with LetsEncrypt so we can easily deploy new apps with SSL using just annotations.
@@ -28,6 +43,7 @@ If you've been following kubernetes, you'll understand theres a myriad of option
 
 
 
+<a name="options"></a>
 ##### Overview of Options
 
 * <a href="https://www.openshift.org/" rel="nofollow">OpenShift</a>: Owned by RedHat - uses its own special tooling around `oc`. Minimum requirements were to high for a small cluster. Pretty high vendor lockin.
@@ -42,6 +58,7 @@ If you've been following kubernetes, you'll understand theres a myriad of option
 
 ... And the *winner* is... <a href="https://github.com/kubernetes/kubeadm" rel="nofollow">Kubeadm</a>. It's not in any incubator stages and is documented as one of the official ways to get a cluster setup.
 
+<a name="servers"></a>
 ##### Servers we'll need:
 
 * $5 (+$5 for 50G block storage) - NFS Pod storage server ( 1 CPU / 1GB RAM / block storage )
@@ -51,6 +68,7 @@ If you've been following kubernetes, you'll understand theres a myriad of option
 
 **Total cost:** $40.00
 
+<a name="scripts"></a>
 ##### Base Worker + Master init-script
 
 {{< highlight bash >}}
@@ -88,6 +106,7 @@ Line 16 we're installing the Ubuntu packaged version of docker -- this is import
 
 Lines 15-22 we're installing the kubernetes repo tools for kubeadm and kubernetes itself.
 
+<a name="nfs-server"></a>
 ##### Setting up the NFS Server
 
 I'm not going to go in depth on setting an NFS server, there's a million guides. I will however mention the exports section which I've kobbled together after a few experiments and reading OpenShift docs. There's also a good amount of documentation if you want to go the CEPH storage route as well, however NFS was the simplest solution to get setup.
@@ -106,6 +125,7 @@ Export options:
 * *no_subtree_check* - prevents issues with files being open and renamed at the same time
 * *no_wdelay* - generally prevents NFS from trying to be smart about when to write, and forces it to write to the disk ASAP.
 
+<a name="master-node"></a>
 #### Setting up the master node
 
 On the master node run `kubeadm` to init the cluster and start kubernetes services:
@@ -127,6 +147,7 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 {{< /highlight >}}
 
 
+<a name="worker-node"></a>
 #### Setting up the worker node
 
 You'll get a token command to run on workers from the previous step. However if you need to generate new tokens later on when you're expanding your cluster, you can use `kubeadm token list` and `kubeadm token create` to get a new token.
@@ -134,6 +155,7 @@ You'll get a token command to run on workers from the previous step. However if 
 **Important Note:** Your worker nodes **Must** have a unique hostname otherwise they will join the cluster and over-write each other (1st node will disappear and things will get rebalanced to the node you just joined). If this happens to you and you want to reset a node, you can run `kubeadm reset` to wipe that worker node.
 
 
+<a name="pod-networking"></a>
 #### Setting up pod networking (Flannel)
 
 
@@ -153,6 +175,7 @@ k8s-master     Ready     master    4d        v1.10.0
 k8s-worker     Ready     <none>    4d        v1.10.0
 {{< /highlight >}}
 
+<a name="dashboard"></a>
 #### Deploying the Kubernetes Dashboard
 
 If you need more thorough documentation, head on over to the [dashboard repo](https://github.com/kubernetes/dashboard#getting-started). We're going to follow a vanilla installation:
@@ -201,6 +224,7 @@ kube proxy
 
 Now you can access the dashboard at [http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login](http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login).
 
+<a name="nfs-sc"></a>
 #### Setting up our NFS storage class
 
 When using a cloud provider you normally get a default storage class provided for you (like on GKE). With our bare metal installation if we want `PersistentVolumes` (PVs)
@@ -290,6 +314,7 @@ kubectl apply -f nfs-test.yaml
 If everything is working, move on to the next sections, you've gotten NFS working! The only problem I ran into at this point was mis-typing my NFS Server IP.
 You can figure this out by doing a `kubectl get events -w` and watching the mount command output and trying to replicate it on the command line from a worker node.
 
+<a name="helm"></a>
 #### Installing Helm
 
 Up until this point we've just been using `kubectl apply` and `kubectl create` to install apps. We'll be using helm to manage our applications and install things going forward for the most part.
@@ -340,6 +365,7 @@ kubectl delete po -n kube-system -l name=tiller
 {{< /highlight >}}
 
 
+<a name="heapster"></a>
 #### Installing Heapster
 
 Heapster provides in cluster metrics and health information:
@@ -351,6 +377,7 @@ helm install stable/heapster --name heapster --set rbac.create=true
 You should see it installed with a `helm ls`.
 
 
+<a name="traefik"></a>
 #### Installing Traefik (LoadBalancer)
 
 First lets create a `traefik.yaml` values file:
@@ -446,6 +473,7 @@ kubectl apply -f traefik-ui.yaml
 
 You can check the progress of this with `kubectl get po -n kube-system -w`. Once everything is registered you should be able to go `https://traefik.sub.yourdomain.com` and login to the dashboard with the basic auth you configured.
 
+<a name="registry"></a>
 #### Private Docker Registry
 
 Provided you got everything working in the previous step (HTTPS works and LetsEncrypt got automatically setup for your traefik dashboard) you can continue on.
@@ -493,3 +521,133 @@ kubectl apply -f traefik-registry.yaml
 {{< /highlight >}}
 
 Provided all that worked, you should now be able to push and pull images and login to your registry at `registry.sub.yourdomain.com`
+
+<a name="creds"></a>
+#### Configuring docker credentials (per namespace)
+
+There are several ways you can set up docker auth (like `ServiceAccounts`) or `ImagePullSecrets` - I'm going to show the latter.
+
+Take your docker config that should look something like this:
+
+{{< highlight json >}}
+{
+        "auths": {
+                "registry.sub.yourdomain.com": {
+                        "auth": "BASE64 ENCODED user:pass"
+                }
+        }
+}
+{{< /highlight >}}
+
+and base64 encode that whole file/string. Make it all one line and then create a `registry-creds.yaml` file:
+
+
+{{< highlight yaml >}}
+apiVersion: v1
+kind: Secret
+metadata:
+ name: regcred
+ namespace: your_app_namespace
+data:
+ .dockerconfigjson: BASE64_ENCODED_CREDENTIALS
+type: kubernetes.io/dockerconfigjson
+{{< /highlight >}}
+
+
+Create your app namespace: `kubectl create namespace your_app_namespace` and apply it.
+
+{{< highlight bash >}}
+kubectl apply -f registry-creds.yaml
+{{< /highlight >}}
+
+You can now delete this file (or encrypt it with GPG, etc) - just don't commit it anywhere. Base64 encoding a string won't protect your credentials.
+
+You would then specify it in your helm `delpoyment.yaml` like:
+
+{{< highlight yaml >}}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      imagePullSecrets:
+        - name: regcred
+{{< /highlight >}}
+
+<a name="deploy"></a>
+#### Deploying your own applications
+
+I generally make a `deployments` folder then do a `helm create app_name` in there. You'll want to edit the `values.yaml` file to match your docker image names and vars.
+
+
+You'll need to edit the templates/ingress.yaml file and make sure you have a traefik annotation:
+
+{{< highlight yaml >}}
+  annotations:
+    kubernetes.io/ingress.class: traefik
+{{< /highlight >}}
+
+And finally here is an example `deployment.yaml` that has a few extra things from the default:
+
+{{< highlight yaml >}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchLabels:
+                app:  {{ template "fullname" . }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+{{< /highlight >}}
+
+On line 14-15 we're specifying our registry credentials we created in the previous step.
+
+Assuming a replica count >= 2, Lines 16-22 are telling kubernetes to schedule the pods on different worker nodes. This will prevent both web servers (for instance) from being put on the same node incase one of them crashes.
+
+Lines 29-41 are going to depend on your app - if your server is slow to start up these values may not make sense and can cause your app to constantly go into a `Running`/ `Error` state and getting its containers reaped by the liveness checks.
+
+And provided you just have configuration changes to try out (container is already built and in a registry), you can iterate locally:
+
+{{< highlight yaml >}}
+helm upgrade your_app_name . -i --namespace your_app_name --wait --debug
+{{< /highlight >}}
+
+<a name="cicd"></a>
+#### Integrating with GitLab / CICD Pipelines
