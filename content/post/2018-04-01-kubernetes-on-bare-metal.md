@@ -29,6 +29,8 @@ draft: true
 
 If you've been following kubernetes, you'll understand theres a myriad of options available... I'll cover a few of them briefly and why I didn't choose them. Don't know what Kubernetes is? <a href="https://kubernetes.io/docs/getting-started-guides/minikube/" rel="nofollow">Minikube</a> is the best way to get going locally.
 
+This guide will take you from nothing to a 2 node cluster, automatic SSL for deployed apps, a custom PVC/PV storage class using NFS, and a private docker registry. Helpful tips and bugs I ran into are sprinkled throughout their respective sections.
+
 <a name="goals"></a>
 ##### But first the goals for this cluster:
 
