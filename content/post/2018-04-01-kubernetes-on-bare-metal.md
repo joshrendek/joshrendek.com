@@ -692,4 +692,10 @@ Lines 16-19 are where we tag latest and our commited SHA and push both to our re
 
 Line 26 is installing helm.
 
-Line 29 is doing a few things. First thing to note is we have our `~/.kube/config` file set as a environment variable in gitlab. The `<(echo)...` stuff is a little shell trick that makes it look like a file on the file system (that way we don't have to write it out in a separate step). `upgrade -i` says to upgrade our app, and if it doesn't exist yet, to install it. The last important bit is `image.tag=$CI_COMMIT_SHA` - this helps you setup for deploying tagged releases instead of always deploying the `latest` from your repository. Thats it, you should now have an automated build pipeline setup for a project on your working kubernetes cluster.
+Line 29 is doing a few things. First thing to note is we have our `~/.kube/config` file set as a environment variable in gitlab. The `<(echo)...` stuff
+is a little shell trick that makes it look like a file on the file system (that way we don't have to write it
+out in a separate step). `upgrade -i` says to upgrade our app, and if it doesn't exist yet,
+to install it. The last important bit is `image.tag=$CI_COMMIT_SHA` - this helps you setup
+for deploying tagged releases instead of always deploying the `latest` from your repository.
+
+Thats it, you should now have an automated build pipeline setup for a project on your working kubernetes cluster.
