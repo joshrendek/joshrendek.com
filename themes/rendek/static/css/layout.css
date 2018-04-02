@@ -8,6 +8,7 @@ header .blue-brace {
 .blog-title {
     margin: 0 !important;
     padding: 0 !important;
+    text-shadow: 1px 1px #ababab;
 }
 
 .blog-title a {
@@ -21,62 +22,81 @@ header .blue-brace {
 }
 
 .menu {
-  margin-top: 15px;
-  border-top: 1px solid #efefef;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #efefef;
+    box-shadow: 2px 2px #ababab;
+    margin-top: 15px;
+    border: 1px solid #999999;
+    border-radius: 5px;
+    background-color: #fff;
+    /*border-top: 1px solid #efefef;*/
+    margin-bottom: 15px;
+    /*border-bottom: 1px solid #efefef;*/
+}
+
+.menu a:hover {
+    text-decoration: underline;
 }
 .menu li {
-  font-weight: bold;
-  display: block;
+    font-weight: bold;
+    display: block;
+}
+
+.article-container {
+    border: 1px solid #999999;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 2px 2px #ababab;
 }
 
 article {
-  --x-height-multiplier: 0.35;
-  --baseline-multiplier: 0.179;
-  font-family: medium-content-serif-font,Georgia,Cambria,"Times New Roman",Times,serif;
-  letter-spacing: .01rem;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 21px;
-  line-height: 1.58;
-  letter-spacing: -.003em;
-  border-bottom: 1px solid #dfdfdf;
-  padding-bottom: 15px;
-  margin-bottom: 30px;
+    --x-height-multiplier: 0.35;
+    --baseline-multiplier: 0.179;
+    font-family: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    /*font-family: medium-content-serif-font,Georgia,Cambria,"Times New Roman",Times,serif;*/
+    letter-spacing: .01rem;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 1.58;
+    letter-spacing: -.003em;
+    padding-left: 15px;
+    padding-top: 10px;
+    border-bottom: 1px solid #dfdfdf;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
 }
 article img {
-  margin: auto;
-  padding: 10%;
+    margin: auto;
+    padding: 10%;
 }
 article code {
-  font-size: .8em;
+    font-size: .8em;
 }
 article .appreciation {
-  text-transform: uppercase;
-  text-align: right;
-  font-family: Helvetica, mono;
+    text-transform: uppercase;
+    text-align: right;
+    font-family: Helvetica, mono;
 }
 article h1 {
-  font-weight: bold;
-  font-size: 1.5rem;
+    font-weight: bold;
+    font-size: 1.5rem;
 }
 article h1 a {
-  color: #222;
-  -o-transition: .5s;
-  -ms-transition: .5s;
-  -moz-transition: .5s;
-  -webkit-transition: .5s;
-  /* ...and now for the proper property */
-  transition: .5s;
+    color: #222;
+    -o-transition: .5s;
+    -ms-transition: .5s;
+    -moz-transition: .5s;
+    -webkit-transition: .5s;
+    /* ...and now for the proper property */
+    transition: .5s;
 }
 
 .sidebar .box-title h3 {
-  font-size: 1.2rem;
-  font-weight: bold;
-  box-shadow: #fff 0 1px;
-  margin: 0 0 .2em 0;
-  font-weight: 700;
-  padding-bottom: .2em;
-  border-bottom: 1px solid #e0e0e0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: #fff 0 1px;
+    margin: 0 0 .2em 0;
+    font-weight: 700;
+    padding-bottom: .2em;
+    border-bottom: 1px solid #e0e0e0;
 }

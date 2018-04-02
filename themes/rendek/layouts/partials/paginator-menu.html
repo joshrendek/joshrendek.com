@@ -1,18 +1,19 @@
-
-<div class="page-nav">
-  <div class="page-prev">
-    {{ if .Paginator.HasPrev }}
+<br>
+<div class="grid-x grid-padding-x">
+  <div class="cell large-6 large-offset-2 small-12 medium-9 article-container">
+    <center>
+      <div class="page-nav">
+        {{ if .Paginator.HasPrev }}
         <a href="{{ .Paginator.Prev.URL }}" title="Previous page" > << </a>
-    {{ end }}
-  </div>
+                                                                       {{ end }}
 
-  <div class="page-num">
-    {{ .Paginator.PageNumber }}/{{ .Paginator.TotalPages }}
-  </div>
+                                                                       {{ .Paginator.PageNumber }}/{{ .Paginator.TotalPages }}
 
-  <div class="page-next">
-    {{ if .Paginator.HasNext }}
-    <a href="{{ .Paginator.Next.URL }}" title="Next page"> >> </a>
-    {{ end }}
+                                                                       {{ if .Paginator.HasNext }}
+                                                                       <a href="{{ .Paginator.Next.URL }}" title="Next page"> >> </a>
+        {{ end }}
+      </div> <!-- page-nav -->
+    </center>
   </div>
-</div> <!-- page-nav -->
+</div>
+<br>

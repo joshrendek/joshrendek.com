@@ -1,30 +1,36 @@
 {{ partial "header.html" . }}
 
 <main>
-  <div class="articles">
-    <article class="post">
-      <div class="content">
-        <h2 class="term-list-title">
-          <a href="{{ .Permalink }}" class="linktopost">{{ .Title }}</a>
-        </h2>
+  <div class="grid-x grid-padding-x">
+    <div class="cell large-6 large-offset-2 small-12 medium-9 article-container">
+      <div class="articles">
+        <article class="post">
+          <div class="content">
+            <h2 class="term-list-title">
+              <a href="{{ .Permalink }}" class="linktopost">{{ .Title }}</a>
+            </h2>
 
-        <div class="terms">
-          {{ $data := .Data }}
-          {{ range $key, $value := .Data.Terms }}
+            <div class="terms">
+              {{ $data := .Data }}
+              {{ range $key, $value := .Data.Terms }}
 
-          <div class="term">
-            <a href="{{ $data.Plural }}/{{ $key | urlize }}">
-              <div class="term-title">{{ $key }} ({{ len $value }}) </div>
-            </a>
+              <div class="term">
+                <a href="{{ $data.Plural }}/{{ $key | urlize }}">
+                  <div class="term-title">{{ $key }} ({{ len $value }}) </div>
+                </a>
 
-          </div> <!-- term -->
+              </div> <!-- term -->
 
-          {{ end }}
-        </div> <!-- terms -->
+              {{ end }}
+            </div> <!-- terms -->
+          </div>
+        </article>
       </div>
-    </article>
+    </div>
+    <div class="cell large-2 medium-2 sidebar">
+      {{ partial "sidebar.html" . }}
+    </div>
   </div>
-  {{ partial "sidebar.html" . }}
 </main>
 
 {{ partial "footer.html" . }}

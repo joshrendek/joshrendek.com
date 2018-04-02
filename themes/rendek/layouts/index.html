@@ -1,8 +1,6 @@
 {{ partial "header.html" . }}
-
-
 <div class="grid-x grid-padding-x">
-  <div class="cell large-6 large-offset-2 small-12 medium-9">
+  <div class="cell large-6 large-offset-2 small-12 medium-9 article-container">
     <div class="articles">
       {{ $paginator := .Paginate (where .Data.Pages "Type" "post") }}
       {{ range $paginator.Pages }}
@@ -22,7 +20,6 @@
     {{ partial "sidebar.html" . }}
   </div>
 </div>
-
 {{ partial "paginator-menu.html" . }}
 
 {{ partial "footer.html" . }}
