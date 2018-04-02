@@ -37,7 +37,7 @@ This guide will take you from nothing to a 2 node cluster, automatic SSL for dep
 * Bare metal for this conversation means a regular VM/VPS provider or a regular private provider like Proxmox with no special services - or actual hardware.
 * Not require anything *fancy* (like BIOS control)
 * Be reasonably priced (<$50/month)
-* Be reasonably production-y (*this is for side projects, not a huge business critical app*)
+* Be reasonably production-y (*this is for side projects, not a huge business critical app*). Production-y for this case means a single master with backups being taken of the node.
 * Works with Ubuntu 16.04
 * Works on Vultr (and others like Digital Ocean - providers that are (mostly) generic VM hosts and don't have specialized APIs and services like AWS/GCE)
 * I also reccomend making sure your VM provider supports a software defined firewall and a private network - however this is not a hard requirement.
