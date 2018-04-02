@@ -4,6 +4,15 @@ date: 2018-04-01T21:01:44-04:00
 draft: true
 ---
 
+<div class="toc">
+<strong>Table of Contents</strong>
+<ul>
+    <li><a href="#goals">Goals</a></li>
+    <li><a href="#goals">Goals</a></li>
+    <li><a href="#goals">Goals</a></li>
+</ul>
+</div>
+
 If you've been following kubernetes, you'll understand theres a myriad of options available... I'll cover a few of them briefly and why I didn't choose them. Don't know what Kubernetes is? <a href="https://kubernetes.io/docs/getting-started-guides/minikube/" rel="nofollow">Minikube</a> is the best way to get going locally.
 
 ##### But first the goals for this cluster:
@@ -18,6 +27,7 @@ If you've been following kubernetes, you'll understand theres a myriad of option
 * I also reccomend making sure your VM provider supports a software defined firewall and a private network - however this is not a hard requirement.
 
 
+
 ##### Overview of Options
 
 * <a href="https://www.openshift.org/" rel="nofollow">OpenShift</a>: Owned by RedHat - uses its own special tooling around `oc`. Minimum requirements were to high for a small cluster. Pretty high vendor lockin.
@@ -30,7 +40,7 @@ If you've been following kubernetes, you'll understand theres a myriad of option
 * <a href="https://github.com/kubicorn/kubicorn" rel="nofollow">Kubicorn</a>: No bare metal support, needs cloud provider APIs to work.
 * <a href="https://rancher.com/" rel="nofollow">Rancher</a>: Rancher is pretty awesome, unfortunately it's *incredibly* easy to break the cluster and break things inside Rancher that make the cluster unstable. It does provide a very simple way to play with kubernetes on whatever platform you want.
 
-... And the *winner* is... <a href="https://github.com/kubernetes/kubeadm" rel="nofollow">Kubeadm</a>.
+... And the *winner* is... <a href="https://github.com/kubernetes/kubeadm" rel="nofollow">Kubeadm</a>. It's not in any incubator stages and is documented as one of the official ways to get a cluster setup.
 
 ##### Servers we'll need:
 

@@ -35,6 +35,24 @@ header .blue-brace {
 .menu a:hover {
     text-decoration: underline;
 }
+
+.toc {
+    float: right;
+    padding: 5px;
+    border: 1px solid #999999;
+    width: 250px;
+    margin: 10px;
+}
+
+.toc strong {
+    padding-left: 15px;
+}
+
+.toc li {
+    margin-left: 10px;
+    list-style-type: square;
+}
+
 .menu li {
     font-weight: bold;
     display: block;
