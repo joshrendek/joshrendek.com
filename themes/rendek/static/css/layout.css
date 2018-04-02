@@ -109,6 +109,10 @@ article h1 a {
     transition: .5s;
 }
 
+.sidebar {
+    padding-right: 0 !important;
+}
+
 .sidebar .box-title h3 {
     font-size: 1.2rem;
     font-weight: bold;
