@@ -273,9 +273,213 @@ managed-nfs-storage (default)   joshrendek.com/nfs   4d
 
 Now lets test our deployment and check the NFS share for the SUCCESS file:
 
-
 {{< highlight bash >}}
 kubectl apply -f nfs-test.yaml
 {{< /highlight >}}
 
-If everything is working, move on to the next sections, you've gotten NFS working! The only problem I ran into at this point was mis-typing my IP. You can figure this out by doing a `kubectl get events -w` and watching the mount command output and trying to replicate it on the command line from a worker node.
+If everything is working, move on to the next sections, you've gotten NFS working! The only problem I ran into at this point was mis-typing my NFS Server IP.
+You can figure this out by doing a `kubectl get events -w` and watching the mount command output and trying to replicate it on the command line from a worker node.
+
+#### Installing Helm
+
+Up until this point we've just been using `kubectl apply` and `kubectl create` to install apps. We'll be using helm to manage our applications and install things going forward for the most part.
+
+If you don't already have helm installed (and are on OSX): `brew install kubernetes-helm`, otherwise hop on over to the [helm website](https://docs.helm.sh/using_helm/#installing-helm) for installation instructions.
+
+First we're going to create a `helm-rbac.yaml`:
+
+{{< highlight yaml >}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: tiller-clusterrolebinding
+subjects:
+- kind: ServiceAccount
+  name: tiller
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: ""
+{{< /highlight >}}
+
+Now we can apply everything:
+
+{{< highlight bash >}}
+kubectl create -f helm-rbac.yaml
+kubectl create serviceaccount --namespace kube-system tiller
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+helm init --upgrade
+kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+{{< /highlight >}}
+
+First we install the RBAC permissions, service accounts, and role bindings. Next we install helm and initalize tiller on the server. Tiller keeps track of which apps are deployed where and when they need updates. Finally we tell the tiller deployment about its new `ServiceAccount`.
+
+You can verify things are working with a `helm ls`. Next we can install our first application, `Heapster`.
+
+**Important Helm Note**: Helm is great, but sometimes it breaks. If your deployments/upgrades/deletes are hanging, try bouncing the tiller pod:
+
+{{< highlight bash >}}
+kubectl delete po -n kube-system -l name=tiller
+{{< /highlight >}}
+
+
+#### Installing Heapster
+
+Heapster provides in cluster metrics and health information:
+
+{{< highlight bash >}}
+helm install stable/heapster --name heapster --set rbac.create=true
+{{< /highlight >}}
+
+You should see it installed with a `helm ls`.
+
+
+#### Installing Traefik (LoadBalancer)
+
+First lets create a `traefik.yaml` values file:
+
+{{< highlight yaml >}}
+serviceType: NodePort
+externalTrafficPolicy: Cluster
+replicas: 2
+cpuRequest: 10m
+memoryRequest: 20Mi
+cpuLimit: 100m
+memoryLimit: 30Mi
+debug:
+  enabled: false
+ssl:
+  enabled: true
+acme:
+  enabled: true
+  email: your_email@example.com
+  staging: false
+  logging: true
+  challengeType: http-01
+  persistence:
+    enabled: true
+    annotations: {}
+    accessMode: ReadWriteOnce
+    size: 1Gi
+dashboard:
+  enabled: true
+  domain: # YOUR DOMAIN HERE
+  auth:
+    basic:
+      admin: # FILL THIS IN WITH A HTPASSWD VALUE
+gzip:
+  enabled: true
+accessLogs:
+  enabled: false
+  ## Path to the access logs file. If not provided, Traefik defaults it to stdout.
+  # filePath: ""
+  format: common  # choices are: common, json
+rbac:
+  enabled: true
+## Enable the /metrics endpoint, for now only supports prometheus
+## set to true to enable metric collection by prometheus
+
+deployment:
+  hostPort:
+    httpEnabled: true
+    httpsEnabled: true
+{{< /highlight >}}
+
+Important things to note here are the `hostPort` setting - with multiple worker nodes this lets us specify multiple A records for some level of redundancy and binds them to the **host** ports of 80 and 443 so they can receive HTTP and HTTPS traffic. The other important setting is to use `NodePort` so we use the worker nodes IP to expose ourselves (normally in something like GKE or AWS we would be registering with an ELB, and that ELB would talk to our k8s cluster).
+
+Let's also make a `traefik-ui.yaml` file:
+
+{{< highlight yaml >}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-web-ui
+  namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: traefik.sub.yourdomain.com
+    http:
+      paths:
+      - backend:
+          serviceName: traefik-dashboard
+          servicePort: 80
+
+{{< /highlight >}}
+
+Now lets install `traefik` and the dashboard:
+
+{{< highlight bash >}}
+helm install stable/traefik --name traefik -f traefik.yaml --namespace kube-system
+kubectl apply -f traefik-ui.yaml
+{{< /highlight >}}
+
+You can check the progress of this with `kubectl get po -n kube-system -w`. Once everything is registered you should be able to go `https://traefik.sub.yourdomain.com` and login to the dashboard with the basic auth you configured.
+
+#### Private Docker Registry
+
+Provided you got everything working in the previous step (HTTPS works and LetsEncrypt got automatically setup for your traefik dashboard) you can continue on.
+
+First we'll be making a `registry.yaml` file with our custom values:
+
+{{< highlight yaml >}}
+replicaCount: 1
+persistence:
+  accessMode: 'ReadWriteOnce'
+  enabled: true
+  size: 10Gi
+  # storageClass: '-'
+# set the type of filesystem to use: filesystem, s3
+storage: filesystem
+secrets:
+  haSharedSecret: ""
+  htpasswd: "YOUR_DOCKER_USERNAME:GENERATE_YOUR_OWN_HTPASSWD_FOR_HERE"
+{{< /highlight >}}
+
+Next lets make a traefik service definition in `traefik-registry.yaml`:
+
+{{< highlight yaml >}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: docker-web
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: registry.sub.yourdomain.com
+    http:
+      paths:
+      - backend:
+          serviceName: registry-docker-registry
+          servicePort: 5000
+{{< /highlight >}}
+
+And putting it all together:
+
+{{< highlight bash >}}
+helm install -f registry.yaml --name registry stable/docker-registry
+kubectl apply -f traefik-registry.yaml
+{{< /highlight >}}
+
+Provided all that worked, you should now be able to push and pull images and login to your registry at `registry.sub.yourdomain.com`
