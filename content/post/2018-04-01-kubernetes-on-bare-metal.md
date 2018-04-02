@@ -8,6 +8,7 @@ If you've been following kubernetes, you'll understand theres a myriad of option
 
 ##### But first the goals for this cluster:
 
+* First-class SSL support with LetsEncrypt so we can easily deploy new apps with SSL using just annotations.
 * Bare metal for this conversation means a regular VM/VPS provider or a regular private provider like Proxmox with no special services - or actual hardware.
 * Not require anything *fancy* (like BIOS control)
 * Be reasonably priced (<$50/month)
@@ -84,9 +85,9 @@ I'm not going to go in depth on setting an NFS server, there's a million guides.
 Remember to lock down your server with a firewall so everything is locked down except internal network traffic to your VMs.
 
 **/etc/exports**
-```
+{{< highlight bash >}}
 /srv/kubestorage 10.99.0.0/255.255.255.0(rw,no_root_squash,no_wdelay,no_subtree_check)
-```
+{{< /highlight >}}
 <br>
 
 Export options:
@@ -107,8 +108,174 @@ This will start the cluster and setup a pod network on `10.244.0.0/16` for inter
 
 Next you'll notice that the node is in a `NotReady` state when you do a `kubectl get nodes`. We need to setup our worker node next.
 
+You can either continue using `kubectl` on the master node or copy the config to your workstation (depending on how your network permissions are setup):
+
+{{< highlight bash >}}
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+{{< /highlight >}}
+
+
 #### Setting up the worker node
 
 You'll get a token command to run on workers from the previous step. However if you need to generate new tokens later on when you're expanding your cluster, you can use `kubeadm token list` and `kubeadm token create` to get a new token.
 
-**Important Note:** Your worker nodes **Must** have a unique hostname otherwise they will join the cluster and over-write each other. If this happens to you and you want to reset a node, you can run `kubeadm reset` to wipe that worker node.
+**Important Note:** Your worker nodes **Must** have a unique hostname otherwise they will join the cluster and over-write each other (1st node will disappear and things will get rebalanced to the node you just joined). If this happens to you and you want to reset a node, you can run `kubeadm reset` to wipe that worker node.
+
+
+#### Setting up pod networking (Flannel)
+
+
+Back on the **master** node we can add our Flannel network overlay. This will let the pods reside on different worker nodes and communicate with eachother over internal DNS and IPs.
+
+{{< highlight bash >}}
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+{{< /highlight >}}
+
+After a few seconds you should see output from `kubectl get nodes` similar to this (depending on hostnames):
+
+{{< highlight bash >}}
+root@k8s-master:~# kubectl get nodes
+NAME           STATUS    ROLES     AGE       VERSION
+k8s-master     Ready     master    4d        v1.10.0
+k8s-worker     Ready     <none>    4d        v1.10.0
+{{< /highlight >}}
+
+#### Deploying the Kubernetes Dashboard
+
+If you need more thorough documentation, head on over to the [dashboard repo](https://github.com/kubernetes/dashboard#getting-started). We're going to follow a vanilla installation:
+
+
+{{< highlight bash >}}
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+{{< /highlight >}}
+
+Once that is installed you need to setup a `ServiceAccount` that can request tokens and use the dashboard, so save this to `dashboard-user.yaml`:
+
+{{< highlight yaml >}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kube-system
+{{< /highlight >}}
+
+and then apply it
+
+
+{{< highlight bash >}}
+kubectl apply -f dashboard-user.yaml
+{{< /highlight >}}
+
+Next you'll need to grab the service token for the dashbord authentication and fire up `kube proxy`:
+
+{{< highlight bash >}}
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t'
+kube proxy
+{{< /highlight >}}
+
+Now you can access the dashboard at [http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login](http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login).
+
+#### Setting up our NFS storage class
+
+When using a cloud provider you normally get a default storage class provided for you (like on GKE). With our bare metal installation if we want `PersistentVolumes` (PVs)
+and `PersistentVolumeClaims` (PVCs) to work, we need to set up our own private storage class.
+
+We'll be using [nfs-client](https://github.com/kubernetes-incubator/external-storage/tree/master/nfs-client) from the incubator for this.
+
+The best way to do this is to clone the repo and go to the `nfs-client` directory and edit the following files:
+
+* `deploy/class.yaml`: This is what your storage will be called in when setting up storage and from `kubectl get sc`:
+
+{{< highlight yaml >}}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: managed-nfs-storage
+provisioner: joshrendek.com/nfs # or choose another name, must match deployment's env PROVISIONER_NAME'
+{{< /highlight >}}
+
+* `deploy/deployment.yaml`: you **must** make sure your provisioner name matches here and that you have your NFS server IP set properly and the mount your exporting set properly.
+
+Create a file called `nfs-test.yaml`:
+
+{{< highlight yaml >}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-claim
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Mi
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - name: test-pod
+    image: gcr.io/google_containers/busybox:1.24
+    command:
+      - "/bin/sh"
+    args:
+      - "-c"
+      - "touch /mnt/SUCCESS && exit 0 || exit 1"
+    volumeMounts:
+      - name: nfs-pvc
+        mountPath: "/mnt"
+  restartPolicy: "Never"
+  volumes:
+    - name: nfs-pvc
+      persistentVolumeClaim:
+        claimName: test-claim
+{{< /highlight >}}
+
+
+Next just follow the repository instructions:
+
+{{< highlight bash >}}
+kubectl apply -f deploy/deployment.yaml
+kubectl apply -f deploy/class.yaml
+kubectl create -f deploy/auth/serviceaccount.yaml
+kubectl create -f deploy/auth/clusterrole.yaml
+kubectl create -f deploy/auth/clusterrolebinding.yaml
+kubectl patch deployment nfs-client-provisioner -p '{"spec":{"template":{"spec":{"serviceAccount":"nfs-client-provisioner"}}}}'
+kubectl patch storageclass managed-nfs-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+{{< /highlight >}}
+
+This creates all the RBAC permissions, adds them to the deployment, and then sets the default storage class provider in your cluster. You should see something similar when running `kubectl get sc` now:
+
+{{< highlight bash >}}
+NAME                            PROVISIONER           AGE
+managed-nfs-storage (default)   joshrendek.com/nfs   4d
+{{< /highlight >}}
+
+Now lets test our deployment and check the NFS share for the SUCCESS file:
+
+
+{{< highlight bash >}}
+kubectl apply -f nfs-test.yaml
+{{< /highlight >}}
+
+If everything is working, move on to the next sections, you've gotten NFS working! The only problem I ran into at this point was mis-typing my IP. You can figure this out by doing a `kubectl get events -w` and watching the mount command output and trying to replicate it on the command line from a worker node.
