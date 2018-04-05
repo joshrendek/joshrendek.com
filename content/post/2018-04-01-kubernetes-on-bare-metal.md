@@ -449,10 +449,17 @@ You can check the progress of this with `kubectl get po -n kube-system -w`. Once
 
 Provided you got everything working in the previous step (HTTPS works and LetsEncrypt got automatically setup for your traefik dashboard) you can continue on.
 
-First we'll be making a `registry.yaml` file with our custom values:
+First we'll be making a `registry.yaml` file with our custom values and enable trefik for our ingress:
 
 {{< highlight yaml >}}
 replicaCount: 1
+ingress:
+  enabled: true
+  # Used to create an Ingress record.
+  hosts:
+    - registry.svc.bluescripts.net
+  annotations:
+    kubernetes.io/ingress.class: traefik
 persistence:
   accessMode: 'ReadWriteOnce'
   enabled: true
@@ -465,30 +472,10 @@ secrets:
   htpasswd: "YOUR_DOCKER_USERNAME:GENERATE_YOUR_OWN_HTPASSWD_FOR_HERE"
 {{< /highlight >}}
 
-Next lets make a traefik service definition in `traefik-registry.yaml`:
-
-{{< highlight yaml >}}
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: docker-web
-  annotations:
-    kubernetes.io/ingress.class: traefik
-spec:
-  rules:
-  - host: registry.sub.yourdomain.com
-    http:
-      paths:
-      - backend:
-          serviceName: registry-docker-registry
-          servicePort: 5000
-{{< /highlight >}}
-
 And putting it all together:
 
 {{< highlight bash >}}
 helm install -f registry.yaml --name registry stable/docker-registry
-kubectl apply -f traefik-registry.yaml
 {{< /highlight >}}
 
 Provided all that worked, you should now be able to push and pull images and login to your registry at `registry.sub.yourdomain.com`
