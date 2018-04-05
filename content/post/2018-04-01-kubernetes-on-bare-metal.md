@@ -410,6 +410,9 @@ acme:
 dashboard:
   enabled: true
   domain: # YOUR DOMAIN HERE
+  service:
+    annotations:
+      kubernetes.io/ingress.class: traefik
   auth:
     basic:
       admin: # FILL THIS IN WITH A HTPASSWD VALUE
@@ -433,44 +436,10 @@ deployment:
 
 Important things to note here are the `hostPort` setting - with multiple worker nodes this lets us specify multiple A records for some level of redundancy and binds them to the **host** ports of 80 and 443 so they can receive HTTP and HTTPS traffic. The other important setting is to use `NodePort` so we use the worker nodes IP to expose ourselves (normally in something like GKE or AWS we would be registering with an ELB, and that ELB would talk to our k8s cluster).
 
-Let's also make a `traefik-ui.yaml` file:
-
-{{< highlight yaml >}}
-apiVersion: v1
-kind: Service
-metadata:
-  name: traefik-web-ui
-  namespace: kube-system
-spec:
-  selector:
-    k8s-app: traefik-ingress-lb
-  ports:
-  - port: 80
-    targetPort: 8080
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: traefik-web-ui
-  namespace: kube-system
-  annotations:
-    kubernetes.io/ingress.class: traefik
-spec:
-  rules:
-  - host: traefik.sub.yourdomain.com
-    http:
-      paths:
-      - backend:
-          serviceName: traefik-dashboard
-          servicePort: 80
-
-{{< /highlight >}}
-
 Now lets install `traefik` and the dashboard:
 
 {{< highlight bash >}}
 helm install stable/traefik --name traefik -f traefik.yaml --namespace kube-system
-kubectl apply -f traefik-ui.yaml
 {{< /highlight >}}
 
 You can check the progress of this with `kubectl get po -n kube-system -w`. Once everything is registered you should be able to go `https://traefik.sub.yourdomain.com` and login to the dashboard with the basic auth you configured.
