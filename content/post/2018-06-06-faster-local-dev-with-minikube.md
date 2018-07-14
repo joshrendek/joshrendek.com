@@ -8,19 +8,19 @@ If your developing against kubernetes services or want to run your changes witho
 
 First create a registry running in minikube:
 
-```
+``` bash
 kubectl create -f https://gist.githubusercontent.com/joshrendek/e2ec8bac06706ec139c78249472fe34b/raw/6efc11eb8c2dce167ba0a5e557833cc4ff38fa7c/kube-registry.yaml
 ```
 
 Forward your localhost:5000 to 5000 on minikube:
 
-```
+``` bash
 kubectl port-forward --namespace kube-system $(kubectl get po -n kube-system | grep kube-registry-v0 | awk '{print $1;}') 5000:5000
 ```
 
 Use minikube's docker daemon and then push to localhost:5000
 
-```
+``` bash
 eval $(minikube docker-env)
 docker push localhost:5000/test-image:latest
 ```
