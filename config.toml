@@ -76,7 +76,7 @@ pygmentsCodefences = true
 pygmentsCodeFencesGuessSyntax = true
 # color-codes for highlighting derived from this style
 highlighter = "chroma"
-pygmentsOptions = "linenos=table"
+pygmentsOptions = "linenos=inline"
 pygmentsStyle =               "tango"
 # true: use pygments-css or false: color-codes directly
 pygmentsUseClasses =          true

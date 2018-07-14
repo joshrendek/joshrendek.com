@@ -123,3 +123,11 @@ article h1 a {
     padding-bottom: .2em;
     border-bottom: 1px solid #e0e0e0;
 }
+
+
+.ln {
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Likely future */
+}
