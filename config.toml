@@ -72,6 +72,7 @@ preserveTaxonomyNames =       false
 # filesystem path to write files to
 publishDir =                  "public"
 # enables syntax guessing for code fences without specified language
+pygmentsCodefences = true
 pygmentsCodeFencesGuessSyntax = true
 # color-codes for highlighting derived from this style
 highlighter = "pygments"
