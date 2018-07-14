@@ -25,6 +25,6 @@ eval $(minikube docker-env)
 docker push localhost:5000/test-image:latest
 ```
 
-And then you can do you helm charts and deploys using localhost. No need to configure default service account creds or getting temporary creds.
+And then you can  develop your helm charts and deploy quicker using localhost. No need to configure default service account creds or getting temporary creds.
 
 Using localhost eliminates the need to use insecure registry settings removing a lot of docker daemon configuration steps.
