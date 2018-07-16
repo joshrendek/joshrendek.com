@@ -4,7 +4,7 @@ date: 2018-06-15T04:18:17-05:00
 draft: true
 ---
 
-In one form or another I've worked remotely since 2005 (with a brief mix of remote/onsite for about 2 years). This post will document some of the things I've found that are instrumental in having a succesful remote work life and ensuring you join a great remote team.
+In one form or another I've worked remotely since 2005 (with a brief mix of remote/onsite for about 2 years).  I'm going to put together a list below of the things I've found that are instrumental in having a succesful remote work life and ensuring you join a great remote team.
 
 Why I like working remote
 
