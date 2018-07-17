@@ -67,14 +67,16 @@ header .blue-brace {
 }
 
 article {
+    /*
     --x-height-multiplier: 0.35;
     --baseline-multiplier: 0.179;
-    font-family: Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    /*font-family: medium-content-serif-font,Georgia,Cambria,"Times New Roman",Times,serif;*/
     /*font-family: medium-content-serif-font,Georgia,Cambria,"Times New Roman",Times,serif;*/
     letter-spacing: .01rem;
     font-weight: 400;
     font-style: normal;
-    font-size: 14px;
+    font-size: 1rem;
     line-height: 1.58;
     letter-spacing: -.003em;
     padding-left: 15px;

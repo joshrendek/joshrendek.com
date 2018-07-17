@@ -1,7 +1,7 @@
 ---
 title: "Faster Local Dev With Minikube"
 date: 2018-06-05T18:23:15-04:00
-draft: false
+categories: ['kubernetes', 'helm', 'minikube']
 ---
 
 If your developing against kubernetes services or want to run your changes without pushing to a remote registry and want to run inside kubernetes:

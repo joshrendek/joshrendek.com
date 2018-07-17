@@ -15,7 +15,7 @@
               {{ range $key, $value := .Data.Terms }}
 
               <div class="term">
-                <a href="{{ $data.Plural }}/{{ $key | urlize }}">
+                <a href="{{ $key | urlize }}">
                   <div class="term-title">{{ $key }} ({{ len $value }}) </div>
                 </a>
 
