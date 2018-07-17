@@ -1,7 +1,7 @@
 ---
 title: "Helm not updating image, how to fix"
 date: 2018-07-16T21:56:43-04:00
-draft: true
+draft: false
 categories: ['kubernetes', 'helm']
 ---
 
