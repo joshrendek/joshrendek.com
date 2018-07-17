@@ -85,6 +85,11 @@ article {
     padding-bottom: 15px;
     margin-bottom: 30px;
 }
+
+article .content {
+    margin-top: 10px;
+}
+
 article img {
     margin: auto;
     padding: 10%;
@@ -97,6 +102,8 @@ article .appreciation {
     text-align: right;
     font-family: Helvetica, mono;
 }
+
+
 article h1 {
     font-weight: bold;
     font-size: 1.5rem;

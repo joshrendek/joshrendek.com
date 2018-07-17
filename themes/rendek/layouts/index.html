@@ -8,7 +8,7 @@
         <div class="grid-x grid-padding-x">
           <div class="cell large-12 medium-12 small-12">
             <h1> <a href='{{ .Permalink }}'> {{ .Title }}</a> </h1>
-            <small> {{ .Date.Format "Jan 2, 2006" }} - {{ .ReadingTime }} minutes</small>
+            <small class="date"> {{ .Date.Format "Jan 2, 2006" }} - {{ .ReadingTime }} minutes</small>
           </div>
         </div>
         <div class="content"> {{ .Content }} </div>
