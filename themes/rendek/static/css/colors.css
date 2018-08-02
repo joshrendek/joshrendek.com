@@ -6,7 +6,7 @@ body { color: #0a0a0a; background-color: #cfcfcf; }
 main { color: #222; }
 /*pre { background: #1D1F21; border: 1px solid #5C5C5C; border-radius: 5px; }*/
 /*code { background: #1D1F21; }*/
-blockquote { background: #1D1F21; border-left: 3px solid #388ED6; color: #efefef; }
+/*blockquote { background: #1D1F21; border-left: 3px solid #388ED6; color: #efefef; }*/
 table { /*margin: 1em auto;*/ border-collapse: collapse; background: #fff; }
 table, th, td { border: 1px solid #ababab; }
 tr:hover { background: #efefef; }
