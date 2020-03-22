@@ -1,7 +1,7 @@
 baseURL = "https://joshrendek.com"
 disablePathToLower = false
 languageCode = "en-us"
-Copyright = "© Copyright 2008-2017 Josh Rendek"
+Copyright = "© Copyright 2008-2020 Josh Rendek"
 title = "Josh Rendek"
 archetypeDir =                "archetypes"
 DisqusShortname = "bluescripts"
