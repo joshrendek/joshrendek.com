@@ -1,0 +1,23 @@
+{{ partial "header.html" . }}
+
+<div class="grid-x grid-padding-x">
+  <div class="cell large-9 large-offset-0 small-12 medium-9 article-container">
+    <div class="articles">
+      <article class="post">
+        <div class="grid-x grid-padding-x">
+          <div class="cell large-12 medium-12 small-12">
+            <h1> <a href='{{ .Permalink }}'> {{ .Title }}</a> </h1>
+            <small> {{ .Date.Format "Jan 2, 2006" }} - {{ .ReadingTime }} minutes</small>
+          </div>
+        </div>
+        <div class="content"> {{ .Content }} </div>
+        {{ partial "postfooter.html" . }}
+      </article>
+    </div>
+  </div>
+
+  <div class="cell large-3 medium-3 sidebar">
+    {{ partial "sidebar.html" . }}
+  </div>
+</div>
+{{ partial "footer.html" . }}

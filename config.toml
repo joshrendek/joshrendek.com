@@ -87,7 +87,7 @@ staticDir =                   "static"
 stepAnalysis =                false
 # theme to use (located by default in /themes/THEMENAME/)
 themesDir =                   "themes"
-theme =                       "rendek"
+theme =                       "rendek-dark"
 # if true, use /filename.html instead of /filename/
 uglyURLs =                    false
 # verbose output

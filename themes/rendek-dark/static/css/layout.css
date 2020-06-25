@@ -1,14 +1,15 @@
 header .blue-brace {
-    color: #388ED6 !important;
+    color: #c3e88d !important;
 }
 
 blockquote {
-  background: #f9f9f9;
+  background: #191a2a;
   border-left: 10px solid #ccc;
   margin: 1.5em 10px;
   padding: 0.5em 10px;
   quotes: "\201C""\201D""\2018""\2019";
 }
+
 blockquote:before {
   color: #ccc;
   content: open-quote;
@@ -28,11 +29,11 @@ blockquote p {
 .blog-title {
     margin: 0 !important;
     padding: 0 !important;
-    text-shadow: 1px 1px #ababab;
+    text-shadow: 1px 1px #191a2a;
 }
 
 .blog-title a {
-    color: #222;
+    color: #b4c2f0;
 }
 
 .blog-subtitle {
@@ -42,11 +43,12 @@ blockquote p {
 }
 
 .menu {
-    box-shadow: 2px 2px #ababab;
+    border: 1px solid #191a2a;
+    box-shadow: 2px 2px #191a2a;
+    background-color: #2f334d;
+
     margin-top: 15px;
-    border: 1px solid #999999;
     border-radius: 5px;
-    background-color: #fff; 
     /*border-top: 1px solid #efefef;*/
     margin-bottom: 15px;
     /*border-bottom: 1px solid #efefef;*/
@@ -79,11 +81,11 @@ blockquote p {
 }
 
 .article-container {
-    border: 1px solid #999999;
+    border: 1px solid #191a2a;
+    box-shadow: 2px 2px #191a2a;
+    background-color: #2f334d;
     border-radius: 5px;
     padding: 10px;
-    background-color: #fff;
-    box-shadow: 2px 2px #ababab;
 }
 
 article {
@@ -134,13 +136,14 @@ article h2 {
 }
 
 article h1 a {
-    color: #222;
-    -o-transition: .5s;
-    -ms-transition: .5s;
-    -moz-transition: .5s;
-    -webkit-transition: .5s;
-    /* ...and now for the proper property */
-    transition: .5s;
+  color: #c3e88d;
+  /* color: #c8d3f5; */
+  -o-transition: .5s;
+  -ms-transition: .5s;
+  -moz-transition: .5s;
+  -webkit-transition: .5s;
+  /* ...and now for the proper property */
+  transition: .5s;
 }
 
 .sidebar {
@@ -151,11 +154,11 @@ article h1 a {
 .sidebar .box-title h3 {
     font-size: 1.2rem;
     font-weight: bold;
-    box-shadow: #fff 0 1px;
+    box-shadow: #191a2a 0 1px;
     margin: 0 0 .2em 0;
     font-weight: 700;
     padding-bottom: .2em;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #191a2a;
 }
 
 

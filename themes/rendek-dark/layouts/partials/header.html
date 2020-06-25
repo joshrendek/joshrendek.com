@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+  {{ partial "head.html" . }}
+
+  <body>
+    <div class="grid-x grid-padding-x">
+      <div class="cell large-1"></div>
+      <div class="cell large-10">
+        <header>
+          <div class="grid-x grid-padding-x">
+            <div class="cell large-12 large-offset-0">
+              <div class="blog-title">
+                <a href="{{ .Site.BaseURL }}">
+                  <h1>
+                    <span class='blue-brace'>{</span>
+                    {{ .Site.Title }}
+                    <span class='blue-brace'>}</span>
+                  </h1>
+                </a>
+                <div class="blog-subtitle">
+                  <span class="heart">&lt;3</span> Go <img src="/golang.png" width="20"> &amp; Kubernetes <img src="/k8s.png" width="30">
+                </div>
+              </div> <!--siteTitle-->
+            </div>
+          </div>
+          <div class="grid-x grid-padding-x">
+            <div class="cell large-12 large-offset-0" style="padding: 0">
+              <ul class="menu">
+                {{ $currentPage := . }}
+                {{ range .Site.Menus.main }}
+                <li>
+                  <a href="{{.URL}}">{{ .Name }}</a>
+                </li>
+                {{ end }}
+              </ul>
+            </div>
+          </div>
+
+        </header>

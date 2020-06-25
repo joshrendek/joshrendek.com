@@ -1,0 +1,38 @@
+<div class="sidebar">
+  <section class="article-container">
+    <div class="box-title">
+      <h3>Projects</h3>
+    </div>
+    <ul>
+      <li><a href="https://threatwar.com/">threatwar.com</a> is a honeypot service written in Go.</li>
+      <li><a href="https://garden.gg">garden.gg</a> garden tracking tool + plant journal.</li>
+      <li><a href="http://ifcfg.net/">ifcfg.net</a> is a simple 'what is my IP' service with a few extra RESTful endpoints.</li>
+
+      <li><a href="/projects/">View More</a>
+
+      <li><a href="https://github.com/joshrendek?tab=repositories"><img src="/images/github.png" style='border: none;'>GitHub</a></li>
+    </ul>
+  </section>
+<br>
+  <section class="article-container">
+    <div class="box-title">
+      <h3>Other Blogs</h3>
+    </div>
+    <ul>
+      <li><a href="http://tendermeatlove.com">Tender Meat Love</a> is my blog about cooking.</li>
+      <li><a href="http://hydronerd.com">Hydro Nerd</a> is my blog about hydroponics and gardening.</li>
+    </ul>
+  </section>
+<br>
+  <section class="article-container">
+    <div class="box-title">
+      <h3>Recent Posts</h3>
+    </div>
+    <ul>
+      {{ range first 10 (where .Site.Pages "Type" "post") }}
+      <li><a href="{{ .Permalink }}">{{ .Title }}</a></li>
+      {{ end }}
+    </ul>
+  </section>
+
+</div>

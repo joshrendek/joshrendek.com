@@ -1,0 +1,7 @@
+<div class="content-item">
+    <div class="date"><small>{{ .Date.Format "Jan 2, 2006" }}</small></div>
+    <a href="{{ .Permalink }}">
+    <div class="post-list">{{ .Title }}</div>
+    </a>
+    {{ partial "tags.html" . }}
+</div>

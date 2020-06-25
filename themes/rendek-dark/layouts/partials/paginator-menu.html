@@ -1,0 +1,19 @@
+<br>
+<div class="grid-x grid-padding-x">
+  <div class="cell large-9 small-12 medium-9 article-container">
+    <center>
+      <div class="page-nav">
+        {{ if .Paginator.HasPrev }}
+        <a href="{{ .Paginator.Prev.URL }}" title="Previous page" > << </a>
+                                                                       {{ end }}
+
+                                                                       {{ .Paginator.PageNumber }}/{{ .Paginator.TotalPages }}
+
+                                                                       {{ if .Paginator.HasNext }}
+                                                                       <a href="{{ .Paginator.Next.URL }}" title="Next page"> >> </a>
+        {{ end }}
+      </div> <!-- page-nav -->
+    </center>
+  </div>
+</div>
+<br>

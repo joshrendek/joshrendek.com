@@ -1,0 +1,36 @@
+{{ partial "header.html" . }}
+
+<main>
+  <div class="grid-x grid-padding-x">
+    <div class="cell large-9 large-offset-0 small-12 medium-9 article-container">
+      <div class="articles">
+        <article class="post">
+          <div class="content">
+            <h2 class="term-list-title">
+              <a href="{{ .Permalink }}" class="linktopost">{{ .Title }}</a>
+            </h2>
+
+            <div class="terms">
+              {{ $data := .Data }}
+              {{ range $key, $value := .Data.Terms }}
+
+              <div class="term">
+                <a href="{{ $key | urlize }}">
+                  <div class="term-title">{{ $key }} ({{ len $value }}) </div>
+                </a>
+
+              </div> <!-- term -->
+
+              {{ end }}
+            </div> <!-- terms -->
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="cell large-3 medium-3 sidebar">
+      {{ partial "sidebar.html" . }}
+    </div>
+  </div>
+</main>
+
+{{ partial "footer.html" . }}
