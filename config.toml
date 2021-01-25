@@ -18,8 +18,7 @@ canonifyURLs =                false
 # config file (default is path/config.yaml|json|toml)
 config =                     "config.toml"
 contentDir =                  "content"
-dataDir =                     "data"
-defaultExtension =            "html"
+dataDir =                     "data" defaultExtension =            "html"
 defaultLayout =               "post"
 # Missing translations will default to this content language
 defaultContentLanguage =      "en"
@@ -125,7 +124,7 @@ post = "/:year/:month/:title/"
     weight = 5
 [[menu.main]]
     name = "Resume"
-    url = "/resume.pdf"
+    url = "https://rendek.dev/"
     weight = 6
 [[menu.main]]
     name = "About"
