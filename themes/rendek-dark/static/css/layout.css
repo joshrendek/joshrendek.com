@@ -43,7 +43,8 @@ blockquote p {
 }
 
 .menu {
-    border: 1px solid #191a2a;
+    /*border: 1px solid #191a2a;*/
+    /*border: 1px solid #000;*/
     box-shadow: 2px 2px #191a2a;
     background-color: #2f334d;
 
@@ -81,7 +82,7 @@ blockquote p {
 }
 
 .article-container {
-    border: 1px solid #191a2a;
+    /*border: 1px solid #191a2a;*/
     box-shadow: 2px 2px #191a2a;
     background-color: #2f334d;
     border-radius: 5px;
