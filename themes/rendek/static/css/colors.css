@@ -27,8 +27,14 @@ th { background: #cdcdcd; }
     font-size: .75em;
     padding: 15px;
     text-shadow: #11 2px;
-
 }
+
+/* FontSizing  */
+.post, .sidebar .article-container { font-size: 1.2rem; }
+.sidebar .article-container .box-title h3 { font-size: 1.5rem; }
+.highlight pre { font-size: 1.0rem; }
+/* /FontSizing */
+
 .nav-item-title:hover {
     color: #388ED6;
     transition: color 0.3s;
