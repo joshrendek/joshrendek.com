@@ -4,7 +4,6 @@
   <meta name="description" content="{{ .Site.Params.meta.description }}" />
   <meta name="keywords" content="{{ .Site.Params.meta.keywords }}" />
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-  {{ .Hugo.Generator }}
 
   {{ template "_internal/opengraph.html" . }}
   {{ template "_internal/twitter_cards.html" . }}
@@ -16,10 +15,10 @@
   <link rel="stylesheet" type="text/css" href="/css/pygments2.css" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico?123">
 
-  {{ template "_internal/google_analytics_async.html" . }}
+  template "_internal/google_analytics_async.html" .
 
   <title>
-    {{ $url := replace .Permalink ( printf "%s" .Site.BaseURL) "" }}
+    {{ $url := replace .RelPermalink ( printf "%s" .Site.BaseURL) "" }}
     {{ if eq $url "/" }}
     {{ .Site.Title }}
     {{ else }}

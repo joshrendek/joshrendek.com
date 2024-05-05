@@ -3,7 +3,7 @@
 <div class="grid-x grid-padding-x">
   <div class="cell large-9 large-offset-0 small-12 medium-9 article-container">
     <article>
-      <a href="{{ .Permalink }}" class="linktopost">{{ .Title }}</a>
+      <a href="{{ .RelPermalink }}" class="linktopost">{{ .Title }}</a>
     {{ range (where .Site.Pages "Type" "post") }}
 
     <div class="content-list">

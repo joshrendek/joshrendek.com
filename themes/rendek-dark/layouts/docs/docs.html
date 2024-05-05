@@ -1,4 +1,5 @@
-{ partial "header.html" . }}
+{{ partial "header.html" . }}
+
 
 <div class="grid-x grid-padding-x">
   <div class="cell large-9 large-offset-0 small-12 medium-9 article-container">
@@ -7,11 +8,8 @@
     </h2>
 
     <div class="content-list">
-      {{ range .Data.Pages.GroupByDate "2006" }}
-      <div class="content-list-date">{{ .Key }}</div>
       {{ range .Pages }}
       {{ .Render "li"}}
-      {{ end }}
       {{ end }}
     </div>
   </div>
