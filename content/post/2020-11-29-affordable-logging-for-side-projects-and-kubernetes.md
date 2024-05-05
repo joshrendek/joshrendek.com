@@ -5,7 +5,7 @@ categories: ['kubernetes']
 draft: false
 ---
 
-Having a useable logging and metrics stack for your hobby projects can extremely expensive if you 
+Having a useable logging and metrics stack for your hobby projects can be extremely expensive if you 
 stick them inside your kubernetes cluster or try and host them on a normal VPS provider (whether that means DigitalOcean or AWS).
 
 Below is an example configuration I use for some hobby projects that uses a dedicated hosting provider (OVH).
