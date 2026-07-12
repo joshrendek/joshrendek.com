@@ -223,7 +223,6 @@ This gives us a total of 16 cores to use for our testing. I'm also using a [Cruc
 {{< figure src="/images/showdown/time_to_process.png" >}}
 
 
-<center>
 <table width="100%" style="text-align: center;">
 <tr>
 <td><strong>Type</strong></td><td><strong>Time to Completion (seconds)</strong></td>
@@ -250,7 +249,6 @@ This gives us a total of 16 cores to use for our testing. I'm also using a [Cruc
 <td>Resque 50</td><td>396</td>
 </tr>
 </table>
-</center>
 
 <hr>
 

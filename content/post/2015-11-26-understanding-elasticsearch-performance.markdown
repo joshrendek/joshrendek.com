@@ -6,7 +6,7 @@ title: Understanding ElasticSearch Performance
 url: /2015/11/understanding-elasticsearch-performance/
 ---
 
-<center><em>Performance before and after Optimizations</em></center>
+<em>Performance before and after Optimizations</em>
 ![](/images/worker_stats.png)
 
 

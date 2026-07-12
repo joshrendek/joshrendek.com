@@ -8,9 +8,7 @@ url: /2014/06/go-lang-mocking-exec-dot-command-using-interfaces/
 
 This is a short example showing how to use an interface to ease testing, and how to use an interface with running shell commands / other programs and providing mock output.
 
-<center>
 <a href="https://github.com/joshrendek/go-exec-mock-example">Source on Github</a>
-</center>
 
 Here is our main file that actually runs the commands and prints out "hello".
 
@@ -98,6 +96,4 @@ func TestHelperProcess(*testing.T) {
 
 Hopefully this helps someone else! I had a hard time finding some good, short examples on the internet that combined both interfaces and mocking like this.
 
-<center>
 <a href="http://golang.org/src/pkg/os/exec/exec_test.go">More examples from os/exec/exec_test.go</a>
-</center>

@@ -6,9 +6,7 @@ title: Writing Dependable Ruby & a Reddit CLI
 url: /2012/08/writing-dependable-ruby-and-a-reddit-cli/
 ---
 
-<center>
     <a href="https://github.com/bluescripts/reddit-cli">View Source on Github</a>
-</center>
 
 
 When you work on your code and are finished for the day, is what you have committed worry free? If another developer were to push your code in the middle of the night, would they be calling you at 3am?
@@ -313,6 +311,4 @@ When working with external resources, whether it be a gem or a remote API, it's 
 ## End Result  &amp; Source Code
 <img src="https://img.skitch.com/20120821-bc2b49nued2e38tt3cekppeq1i.jpg">
 
-<center>
     <a href="https://github.com/bluescripts/reddit-cli">View Source on Github</a>
-</center>

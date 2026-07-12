@@ -5,7 +5,7 @@ wordpress_id: 347
 wordpress_url: http://bluescripts.net/?p=347
 ---
 
-<center><a href="http://servly.com"><h2>Servly</h2></a></center>
+<a href="http://servly.com"><h2>Servly</h2></a>
 Here is a quick sample video of how you can get setup in less than 1 minute with the Servly Agent. We will be launching <a href="http://servly.com">Servly</a> very soon for all your server monitoring needs.... Check out this reel of screen shots as well from the <a title="Server Monitoring" href="http://servly.com/tour/">tour</a> page.
 
 <video id="vid1" width="560" height="359" poster="http://servly.com/wp-content/uploads/2009/10/dashboard.jpg" durationHint="33"	 controls = "true">
