@@ -119,10 +119,6 @@ post = "/:year/:month/:title/"
     url = "/"
     weight = 1
 [[menu.main]]
-    name = "Tech Docs"
-    url = "/docs/"
-    weight = 2
-[[menu.main]]
     name = "Projects"
     url = "/projects/"
     weight = 2

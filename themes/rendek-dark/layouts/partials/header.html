@@ -1,40 +1,16 @@
 <!DOCTYPE html>
-<html>
-
-  {{ partial "head.html" . }}
-
-  <body>
-    <div class="grid-x grid-padding-x">
-      <div class="cell large-1"></div>
-      <div class="cell large-10">
-        <header>
-          <div class="grid-x grid-padding-x">
-            <div class="cell large-12 large-offset-0">
-              <div class="blog-title">
-                <a href="{{ .Site.BaseURL }}">
-                  <h1>
-                    <span class='blue-brace'>{</span>
-                    {{ .Site.Title }}
-                    <span class='blue-brace'>}</span>
-                  </h1>
-                </a>
-                <div class="blog-subtitle">
-                  <span class="heart">&lt;3</span> Go <img src="/golang.png" width="20"> &amp; Kubernetes <img src="/k8s.png" width="30">
-                </div>
-              </div> <!--siteTitle-->
-            </div>
-          </div>
-          <div class="grid-x grid-padding-x">
-            <div class="cell large-12 large-offset-0" style="padding: 0">
-              <ul class="menu">
-                {{ $currentPage := . }}
-                {{ range .Site.Menus.main }}
-                <li>
-                  <a href="{{.URL}}">{{ .Name }}</a>
-                </li>
-                {{ end }}
-              </ul>
-            </div>
-          </div>
-
-        </header>
+<html lang="en">
+{{ partial "head.html" . }}
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="page">
+    <header class="masthead">
+      {{ if .IsHome }}<h1 class="site-title">{{ else }}<p class="site-title">{{ end }}<a href="{{ .Site.BaseURL }}"><span class="brace">{</span> {{ .Site.Title }} <span class="brace">}</span></a><span class="cursor" aria-hidden="true"></span>{{ if .IsHome }}</h1>{{ else }}</p>{{ end }}
+      <p class="tagline"><span class="heart">&lt;3</span> Go &amp; Kubernetes &middot; honeypots &middot; homelab &middot; leadership</p>
+      <nav class="site-nav" aria-label="Main">
+        {{ range .Site.Menus.main }}
+        <a href="{{ .URL }}"{{ if hasPrefix .URL "http" }} rel="noopener noreferrer"{{ end }}>{{ .Name }}</a>
+        {{ end }}
+      </nav>
+    </header>
+    <main id="main">

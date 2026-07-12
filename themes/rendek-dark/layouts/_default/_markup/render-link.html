@@ -1,0 +1,1 @@
+<a href="{{ .Destination | safeURL }}"{{ if or (hasPrefix .Destination "http://") (hasPrefix .Destination "https://") }} rel="noopener noreferrer"{{ end }}>{{ .Text | safeHTML }}</a>

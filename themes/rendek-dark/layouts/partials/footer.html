@@ -1,19 +1,16 @@
-<div class="grid-x grid-padding-x">
-  <div class="cell large-9 small-12 medium-9 article-container">
-    <footer>
-
-      <center>
-        {{ partial "social-links-footer.html" . }}
-
-        <div class="copyright"> {{ .Site.Copyright }} </div>
-      </center>
-
+    </main>
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="{{ "/index.xml" | absURL }}">RSS</a>
+        <a href="https://github.com/joshrendek/" rel="noopener noreferrer">GitHub</a>
+        <span class="copyright">{{ .Site.Copyright }}</span>
+      </div>
+      <div class="statusbar" aria-hidden="true">
+        <span class="sb-mode">NORMAL</span>
+        <span class="sb-file">~/blog{{ .RelPermalink }}</span>
+        <span class="sb-pos">{{ if .IsHome }}{{ with .Paginator }}{{ .PageNumber }}/{{ .TotalPages }}{{ end }}{{ else }}&#9776; 100%{{ end }}</span>
+      </div>
     </footer>
   </div>
-</div>
-
-<div class="cell large-1"></div>
-</div>
-
 </body>
 </html>
