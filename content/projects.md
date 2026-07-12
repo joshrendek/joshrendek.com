@@ -3,7 +3,7 @@ title: "Projects"
 date: 2017-07-23T23:39:39-04:00
 ---
 
-<h1>Maintained</h1>
+## Maintained
 
 * <a href="https://threatwar.com/" target="_blank">threatwar.com</a> 
   * a honeypot service.
@@ -30,14 +30,15 @@ date: 2017-07-23T23:39:39-04:00
   * A tool written to orchestrate docker containers using a simple yml file.
 
 
-<h1>Unmaintained</h1>
-
-<hr>
-
-<h2>Unmaintained</h2>
+## Unmaintained
 
 * [Servly](https://github.com/joshrendek/servly)
   * Servly was an SaaS monitoring solution that was written in JRuby. I open sourced the code behind it since I am not longer maintaining it.
 
 
 <small> Ignore this: <a href="http://104.131.231.87" rel="nofollow">104.131.231.87</a> | <a href="http://192.81.208.160" rel="nofollow">192.81.208.160</a></small>
+
+## Elsewhere
+
+* [Tender Meat Love](http://tendermeatlove.com)
+  * my blog about cooking
