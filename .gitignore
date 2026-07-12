@@ -2,3 +2,7 @@
 nohup.out
 .idea
 public
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
