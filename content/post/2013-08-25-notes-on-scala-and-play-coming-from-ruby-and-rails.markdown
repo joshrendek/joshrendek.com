@@ -2,7 +2,7 @@
 categories: null
 comments: true
 date: 2013-08-25T00:00:00Z
-published: false
+draft: true
 title: Notes on Scala and Play! coming from Ruby and Rails
 url: /2013/08/notes-on-scala-and-play-coming-from-ruby-and-rails/
 ---

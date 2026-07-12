@@ -96,6 +96,17 @@ verbose =                     false
 verboseLog =                  false
 # watch filesystem for changes and recreate as needed
 watch =                       true
+
+[services.disqus]
+shortname = "bluescripts"
+
+[params]
+author = "Josh Rendek"
+
+[params.meta]
+description = "Josh Rendek's blog on software engineering, Go, Ruby, infrastructure, and security."
+keywords = "josh rendek, software engineering, golang, ruby, rails, kubernetes, infrastructure, security"
+
 [taxonomies]
 category = "categories"
 tag = "tags"
@@ -107,6 +118,10 @@ post = "/:year/:month/:title/"
     name = "Home"
     url = "/"
     weight = 1
+[[menu.main]]
+    name = "Tech Docs"
+    url = "/docs/"
+    weight = 2
 [[menu.main]]
     name = "Projects"
     url = "/projects/"
