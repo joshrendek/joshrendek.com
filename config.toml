@@ -100,6 +100,10 @@ watch =                       true
 [services.disqus]
 shortname = "bluescripts"
 
+# Legacy posts and pages contain raw inline HTML; goldmark drops it by default
+[markup.goldmark.renderer]
+unsafe = true
+
 [params]
 author = "Josh Rendek"
 
