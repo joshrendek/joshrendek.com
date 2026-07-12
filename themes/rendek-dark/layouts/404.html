@@ -1,27 +1,6 @@
 {{ partial "header.html" . }}
-
-<div class="err-404" >
-    <h1 id="title">{{ .Title }} :(</h1>
+<div class="err-404">
+  <h1>404 &mdash; file not found :(</h1>
+  <p><a href="/">cd ~</a></p>
 </div>
-
-<div class="sitemap" >
-  <h2>Pages</h2>
-  <ul>
-  {{ range (where .Site.Pages.ByTitle ".Type" "page") }}
-      <li><article itemscope itemtype="http://schema.org/Blog">
-          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-      </article></li>
-  {{ end }}
-  </ul>
-
-  <h2>Posts</h2>
-  <ul>
-  {{ range (where .Site.Pages.ByTitle ".Type" "post") }}
-      <li><article itemscope itemtype="http://schema.org/Blog">
-          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-      </article></li>
-  {{ end }}
-  </ul>
-
-<div>
 {{ partial "footer.html" . }}

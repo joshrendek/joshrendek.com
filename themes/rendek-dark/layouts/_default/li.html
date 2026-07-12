@@ -1,7 +1,4 @@
 <div class="content-item">
-    <div class="date"><small>{{ .Date.Format "Jan 2, 2006" }}</small></div>
-    <a href="{{ .RelPermalink }}">
-    <div class="post-list">{{ .Title }}</div>
-    </a>
-    {{ partial "tags.html" . }}
+  <span class="item-date">{{ .Date.Format "2006-01-02" }}</span>
+  <a href="{{ .RelPermalink }}">{{ .Title }}</a>
 </div>
