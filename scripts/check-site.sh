@@ -83,6 +83,7 @@ done < <(find "$PUB" -path "$PUB/2*" -name index.html)
 allowed_cats=" go ruby scala kubernetes helm security linux emacs rants homelab "
 if [ -d "$PUB/categories" ]; then
   for d in "$PUB"/categories/*/; do
+    [ -d "$d" ] || continue
     slug=$(basename "$d")
     case "$allowed_cats" in
       *" $slug "*) : ;;
