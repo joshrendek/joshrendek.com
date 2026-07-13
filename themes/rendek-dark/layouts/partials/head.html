@@ -1,26 +1,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="author" content="{{ .Site.Params.author }}" />
-  <meta name="description" content="{{ .Site.Params.meta.description }}" />
-  <meta name="keywords" content="{{ .Site.Params.meta.keywords }}" />
-  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-
+  <meta name="description" content="{{ partial "page-description.html" . }}" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="canonical" href="{{ .Permalink }}" />
+  <link rel="alternate" type="application/rss+xml" href="{{ "index.xml" | absURL }}" title="{{ .Site.Title }}" />
   {{ template "_internal/opengraph.html" . }}
   {{ template "_internal/twitter_cards.html" . }}
-  {{ template "_internal/schema.html" . }}
+  {{ partial "structured-data.html" . }}
   <link rel="stylesheet" type="text/css" href="/css/theme.css" />
   <link rel="stylesheet" type="text/css" href="/css/pygments2.css" />
-  <link rel="icon" type="image/x-icon" href="/favicon.ico?123">
-
-
-  <title>
-    {{ $url := replace .RelPermalink ( printf "%s" .Site.BaseURL) "" }}
-    {{ if eq $url "/" }}
-    {{ .Site.Title }}
-    {{ else }}
-    {{ if .Params.heading }} {{ .Params.heading }} {{ else }} {{ .Title }} {{ end }}
-    {{ end }}
-  </title>
-
-
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
 </head>

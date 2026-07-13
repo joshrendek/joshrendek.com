@@ -1,0 +1,1 @@
+{{- if .Description -}}{{ .Description }}{{- else if and .IsPage .Summary -}}{{ .Summary | plainify | chomp | truncate 155 }}{{- else -}}{{ .Site.Params.meta.description }}{{- end -}}
