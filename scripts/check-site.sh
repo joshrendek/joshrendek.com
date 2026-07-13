@@ -80,6 +80,17 @@ while IFS= read -r f; do
 done < <(find "$PUB" -path "$PUB/2*" -name index.html)
 [ "$multi_h1" -eq 0 ] || err "post pages with more than one <h1> (in-body headings)"
 
+allowed_cats=" go ruby scala kubernetes helm security linux emacs rants homelab "
+if [ -d "$PUB/categories" ]; then
+  for d in "$PUB"/categories/*/; do
+    slug=$(basename "$d")
+    case "$allowed_cats" in
+      *" $slug "*) : ;;
+      *) err "non-canonical category slug: $slug" ;;
+    esac
+  done
+fi
+
 # 8. Optional internal link check
 if command -v htmltest >/dev/null 2>&1; then
   htmltest -s "$PUB" || err "htmltest found broken internal links"
