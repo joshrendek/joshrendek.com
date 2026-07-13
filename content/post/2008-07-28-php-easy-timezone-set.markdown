@@ -9,7 +9,7 @@ Here is a quick way to set a timezone:
 
 <span style="font-family: courier,monospace;"> <php putenv('TZ=America/New_York'); ></span>
 
-A list of timezones for php: <a href="http://www.theprojects.org/dev/zone.txt" target="_blank">http://www.theprojects.org/dev/zone.txt</a>
+A list of timezones for php: <a href="http://www.theprojects.org/dev/zone.txt" target="_blank" rel="noopener noreferrer">http://www.theprojects.org/dev/zone.txt</a>
 
 To get the timezones into a file quickly:
 

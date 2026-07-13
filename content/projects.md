@@ -5,13 +5,13 @@ date: 2017-07-23T23:39:39-04:00
 
 ## Maintained
 
-* <a href="https://threatwar.com/" target="_blank">threatwar.com</a> 
+* <a href="https://threatwar.com/" target="_blank" rel="noopener noreferrer">threatwar.com</a> 
   * a honeypot service.
 * [threatwar agent](https://github.com/joshrendek/hnypots-agent)
   * the open source agent for threatwar
-* <a href="https://garden.gg" target="_blank">garden.gg</a>
+* <a href="https://garden.gg" target="_blank" rel="noopener noreferrer">garden.gg</a>
   * a garden tracking tool and plant journal.
-* <a href="https://ifcfg.net/" target="_blank">ifcfg.net</a>
+* <a href="https://ifcfg.net/" target="_blank" rel="noopener noreferrer">ifcfg.net</a>
   * a simple 'what is my ip' service with a few extra endpoints
 * [redis rate limiter](https://github.com/joshrendek/redis-rate-limiter)
   * distributed rate limiter written in go + redis

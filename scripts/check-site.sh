@@ -48,10 +48,9 @@ grep -rl --include='*.html' 'foundation.min.css' "$PUB" | grep -q . && err "foun
 grep -rl --include='*.html' '<center>' "$PUB" | grep -q . && err "<center> found in output"
 grep -rl --include='*.html' '<nobr>'   "$PUB" | grep -q . && err "<nobr> found in output"
 
-# 7. target=_blank hygiene (WARN only: legacy raw-HTML in old posts is a
-#    content fix tracked by bead blog-0ra, not a template regression)
+# 7. target=_blank hygiene
 bad=$(grep -rhoE '<a [^>]*target="_blank"[^>]*>' --include='*.html' "$PUB" | grep -cv noopener)
-[ "$bad" -eq 0 ] || warn "$bad target=\"_blank\" links without rel=noopener (content-level)"
+[ "$bad" -eq 0 ] || err "$bad target=\"_blank\" links without rel=noopener"
 
 # 9. SEO head assertions (seo-head-pass)
 for f in $SAMPLES; do
