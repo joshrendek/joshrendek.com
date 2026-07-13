@@ -3,7 +3,9 @@
   <meta name="author" content="{{ .Site.Params.author }}" />
   <meta name="description" content="{{ partial "page-description.html" . }}" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="canonical" href="{{ .Permalink }}" />
+  {{ $canonical := .Permalink }}
+  {{- if .IsHome }}{{ with .Paginator }}{{ if gt .PageNumber 1 }}{{ $canonical = .URL | absURL }}{{ end }}{{ end }}{{ end -}}
+  <link rel="canonical" href="{{ $canonical }}" />
   <link rel="alternate" type="application/rss+xml" href="{{ "index.xml" | absURL }}" title="{{ .Site.Title }}" />
   {{ template "_internal/opengraph.html" . }}
   {{ template "_internal/twitter_cards.html" . }}

@@ -1,1 +1,1 @@
-{{- if .Description -}}{{ .Description }}{{- else if and .IsPage .Summary -}}{{ .Summary | plainify | chomp | truncate 155 }}{{- else -}}{{ .Site.Params.meta.description }}{{- end -}}
+{{- if .Description -}}{{ .Description }}{{- else if and .IsPage .Summary -}}{{ .Summary | plainify | replaceRE "\\s+" " " | strings.TrimSpace | truncate 155 }}{{- else -}}{{ .Site.Params.meta.description }}{{- end -}}

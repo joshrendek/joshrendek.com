@@ -62,6 +62,10 @@ else
   err "robots.txt missing"
 fi
 grep -q 'property="og:image"' "$PUB/index.html" || err "missing og:image on homepage"
+if [ -f "$PUB/page/2/index.html" ]; then
+  grep -q 'rel="canonical" href="https://joshrendek.com/page/2/"' "$PUB/page/2/index.html" || err "page/2 canonical not self-referencing"
+fi
+[ -n "$POST" ] && { grep -q 'property="og:image"' "$POST" || err "missing og:image on post"; }
 if [ -n "$POST" ]; then
   grep -q '| Josh Rendek</title>' "$POST" || err "post title lacks site suffix: $POST"
   grep 'name="description"' "$POST" | grep -q 'blog on software engineering' && err "post still uses site-wide description: $POST"
