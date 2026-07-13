@@ -106,6 +106,7 @@ unsafe = true
 
 [params]
 author = "Josh Rendek"
+images = ["/images/og-default.png"]
 
 [params.meta]
 description = "Josh Rendek's blog on software engineering, Go, Ruby, infrastructure, and security."
