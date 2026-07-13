@@ -23,7 +23,7 @@ require 'benchmark'
 
 fork_pids = []
 
-## Lets fill up some memory
+# Lets fill up some memory
 
 objs = {}
 objs['test'] = []
@@ -170,13 +170,13 @@ require 'resque'
 require 'digest'
 
 
-## Running:
-## sidekiq -r ./por.rb -c 240
+# Running:
+# sidekiq -r ./por.rb -c 240
 #
-## require 'sidekiq'
-## require './por'
-## queueing: 150_000.times { Sidekiq::Client.enqueue(POR, [rand(123098)]*20) }
-## queueing: 150_000.times { Resque.enqueue(POR, [rand(123098)]*20) }
+# require 'sidekiq'
+# require './por'
+# queueing: 150_000.times { Sidekiq::Client.enqueue(POR, [rand(123098)]*20) }
+# queueing: 150_000.times { Resque.enqueue(POR, [rand(123098)]*20) }
 
 class POR
   include Sidekiq::Worker

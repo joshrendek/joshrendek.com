@@ -246,7 +246,7 @@ To fix, first exit the web server (Ctrl+C), then:
 <div class="console">cd app
 cd controllers
 nano hello_controller.rb
-## Change file to look like this:
+# Change file to look like this:
 class HelloController < ApplicationController
    def index
       render :text => "Hello World"

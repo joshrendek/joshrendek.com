@@ -9,7 +9,7 @@ I'm always trying to find a good method of monitoring system performance and log
 
 sar 0 was returning high idle percentages:
 <pre>
-## sar -u 0
+# sar -u 0
 
 08:17:29 AM Â  Â  Â  CPU Â  Â  %user Â  Â  %nice Â  %system Â  %iowait Â  Â  %idle
 
