@@ -25,7 +25,7 @@ curl -L https://get.rvm.io | bash -s stable --ruby
 source /home/ubuntu/.rvm/scripts/rvm
 rvm use 1.9.3 --default
 echo 'rvm_trust_rvmrcs_flag=1' > ~/.rvmrc
-# sudo su before this
+## sudo su before this
 echo 'RAILS_ENV=production' >> /etc/environment
 rvm gemset create tester
 {{< / highlight >}}
@@ -44,7 +44,7 @@ cd tester
 bundle install
 rails g controller homepage index
 rm -rf public/index.html
-# Open up config/routes.rb and modify the root to to point to homepage#index
+## Open up config/routes.rb and modify the root to to point to homepage#index
 rake db:create
 git init .
 git remote add origin https://github.com/bluescripts/tester.git # replace this with your git repo
@@ -81,30 +81,30 @@ rake assets:precompile # dont forget to add it to git!
 Make a file called config/unicorn.rb:
 {{< highlight ruby >}}
 
-# config/unicorn.rb
-# Set environment to development unless something else is specified
+## config/unicorn.rb
+## Set environment to development unless something else is specified
 env = ENV["RAILS_ENV"] || "development"
 
 site = 'tester'
 deploy_user = 'ubuntu'
 
-# See http://unicorn.bogomips.org/Unicorn/Configurator.html for complete
-# documentation.
+## See http://unicorn.bogomips.org/Unicorn/Configurator.html for complete
+## documentation.
 worker_processes 4
 
-# listen on both a Unix domain socket and a TCP port,
-# we use a shorter backlog for quicker failover when busy
+## listen on both a Unix domain socket and a TCP port,
+## we use a shorter backlog for quicker failover when busy
 listen "/tmp/#{site}.socket", :backlog => 64
 
-# Preload our app for more speed
+## Preload our app for more speed
 preload_app true
 
-# nuke workers after 30 seconds instead of 60 seconds (the default)
+## nuke workers after 30 seconds instead of 60 seconds (the default)
 timeout 30
 
 pid "/tmp/unicorn.#{site}.pid"
 
-# Production specific settings
+## Production specific settings
 if env == "production"
   # Help ensure your application will always spawn in the symlinked
   # "current" directory that Capistrano sets up.
@@ -314,7 +314,7 @@ production:
 Go into current and create the database if you haven't already:
 {{< highlight bash >}}
 rake db:create
-# cd down a level
+## cd down a level
 cd ../
 mkdir -p shared/pids
 {{< / highlight >}}

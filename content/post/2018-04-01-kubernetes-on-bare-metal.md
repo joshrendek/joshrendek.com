@@ -465,7 +465,7 @@ persistence:
   enabled: true
   size: 10Gi
   # storageClass: '-'
-# set the type of filesystem to use: filesystem, s3
+## set the type of filesystem to use: filesystem, s3
 storage: filesystem
 secrets:
   haSharedSecret: ""

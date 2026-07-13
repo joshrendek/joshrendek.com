@@ -213,7 +213,7 @@ Another important principal to keep in mind is the "Tell, Dont Ask" rule. Withou
 
 {% codeblock bad_example.rb lang:ruby %}
 @reddit = Reddit.new('ProgrammerHumor')
-# User presses next
+## User presses next
 @reddit.url = "http://reddit.com/r/ProgrammerHumor/.json?after=sometoken"
 {% endcodeblock %}
 

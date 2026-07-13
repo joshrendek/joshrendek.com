@@ -8,7 +8,7 @@ url: /2012/11/sidekiq-vs-resque/
 
 Before we dive into the benchmarks of Resque vs Sidekiq it will first help to have a better understanding of how forking and threading works in Ruby.
 
-# Threading vs Forking
+## Threading vs Forking
 
 ## Forking
 
@@ -23,7 +23,7 @@ require 'benchmark'
 
 fork_pids = []
 
-# Lets fill up some memory
+## Lets fill up some memory
 
 objs = {}
 objs['test'] = []
@@ -140,7 +140,7 @@ Compared to the MRI version, ruby running on the JVM was able to make some optim
 
 Now that we have a better understanding of the differences between forking and threading in Ruby, lets move on to Sidekiq and Resque.
 
-# Sidekiq and Resque
+## Sidekiq and Resque
 
 ## Resque's view of the world
 
@@ -160,7 +160,7 @@ Now that we know how Sidekiq and Resque work we can get on to testing them and c
 
 [Sidekiq @ Github](https://github.com/mperham/sideki://github.com/mperham/sidekiq)
 
-# The Test Code
+## The Test Code
 
 The idea behind the test was to pick a CPU bound processing task, in this case SHA256 and apply it across a set of 20 numbers, 150,000 times.
 
@@ -170,13 +170,13 @@ require 'resque'
 require 'digest'
 
 
-# Running:
-# sidekiq -r ./por.rb -c 240
+## Running:
+## sidekiq -r ./por.rb -c 240
 #
-# require 'sidekiq'
-# require './por'
-# queueing: 150_000.times { Sidekiq::Client.enqueue(POR, [rand(123098)]*20) }
-# queueing: 150_000.times { Resque.enqueue(POR, [rand(123098)]*20) }
+## require 'sidekiq'
+## require './por'
+## queueing: 150_000.times { Sidekiq::Client.enqueue(POR, [rand(123098)]*20) }
+## queueing: 150_000.times { Resque.enqueue(POR, [rand(123098)]*20) }
 
 class POR
   include Sidekiq::Worker
@@ -198,7 +198,7 @@ class POR
 end
 {{< / highlight >}}
 
-# Test Machine
+## Test Machine
 
 ```
       Model Name: Mac Pro
@@ -216,7 +216,7 @@ end
 This gives us a total of 16 cores to use for our testing. I'm also using a [Crucial M4 SSD](http://www.amazon.com/gp/product/B004W2JKZI/ref=as_li_qf_sp_asin_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B004W2JKZI&linkCode=as2&tag=josren-20)
 
 
-# Results
+## Results
 
 ## Time to Process 150,000 sets of 20 numbers
 
@@ -292,7 +292,7 @@ We're doing much better now with native threads. With 50 OS level threads, we're
 We're no longer seeing a increase in (much) CPU usage and only a slight decrease in processing time. As we keep adding more and more threads we end up running into some thread contention issues with accessing redis and how quickly we can pop things off the queue.
 
 
-# Overview
+## Overview
 
 Even if we stick with the stock MRI ruby and go with Sidekiq, we're going to see a huge decrease in CPU usage while also gaining a little bit of performance as well.
 
@@ -305,13 +305,13 @@ The only thing I find missing from Sidekiq that I enjoyed in Resque was the abil
 
 And of course, JRuby comes out on top and gives us the best performance and bang for the buck (although your mileage may vary, depending on the task).
 
-# Further Reading
+## Further Reading
 
 <a href="http://www.amazon.com/gp/product/1934356972/ref=as_li_qf_sp_asin_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1934356972&linkCode=as2&tag=josren-20">Deploying with JRuby: Deliver Scalable Web Apps using the JVM (Pragmatic Programmers)</a><img src="http://www.assoc-amazon.com/e/ir?t=josren-20&l=as2&o=1&a=1934356972" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
 <a href="http://www.amazon.com/gp/product/B005SNJF28/ref=as_li_qf_sp_asin_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B005SNJF28&linkCode=as2&tag=josren-20">JRuby Cookbook</a><img src="http://www.assoc-amazon.com/e/ir?t=josren-20&l=as2&o=1&a=B005SNJF28" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
-# Sidekiq & Resque
+## Sidekiq & Resque
 
 [Sidekiq](https://github.com/mperham/sidekiq)
 

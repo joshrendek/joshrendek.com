@@ -12,7 +12,7 @@ Github: [https://github.com/joshrendek/influx-alert](https://github.com/joshrend
 
 I hope someone finds this useful! It's got a few simple functions/comparisons done already and support for HipChat and Slack notifications.
 
-# Documentation
+## Documentation
 
 ## Influx Alert
 

@@ -12,7 +12,7 @@ The goal of this project was to start with a base directory (in this case The Hi
 * Limited to 10k visits per host so we wouldn't infinitely keep spidering / some reasonable time frame to finish
 * Non `200 OK` status responses were skipped
 
-# Table of Contents
+## Table of Contents
 
 * <a href="#stack">Stack & Tools</a>
 * <a href="#crawl-stats">Crawl Stats</a>
@@ -24,7 +24,7 @@ The goal of this project was to start with a base directory (in this case The Hi
 * <a href="#summary">Summary</a>
 
 <a name="stack"></a>
-# Stack & Tools
+## Stack & Tools
 
 I used a few different tools to build this out:
 
@@ -36,7 +36,7 @@ I used a few different tools to build this out:
 This was all run on a single dedicated server over the period of about 1 week, multiple prototypes ran before that to flush out bugs.
 
 <a name="crawl-stats"></a>
-# Crawl Stats
+## Crawl Stats
 
 | Metric | Count |
 | ------------- | ------------- |
@@ -45,7 +45,7 @@ This was all run on a single dedicated server over the period of about 1 week, m
 | Total Visited (non-200+) | 17,038,091 |
 
 <a name="security-headers"></a>
-# Security Headers
+## Security Headers
 
 | Technology | % using |
 | --- | --- |
@@ -64,7 +64,7 @@ Some of these headers are interesting when viewed through a Tor light. HSTS and 
 
 Services implementing CORS also help protect users by preventing cookie finger printing via scripts and other malicious finger printing methods.
 
-# Software Stats
+## Software Stats
 
 We can fingerprint and figure out exposed software by taking a look at a few different signatures, like cookies and headers. There are other methods to fingerprint using the response body but due to server restrictions and time I couldn't save every single page source, so the results based on headers/titles are below:
 
@@ -176,7 +176,7 @@ Just from the `Server` header we can gather a bunch of useful information:
 
 
 <a name="summary"></a>
-# Summary
+## Summary
 
 This was a fun project to work on and I learned quite a bit about scaling up the tor binary in order to scan the network faster. I'm hoping to make this process a bit less manual and start publishing these results regularly over at my security data website, [https://hnypots.com](https://hnypots.com)
 

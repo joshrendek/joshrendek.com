@@ -12,7 +12,7 @@ You get to the part where your trying to install rpm-python. This doesn't work q
 
 Error:
 <pre>
-# rpm -Uvh rpm-python-4.4.2-48.el5.i386.rpm
+## rpm -Uvh rpm-python-4.4.2-48.el5.i386.rpm
 
 warning: rpm-python-4.4.2-48.el5.i386.rpm: Header V3 DSA signature: NOKEY, key ID e8562897
 
