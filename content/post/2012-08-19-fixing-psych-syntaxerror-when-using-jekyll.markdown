@@ -1,5 +1,5 @@
 ---
-categories: ruby jekyll
+categories: [ruby]
 comments: true
 date: 2012-08-19T00:00:00Z
 title: Fixing Psych::SyntaxError when using Jekyll

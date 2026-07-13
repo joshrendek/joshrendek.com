@@ -1,5 +1,5 @@
 ---
-categories: security linux
+categories: [security, linux]
 comments: true
 date: 2013-02-26T00:00:00Z
 title: Why setuid Is Bad and What You Can Do

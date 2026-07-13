@@ -1,5 +1,5 @@
 ---
-categories: rants
+categories: [rants]
 comments: true
 date: 2012-08-19T00:00:00Z
 title: Moved domains to my name

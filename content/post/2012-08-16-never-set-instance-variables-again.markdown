@@ -1,5 +1,5 @@
 ---
-categories: ruby
+categories: [ruby]
 date: 2012-08-16T00:00:00Z
 title: Never Set Instance Variables Again
 url: /2012/08/never-set-instance-variables-again/

@@ -1,5 +1,5 @@
 ---
-categories: go golang
+categories: [go]
 comments: true
 date: 2014-06-09T00:00:00Z
 title: A useful logger in Go

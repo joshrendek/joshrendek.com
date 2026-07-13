@@ -1,5 +1,5 @@
 ---
-categories: security linux ubuntu
+categories: [security, linux]
 comments: true
 date: 2013-01-17T00:00:00Z
 title: Securing Ubuntu

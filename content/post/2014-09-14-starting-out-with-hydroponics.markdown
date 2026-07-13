@@ -1,5 +1,4 @@
 ---
-categories: null
 comments: true
 date: 2014-09-14T12:02:21Z
 title: Starting out with hydroponics

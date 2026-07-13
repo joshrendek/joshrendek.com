@@ -1,5 +1,5 @@
 ---
-categories: go golang security
+categories: [go, security]
 comments: true
 date: 2014-07-08T00:00:00Z
 title: Go-lang compare *ssh.Request.Type against a string

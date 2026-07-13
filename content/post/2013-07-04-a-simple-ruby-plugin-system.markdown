@@ -1,5 +1,5 @@
 ---
-categories: ruby
+categories: [ruby]
 comments: true
 date: 2013-07-04T00:00:00Z
 title: A simple ruby plugin system

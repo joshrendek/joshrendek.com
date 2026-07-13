@@ -1,5 +1,4 @@
 ---
-categories: null
 comments: true
 date: 2015-02-21T10:20:39Z
 title: Communication between React components using events

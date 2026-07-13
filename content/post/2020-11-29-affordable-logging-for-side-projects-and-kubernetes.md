@@ -1,7 +1,7 @@
 ---
 title: 'Affordable logging for kubernetes hobby projects'
 date: 2021-10-13T00:46:27-04:00
-categories: ['kubernetes']
+categories: [kubernetes]
 draft: false
 ---
 

@@ -1,5 +1,5 @@
 ---
-categories: chef ruby
+categories: [ruby]
 comments: true
 date: 2012-12-05T00:00:00Z
 title: Dealing with cascading failures with Chef Server

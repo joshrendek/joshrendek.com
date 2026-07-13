@@ -1,5 +1,5 @@
 ---
-categories: go golang
+categories: [go]
 comments: true
 date: 2014-06-18T00:00:00Z
 title: 'Go-lang: mocking exec.Command using interfaces'

@@ -1,5 +1,5 @@
 ---
-categories: ruby refactoring
+categories: [ruby]
 comments: true
 date: 2013-11-15T00:00:00Z
 title: 2 patterns for refactoring with your ruby application

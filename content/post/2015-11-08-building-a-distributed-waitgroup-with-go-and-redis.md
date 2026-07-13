@@ -1,5 +1,5 @@
 ---
-categories: golang
+categories: [go]
 comments: true
 date: 2015-11-08T21:30:07Z
 title: Building a distributed WaitGroup with Go and Redis

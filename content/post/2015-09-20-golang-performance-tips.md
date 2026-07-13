@@ -1,5 +1,5 @@
 ---
-categories: golang
+categories: [go]
 comments: true
 date: 2015-09-20T21:30:07Z
 title: Golang Performance Tips

@@ -1,5 +1,5 @@
 ---
-categories: golang
+categories: [go]
 comments: true
 date: 2015-11-02T21:30:07Z
 title: 'Docker and ping: sendmsg: Operation not permitted'

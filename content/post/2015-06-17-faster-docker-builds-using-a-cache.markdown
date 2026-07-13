@@ -1,5 +1,4 @@
 ---
-categories: null
 comments: true
 date: 2015-06-17T21:30:07Z
 title: Faster docker builds using a cache

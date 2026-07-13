@@ -1,5 +1,5 @@
 ---
-categories: ruby
+categories: [ruby]
 comments: true
 date: 2012-08-28T00:00:00Z
 title: Preventing a ruby class from being reopened

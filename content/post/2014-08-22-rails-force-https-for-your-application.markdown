@@ -1,5 +1,4 @@
 ---
-categories: null
 comments: true
 date: 2014-08-22T10:57:37Z
 title: Rails force HTTPS for your application

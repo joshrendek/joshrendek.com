@@ -1,5 +1,5 @@
 ---
-categories: ruby performance jruby ruby mri jvm
+categories: [ruby]
 comments: true
 date: 2012-11-03T00:00:00Z
 title: Sidekiq vs Resque, with MRI and JRuby

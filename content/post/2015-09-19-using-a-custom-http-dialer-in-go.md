@@ -1,5 +1,5 @@
 ---
-categories: golang
+categories: [go]
 comments: true
 date: 2015-09-19T21:30:07Z
 title: Using a custom HTTP Dialer in Go

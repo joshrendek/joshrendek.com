@@ -1,5 +1,4 @@
 ---
-categories: null
 comments: true
 date: 2013-08-25T00:00:00Z
 draft: true

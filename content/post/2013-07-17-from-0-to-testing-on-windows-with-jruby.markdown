@@ -1,5 +1,5 @@
 ---
-categories: ruby jruby testing
+categories: [ruby]
 comments: true
 date: 2013-07-17T00:00:00Z
 title: From 0 to Testing on Windows with JRuby

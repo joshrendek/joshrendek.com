@@ -1,5 +1,5 @@
 ---
-categories: golang, elasticsearch
+categories: [go]
 comments: true
 date: 2015-11-26T12:05:13Z
 title: Understanding ElasticSearch Performance

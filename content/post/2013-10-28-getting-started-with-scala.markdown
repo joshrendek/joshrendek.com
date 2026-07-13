@@ -1,5 +1,5 @@
 ---
-categories: scala
+categories: [scala]
 comments: true
 date: 2013-10-28T00:00:00Z
 title: Getting started with Scala

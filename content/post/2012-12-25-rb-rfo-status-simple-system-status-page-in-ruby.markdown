@@ -1,5 +1,5 @@
 ---
-categories: ruby
+categories: [ruby]
 comments: true
 date: 2012-12-25T00:00:00Z
 title: 'Rb RFO Status: A Simple System Status Page in Ruby'

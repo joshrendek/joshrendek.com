@@ -1,5 +1,5 @@
 ---
-categories: scala
+categories: [scala]
 comments: true
 date: 2013-10-31T00:00:00Z
 title: Parsing HTML in Scala

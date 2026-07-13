@@ -1,5 +1,5 @@
 ---
-categories: uptime
+categories: [homelab]
 comments: true
 date: 2012-07-22T00:00:00Z
 external-url: http://google.com

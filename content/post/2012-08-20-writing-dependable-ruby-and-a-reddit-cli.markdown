@@ -1,5 +1,5 @@
 ---
-categories: ruby
+categories: [ruby]
 comments: true
 date: 2012-08-20T00:00:00Z
 title: Writing Dependable Ruby & a Reddit CLI

@@ -2,7 +2,7 @@
 title: "Helm not updating image, how to fix"
 date: 2018-07-16T21:56:43-04:00
 draft: false
-categories: ['kubernetes', 'helm']
+categories: [kubernetes, helm]
 ---
 
 If you have your `imagePullPolicy: Always` and deploys aren't going out (for example if you're using a static tag, like `stable`) - then you may be running into a helm templating bug/feature.

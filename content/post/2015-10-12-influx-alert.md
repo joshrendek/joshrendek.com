@@ -1,5 +1,5 @@
 ---
-categories: golang
+categories: [go]
 comments: true
 date: 2015-10-12T21:30:07Z
 title: Influx Alert
