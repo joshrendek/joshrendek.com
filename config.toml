@@ -47,62 +47,47 @@ enableEmoji =                 false
 enableMissingTranslationPlaceholders = false
 footnoteAnchorPrefix =        ""
 footnoteReturnLinkContents =  ""
-googleAnalytics =             "UA-3754808-1"
 # if true, auto-detect Chinese/Japanese/Korean Languages in the content. (.Summary and .WordCount can work properly in CJKLanguage)
 hasCJKLanguage =              false
 layoutDir =                   "layouts"
-# Enable Logging
-log =                         false
 # maximum number of items in the RSS feed
 rssLimit =                    15
 # "toml","yaml", or "json"
 metaDataFormat =              "toml"
-newContentEditor =            ""
 # Don't sync permission mode of files
 noChmod =                     false
 # Don't sync modification time of files
 noTimes =                     false
-# Pagination
-paginate =                    10
-paginatePath =                "page"
 # Pluralize titles in lists using inflect
 pluralizeListTitles =         true
 # Preserve special characters in taxonomy names ("Gérard Depardieu" vs "Gerard Depardieu")
 preserveTaxonomyNames =       false
 # filesystem path to write files to
 publishDir =                  "public"
-# enables syntax guessing for code fences without specified language
-pygmentsCodefences = true
-pygmentsCodeFencesGuessSyntax = true
-# color-codes for highlighting derived from this style
-highlighter = "chroma"
-pygmentsOptions = "linenos=inline"
-pygmentsStyle =               "tango"
-# true: use pygments-css or false: color-codes directly
-pygmentsUseClasses =          true
-# default sitemap configuration map
-source =                      ""
 staticDir =                   "static"
-# display memory and timing of different steps of the program
-stepAnalysis =                false
 # theme to use (located by default in /themes/THEMENAME/)
 themesDir =                   "themes"
 theme =                       "rendek-dark"
 # if true, use /filename.html instead of /filename/
 uglyURLs =                    false
-# verbose output
-verbose =                     false
-# verbose logging
-verboseLog =                  false
-# watch filesystem for changes and recreate as needed
-watch =                       true
 
 [services.disqus]
 shortname = "bluescripts"
 
+[pagination]
+pagerSize = 10
+path = "page"
+
 # Legacy posts and pages contain raw inline HTML; goldmark drops it by default
 [markup.goldmark.renderer]
 unsafe = true
+
+[markup.highlight]
+codeFences = true
+guessSyntax = true
+noClasses = false
+lineNos = true
+lineNumbersInTable = false
 
 [params]
 author = "Josh Rendek"
@@ -110,7 +95,6 @@ images = ["/images/og-default.png"]
 
 [params.meta]
 description = "Josh Rendek's blog on software engineering, Go, Ruby, infrastructure, and security."
-keywords = "josh rendek, software engineering, golang, ruby, rails, kubernetes, infrastructure, security"
 
 [taxonomies]
 category = "categories"
