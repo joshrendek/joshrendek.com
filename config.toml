@@ -15,11 +15,8 @@ buildExpired =                false
 # enable this to make all relative URLs relative to content root. Note that this does not affect absolute URLs.
 relativeURLs =                false
 canonifyURLs =                false
-# config file (default is path/config.yaml|json|toml)
-config =                     "config.toml"
 contentDir =                  "content"
 dataDir =                     "data" 
-defaultExtension =            "html"
 defaultLayout =               "post"
 # Missing translations will default to this content language
 defaultContentLanguage =      "en"
