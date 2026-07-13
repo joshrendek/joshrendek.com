@@ -13,6 +13,8 @@ warn() { echo "WARN: $*"; }
 POST=$(find "$PUB" -path "$PUB/2*" -name index.html | sort | head -1)
 CAT=$(find "$PUB/categories" -mindepth 2 -name index.html 2>/dev/null | sort | head -1)
 SAMPLES="$PUB/index.html $PUB/404.html $PUB/archives/index.html $POST $CAT"
+[ -n "$POST" ] || err "no post page found under $PUB/2* — sample set incomplete"
+[ -n "$CAT" ]  || err "no category term page found — sample set incomplete"
 
 # 1. Brace-bug regression guard
 if grep -rl --include='*.html' '{ partial' "$PUB" | grep -q .; then
@@ -70,6 +72,14 @@ if [ -n "$POST" ]; then
   grep -q '| Josh Rendek</title>' "$POST" || err "post title lacks site suffix: $POST"
   grep 'name="description"' "$POST" | grep -q 'blog on software engineering' && err "post still uses site-wide description: $POST"
 fi
+
+# 10. Whole-corpus content assertions
+multi_h1=0
+while IFS= read -r f; do
+  n=$(grep -o '<h1' "$f" | wc -l | tr -d ' ')
+  [ "$n" -gt 1 ] && { echo "  multi-h1 ($n): $f"; multi_h1=1; }
+done < <(find "$PUB" -path "$PUB/2*" -name index.html)
+[ "$multi_h1" -eq 0 ] || err "post pages with more than one <h1> (in-body headings)"
 
 # 8. Optional internal link check
 if command -v htmltest >/dev/null 2>&1; then
