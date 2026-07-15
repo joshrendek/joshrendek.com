@@ -92,6 +92,9 @@ if [ -d "$PUB/categories" ]; then
   done
 fi
 
+noalt=$(grep -rhoE '<img [^>]*>' --include='*.html' "$PUB" | grep -cv 'alt=')
+[ "$noalt" -eq 0 ] || err "$noalt <img> tags without alt attribute in output"
+
 # 8. Optional internal link check
 if command -v htmltest >/dev/null 2>&1; then
   htmltest -s "$PUB" || err "htmltest found broken internal links"
