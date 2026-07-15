@@ -7,7 +7,7 @@ url: /2015/11/understanding-elasticsearch-performance/
 ---
 
 <em>Performance before and after Optimizations</em>
-![](/images/worker_stats.png)
+![Line chart of documents processed per minute climbing from near zero to 6.15 million after optimizations](/images/worker_stats.png)
 
 
 When working with billions of documents in your Elasticsearch cluster, there are a few important things to keep in mind:

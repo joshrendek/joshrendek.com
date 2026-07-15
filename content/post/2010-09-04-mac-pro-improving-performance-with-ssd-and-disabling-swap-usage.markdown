@@ -14,8 +14,8 @@ For others doing this, make sure you have enough memory, or you'll run into issu
 sudo rm /private/var/vm/swapfile*</pre>
 Reboot and your done. I keep Activity Monitor running on the side so I can see how much memory is being used so I don't crash, but even with RubyMine open or playing StarCraft II I still usually have at least a GB or two of memory free.
 
-[caption id="attachment_381" align="alignnone" width="637" caption="I set the inactive and free colors the same since they are, in essence, the same for what I want to watch."]<img class="size-full wp-image-381 " title="Activity Monitor" src="http://bluescripts.net/wp-content/uploads/2010/09/Activity-Monitor.jpg" alt="" width="637" height="478" />[/caption]
+[caption id="attachment_381" align="alignnone" width="637" caption="I set the inactive and free colors the same since they are, in essence, the same for what I want to watch."]<img class="size-full wp-image-381 " title="Activity Monitor" src="http://bluescripts.net/wp-content/uploads/2010/09/Activity-Monitor.jpg" alt="Activity Monitor memory tab with inactive and free memory colored the same" width="637" height="478" />[/caption]
 
 And here is a shot of my OSX bar and how it looks to show free memory:
 
-<img class="alignnone size-full wp-image-382" title="Dock" src="http://bluescripts.net/wp-content/uploads/2010/09/Dock.jpg" alt="" width="44" height="954" />
+<img class="alignnone size-full wp-image-382" title="Dock" src="http://bluescripts.net/wp-content/uploads/2010/09/Dock.jpg" alt="OS X menu bar free memory indicator" width="44" height="954" />

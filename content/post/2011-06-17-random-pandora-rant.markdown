@@ -10,4 +10,4 @@ Its 2011 and Pandora hasn't heard about expandable layouts... I love pandora, bu
 
 Do something with all my screen real estate, please!
 
-<a href="https://img.skitch.com/20110617-jmwa2nwrbd34fspgwgcxdnjd31.jpg"><img class="alignnone" src="https://img.skitch.com/20110617-jmwa2nwrbd34fspgwgcxdnjd31.jpg" alt="" width="487" height="290" /></a>
+<a href="https://img.skitch.com/20110617-jmwa2nwrbd34fspgwgcxdnjd31.jpg"><img class="alignnone" src="https://img.skitch.com/20110617-jmwa2nwrbd34fspgwgcxdnjd31.jpg" alt="Pandora's station list cramped into a narrow non-expandable sidebar" width="487" height="290" /></a>

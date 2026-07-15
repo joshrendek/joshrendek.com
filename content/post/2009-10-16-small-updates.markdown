@@ -8,11 +8,11 @@ wordpress_url: http://bluescripts.net/?p=287
 Let me know if you notice anything broken or borked... just moved the blog to a new server.
 
 Since my last post I've added a few new things to my github account... one is a mmorpg rails plugin and another is a server automator for fresh installs to get them production/development ready.
-<div><img id="lang" src="../images/script.png" alt="" /> <a href="../apps/server-setup-fu/">Server Setup Fu</a>
+<div><img id="lang" src="../images/script.png" alt="Shell script icon" /> <a href="../apps/server-setup-fu/">Server Setup Fu</a>
 <div>A collection of shell scripts that you run once to setup a bare metal server for development or production.</div>
 </div>
 <div>
-<div><img id="lang" src="../images/ror.png" alt="" width="16" height="16" /> <a href="../apps/mmo_fo/">mmo_fu</a>
+<div><img id="lang" src="../images/ror.png" alt="Ruby on Rails icon" width="16" height="16" /> <a href="../apps/mmo_fo/">mmo_fu</a>
 <div>A rails plugin to interact with MMO websites like: wow armory, lotro armory, etc.</div>
 </div>
 <div>

@@ -44,7 +44,7 @@ fork_pids.map{|p| Process.waitpid(p) }
 
 We can see this in action here:
 
-{{< figure src="/images/showdown/copy_on_write.png" >}}
+{{< figure src="/images/showdown/copy_on_write.png" alt="Activity Monitor listing 20 forked ruby processes each using 596 KB of real memory" >}}
 
 
 However when we start modifying memory inside the child forks, memory quickly grows.
@@ -62,7 +62,7 @@ fork_pids.map{|p| Process.waitpid(p) }
 
 We're now creating a million new objects in each forked child:
 
-{{< figure src="/images/showdown/forced_copy_on_write.png" >}}
+{{< figure src="/images/showdown/forced_copy_on_write.png" alt="Activity Monitor listing 20 forked ruby processes now each using around 107 MB of real memory after writes trigger copy-on-write" >}}
 
 
 ## Threading
@@ -101,7 +101,7 @@ Normally this would be an unsafe operation, but since the GIL/GVL exists we don'
 
 Another important note is that the Ruby GC is doing a really horrible job during this benchmark.
 
-{{< figure src="/images/showdown/threading_leak.png" >}}
+{{< figure src="/images/showdown/threading_leak.png" alt="Activity Monitor showing a single ruby process at 99.9% CPU with real memory growing to 2.62 GB" >}}
 
 The memory kept growing so I had to kill the process after a few seconds.
 
@@ -136,7 +136,7 @@ threads.map(&:join)
 
 Compared to the MRI version, ruby running on the JVM was able to make some optimizations and keep memory usage around 800MB for the duration of the test:
 
-{{< figure src="/images/showdown/jvm_threading.png" >}}
+{{< figure src="/images/showdown/jvm_threading.png" alt="Activity Monitor showing the JRuby java process pegged at 99.9% CPU holding steady around 808 MB of real memory" >}}
 
 Now that we have a better understanding of the differences between forking and threading in Ruby, lets move on to Sidekiq and Resque.
 
@@ -220,7 +220,7 @@ This gives us a total of 16 cores to use for our testing. I'm also using a [Cruc
 
 ## Time to Process 150,000 sets of 20 numbers
 
-{{< figure src="/images/showdown/time_to_process.png" >}}
+{{< figure src="/images/showdown/time_to_process.png" alt="Bar chart of time to complete 150,000 jobs, from about 90 seconds for Sidekiq on JRuby up to 396 seconds for Resque" >}}
 
 
 <table width="100%" style="text-align: center;">
@@ -256,38 +256,38 @@ This gives us a total of 16 cores to use for our testing. I'm also using a [Cruc
 
 ### Resque: 50 workers
 
-{{< figure src="/images/showdown/resque_50.png" >}}
+{{< figure src="/images/showdown/resque_50.png" alt="CPU usage graph for Resque with 50 workers showing sys time near 100% with heavy forking overhead" >}}
 
 Here we can see that the forking is taking its toll on the available CPU we have for processing. Roughly 50% of the CPU is being wasted on forking and scheduling those new processes. Resque took 396 seconds to finish and process 150,000 jobs.
 
 ### Sidekiq (MRI) 1 process, 50 threads
 
-{{< figure src="/images/showdown/mri_50.png" >}}
+{{< figure src="/images/showdown/mri_50.png" alt="CPU usage graph for Sidekiq on MRI with 1 process and 50 threads showing user CPU around 15%, one core pegged" >}}
 
 We're not fully utilizing the CPU. When running this test it pegged one CPU at 100% usage and kept it there for the duration of the test. We have a slight overhead with system CPU usage. Sidekiq took 312 seconds with 50 threads using MRI Ruby. Lets now take a look at doing things a bit resque-ish, and use multiple sidekiq processes to get more threads scheduled across multiple CPUs.
 
 ### Sidekiq (MRI) 3 processes, 50 threads
 
-{{< figure src="/images/showdown/mri_3x50.png" >}}
+{{< figure src="/images/showdown/mri_3x50.png" alt="CPU usage graph for Sidekiq on MRI with 3 processes and 50 threads each showing higher CPU utilization than the single-process run" >}}
 
 We're doing better. We've cut our processing time roughly in third and we're utilizing more of our resources (CPUs). 3 Sidekiq processes with 50 threads each (for a total of 150 threads) took 120 seconds to complete 150,000 jobs.
 
 ### Sidekiq (MRI) 5 processes, 50 threads
 
-{{< figure src="/images/showdown/mri_5x50.png" >}}
+{{< figure src="/images/showdown/mri_5x50.png" alt="CPU usage graph for Sidekiq on MRI with 5 processes and 50 threads each showing further increased CPU utilization" >}}
 
 As we keep adding more processes that get scheduled to different cores we're seeing the CPU usage go up even further, however with more processes comes more overhead for process scheduling (versus thread scheduling). We're still wasting CPU cycles, but we're completing 150,000 jobs in 98 seconds.
 
 ### Sidekiq (JRuby) 50 threads
 
-{{< figure src="/images/showdown/jruby_50.png" >}}
+{{< figure src="/images/showdown/jruby_50.png" alt="CPU usage graph for Sidekiq on JRuby with 50 native threads showing user CPU sustained around 40-60%" >}}
 
 We're doing much better now with native threads. With 50 OS level threads, we're completing our set of jobs in 91 seconds.
 
 ### Sidekiq (JRuby) 150 threads & 240 Threads
 
-{{< figure src="/images/showdown/jruby_150.png" >}}
-{{< figure src="/images/showdown/jruby_240.png" >}}
+{{< figure src="/images/showdown/jruby_150.png" alt="CPU usage graph for Sidekiq on JRuby with 150 threads showing similar CPU utilization to the 50-thread run" >}}
+{{< figure src="/images/showdown/jruby_240.png" alt="CPU usage graph for Sidekiq on JRuby with 240 threads showing CPU utilization plateauing with only a slight decrease in run time" >}}
 
 We're no longer seeing a increase in (much) CPU usage and only a slight decrease in processing time. As we keep adding more and more threads we end up running into some thread contention issues with accessing redis and how quickly we can pop things off the queue.
 

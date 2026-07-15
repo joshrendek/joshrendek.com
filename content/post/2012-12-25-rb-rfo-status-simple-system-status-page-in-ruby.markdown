@@ -32,16 +32,16 @@ sudo RAILS_ENV=production BUNDLE_WITHOUT=development:test BUNDLE_GEMFILE=Gemfile
 
 ### Homepage
 
-{{< figure src="https://www.evernote.com/shard/s4/sh/dd1aa9b9-cfcf-4257-af11-3d17d3f1e8dd/c7917a5540f04a60eacad189479e799c/res/6a125eeb-21c8-4f96-9ced-21169a89c527/skitch.png" >}}
+{{< figure src="https://www.evernote.com/shard/s4/sh/dd1aa9b9-cfcf-4257-af11-3d17d3f1e8dd/c7917a5540f04a60eacad189479e799c/res/6a125eeb-21c8-4f96-9ced-21169a89c527/skitch.png" alt="Rb RFO Status homepage listing system status" >}}
 
 ### Creating an Incident
 
-{{< figure src="https://www.evernote.com/shard/s4/sh/29176e2c-d770-4c6d-a593-369786d9079d/4c564af13979ba3d5e272c836cc830a2/res/bd810786-94fc-4652-86e1-27885f12bad8/skitch.png?resizeSmall&width=832" >}}
+{{< figure src="https://www.evernote.com/shard/s4/sh/29176e2c-d770-4c6d-a593-369786d9079d/4c564af13979ba3d5e272c836cc830a2/res/bd810786-94fc-4652-86e1-27885f12bad8/skitch.png?resizeSmall&width=832" alt="Form for creating a new incident in Rb RFO Status" >}}
 
 ### Updating an incident
 
-{{< figure src="https://www.evernote.com/shard/s4/sh/84afb640-b46c-40eb-9b30-00583685b7a5/915d77b53e7755498e1ef98a86c1ee57/res/8eabf163-959c-4f31-bf88-cbeb6d97dc77/skitch.png?resizeSmall&width=832" >}}
+{{< figure src="https://www.evernote.com/shard/s4/sh/84afb640-b46c-40eb-9b30-00583685b7a5/915d77b53e7755498e1ef98a86c1ee57/res/8eabf163-959c-4f31-bf88-cbeb6d97dc77/skitch.png?resizeSmall&width=832" alt="Form for updating an existing incident in Rb RFO Status" >}}
 
 ### A resolved incident
 
-{{< figure src="https://www.evernote.com/shard/s4/sh/d0449a09-75e1-47bc-8bc9-7073b76bfdaa/7c68e52c97dc1b912c408f9f0c5bded0/res/b077981e-37e0-4e2b-a8e4-abc1ae092033/skitch.png?resizeSmall&width=832" >}}
+{{< figure src="https://www.evernote.com/shard/s4/sh/d0449a09-75e1-47bc-8bc9-7073b76bfdaa/7c68e52c97dc1b912c408f9f0c5bded0/res/b077981e-37e0-4e2b-a8e4-abc1ae092033/skitch.png?resizeSmall&width=832" alt="Rb RFO Status page showing an incident marked as resolved" >}}

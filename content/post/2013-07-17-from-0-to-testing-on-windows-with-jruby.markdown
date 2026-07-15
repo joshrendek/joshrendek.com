@@ -24,39 +24,39 @@ his test load is piling up.
 
 So let's help John out and install [Sublime Text 2](http://sublimetext.com/2) and [JRuby](http://jruby.org/).
 
-![](/images/jrubytesting/download-sublime.png)
+![Sublime Text download page with the Windows 64 bit link highlighted](/images/jrubytesting/download-sublime.png)
 
 Start by downloading the 64-bit version of Sublime Text.
 Make sure to add the context menu when going through the install process.
 
-![](/images/jrubytesting/slt-setup.png)
+![Sublime Text 2 setup wizard with "Add to explorer context menu" checked](/images/jrubytesting/slt-setup.png)
 
 Now we'll visit the JRuby homepage and download the 64 bit installer.
 
-![](/images/jrubytesting/dl-jruby.png)
+![JRuby homepage with an arrow pointing at the exe(x64) download link](/images/jrubytesting/dl-jruby.png)
 
 Go through the installer and let JRuby set your path so you can access ruby from `cmd.exe`
 
-![](/images/jrubytesting/jruby-path.png)
+![JRuby installer with "Configure Path for me (recommended)" checked](/images/jrubytesting/jruby-path.png)
 
 Now when we open `cmd.exe` and type `jruby -v` we'll be able to see that it was installed.
 
-![](/images/jrubytesting/jruby-cmd.png)
+![Windows cmd.exe showing "jruby -v" output confirming JRuby 1.7.4 is installed](/images/jrubytesting/jruby-cmd.png)
 
 Now that we have our tools installed lets setup our test directory on the Desktop.
 Inside our `testing` folder we'll create a folder called `TestDemo` for our tests for the Demo project.
 
-![](/images/jrubytesting/testdemo-folder.png)
+![Windows Explorer showing the TestDemo folder inside a testing folder on the Desktop](/images/jrubytesting/testdemo-folder.png)
 
 Next we'll open Sublime Text and go to `File > Open Folder` and navigate to our `TestDemo` folder and hit open.
 
-![](/images/jrubytesting/slt-openfolder.png)
+![Sublime Text 2 File menu with an arrow pointing at the Open Folder option](/images/jrubytesting/slt-openfolder.png)
 
 Now we can continue making our directory structure inside Sublime Text. Since we're going to use `rspec`
 we need to create a folder called `spec` to contain all of our tests. Right click on the `TestDemo` in the
 tree navigation and click `New Folder`.
 
-![](/images/jrubytesting/slt-newfolder.png)
+![Sublime Text 2 right-click context menu on TestDemo with an arrow pointing at New Folder](/images/jrubytesting/slt-newfolder.png)
 
 Call the folder `spec` in the bottom title bar when it prompts you for the folder name.
 
@@ -77,15 +77,15 @@ Once we have that file created, open `cmd.exe` and switch to your project's root
 
 Type `jgem install bundler` to install `bundler` which manages ruby dependencies.
 
-![](/images/jrubytesting/bundler.png)
+![Windows cmd.exe showing "jgem install bundler" successfully installing bundler 1.3.5](/images/jrubytesting/bundler.png)
 
 While still at the command prompt we're going to `bundle` to install our dependencies:
 
-![](/images/jrubytesting/bundle.png)
+![Windows cmd.exe showing "bundle" resolving and installing rspec, selenium, and capybara gems](/images/jrubytesting/bundle.png)
 
 After that finishes we need to run one last command for `selenium` to work properly: `selenium install`
 
-![](/images/jrubytesting/selenium-install.png)
+![Windows cmd.exe showing "selenium install" downloading and unzipping the selenium server](/images/jrubytesting/selenium-install.png)
 
 We also need a `spec_helper.rb` file inside our `spec` directory.
 
@@ -103,16 +103,16 @@ the test that will save John a ton of time.
 Chrome comes with a simple tool to get XPath paths so we're going to use that to get the XPath
 for the search button. Right click on the "Google Search" button and click `Inspect element`
 
-![](/images/jrubytesting/google-inspect.png)
+![Google homepage right-click menu with an arrow pointing at Inspect element](/images/jrubytesting/google-inspect.png)
 
 Right click on the highlighted element and hit `Copy XPath`.
 
-![](/images/jrubytesting/google-xpath.png)
+![Chrome DevTools element context menu with an arrow pointing at Copy XPath](/images/jrubytesting/google-xpath.png)
 
 Now we're going to make our spec file and call it `homepage_spec.rb` and locate it under `spec\integration`.
 
 Here is a picture showing the directory structure and files:
-![](/images/jrubytesting/homepage-spec.png)
+![Sublime Text 2 showing the TestDemo project tree and the homepage_spec.rb file contents](/images/jrubytesting/homepage-spec.png)
 
 
 Here is the spec file with comments explaining each part:
@@ -147,7 +147,7 @@ end
 
 Now we can tab back to our `cmd.exe` prompt and run our tests!
 `rspec spec` will run all your tests under the `spec` folder.
-![](/images/jrubytesting/rspec-spec.png)
+![Windows cmd.exe showing "rspec spec" passing with 1 example, 0 failures](/images/jrubytesting/rspec-spec.png)
 
 
 ### Things to take note of

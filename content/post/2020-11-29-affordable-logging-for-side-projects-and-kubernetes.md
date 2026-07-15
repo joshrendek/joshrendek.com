@@ -159,6 +159,6 @@ And open your browser to http://localhost:5601
 
 Here is an example of the APM dashboard in Kibana under Observability -> Overview
 
-![](/images/monitoring/apm.png)
+![Kibana Observability overview dashboard showing logs rate, CPU/memory/traffic metrics, and APM transactions per minute](/images/monitoring/apm.png)
 
 And that's it. Make sure you setup index policies to rotate large indexes so the disks don't get full.

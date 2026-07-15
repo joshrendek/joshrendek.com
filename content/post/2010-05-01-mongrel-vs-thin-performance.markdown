@@ -5,7 +5,7 @@ wordpress_id: 328
 wordpress_url: http://bluescripts.net/?p=328
 ---
 
-<img class="alignnone" title="Mongrel vs Thin" src="http://bluescripts.net/wp-content/uploads/2010/05/mvt.png" alt="" width="549" height="381" />
+<img class="alignnone" title="Mongrel vs Thin" src="http://bluescripts.net/wp-content/uploads/2010/05/mvt.png" alt="Bar chart comparing Mongrel and Thin requests per second" width="549" height="381" />
 
 Thin won out in pretty much every category showing it can handle a larger volume of traffic faster than mongrel can.
 <pre>-------------------------------------

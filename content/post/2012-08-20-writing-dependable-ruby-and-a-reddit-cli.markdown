@@ -309,6 +309,6 @@ RedditCli.new(RedditApi.new(subreddit))
 When working with external resources, whether it be a gem or a remote API, it's important to wrap those endpoints in your own abstraction. For instance, with our Reddit CLI we could have avoided those first 2 classes entirely, written everything in the CLI display class, and worked with the raw JSON. But what happens when Reddit changes their API? If this CLI class was huge or incoporated many other components, this could be quite a big code change. Instead, what we wrote encapsulates the API inside a `RedditApi` class that returns a generic `Story` struct we can work with and pass around. We don't care if the API changes in the CLI, or in any other code. If the API changes, we only have to update the one API class to mold the new API to the output we were already generating.
 
 ## End Result  &amp; Source Code
-<img src="https://img.skitch.com/20120821-bc2b49nued2e38tt3cekppeq1i.jpg">
+<img src="https://img.skitch.com/20120821-bc2b49nued2e38tt3cekppeq1i.jpg" alt="Terminal screenshot showing the Reddit CLI's end result listing story titles">
 
     <a href="https://github.com/bluescripts/reddit-cli">View Source on Github</a>
