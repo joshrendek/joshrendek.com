@@ -2,15 +2,31 @@
 title: "Training a small model for my honeypots"
 date: 2026-11-25T16:00:00-05:00
 categories: [machine-learning]
-description: "What I got for a month of fine-tuning Qwen for threat.gg, including an off-by-one error, a PostgreSQL problem, and a working model on a rented A4000."
+description: "What the SSH and database sessions on threat.gg tell me about scanners, and what happened when I trained a small model to keep those conversations going."
 draft: true
 ---
 
-I let Codex work on a new model for my threat.gg honeypots for most of a month. By the time I added it up, I'd spent over $200 on Runpod. When I wanted my 4080 back to play games, the model I moved to a rented GPU was r6. The newer one, r11, had spent a lot more time on rented GPUs. I couldn't show that it gave better answers.
+I build threat.gg, a network of honeypots you can run on your own servers. An SSH sensor lets a visitor log in to a decoy shell and records what they type. If all I kept were the source IP, the username and the guessed password, I'd miss my favorite part of the summer's traffic. A surprising number of those visitors wanted to know what graphics card the machine had.
 
-A honeypot gives someone who connects to it a machine to poke around in. For threat.gg I wanted one small model that could play the part of a shell over SSH or Telnet, or a database over PostgreSQL or SQL Server. If the shell says the machine has 8 GB of RAM, the next command should agree. A database client wants actual columns and rows. If it asks for one row and gets two, it hardly matters how plausible the second one looks.
+Over two months the sensors recorded 54,613 GPU checks across 24,038 SSH sessions. I could open a session and see a client ask about the kernel and CPU, then look for a graphics device. The SSH client banner gave me another way to group those visits when the source address changed. I could tell someone was inventorying GPUs. From those commands alone I'd have a hard time saying whether they wanted a miner or a box to run inference on. [The summer SSH campaign report](https://threat.gg/blog/ssh-threat-actors-may-july-2026) has the breakdown.
 
-## How I got to r6
+## What I get out of answering
+
+Those summer sessions predate the small model. The reason to build one was sitting in the command archive. By October it held nearly 40,000 distinct SSH command patterns. A few lines of Go will give me a good answer to `nproc`, but someone has to write and maintain each of those canned answers. I wanted the common commands to keep using those cheap, predictable answers and a small model to handle the rest. It had to remember which machine it was pretending to be. It also had to be fast enough to answer a database client that gives its first query half a second.
+
+When I open a recorded shell session, I can see what the visitor typed, the working directory, our reply and its exit code. SQL has its own version of this. In one two-hour production check I could match all 10,918 PostgreSQL generation records back to stored queries. That lets me read a query alongside the result our service generated for it. The record also points back to the earlier turns and the machine profile used for the answer. If the decoy claims it has an NVIDIA card, that's a detail about *my decoy*. What I learned about the visitor is that they asked about the card. Their next command is a separate observation.
+
+![How a threat.gg session joins visitor input and decoy reply history, with a separate link from an observed download command to a captured file.](session-evidence.png)
+
+I had a hunch about the GPU scans. Were bots leaving because they didn't like the hardware we showed them? In an October comparison, 623 sessions went on to issue a download command and about 48,700 stopped. Both groups got much the same mix of answers to the CPU-count and graphics-device checks. I couldn't credit a particular reply for getting us to the download.
+
+When we *do* capture a file, its SHA-256 lets me find other commands that delivered the same bytes under different names. One backfill of the older SSH data connected over 120,000 command-to-file links to just 2,201 distinct samples. That lets me start from a file and work backwards to the sessions where it turned up.
+
+## Why train a model this small?
+
+I wanted one model I could host myself for SSH, Telnet, PostgreSQL and SQL Server. Sending a shell command and its recent history to a hosted model adds a round trip and means handing that provider the transcript. The first-query SQL timeout is especially unforgiving. Our larger model needs a budget of at least 1.5 seconds before the service will even try it.
+
+I let Codex work on the training for most of a month. By my count I'd spent over $200 on Runpod, and when I wanted my 4080 back to play games, I still deployed the sixth revision, r6. The newer one, r11, had spent a lot more time on rented GPUs. I couldn't show that it gave better answers.
 
 I started with SSH and used replies from a larger model as training examples for a smaller one. That's most of what I mean by *distillation* here. The first run used 17,849 examples and took about an hour to train on an H100. I used LoRA, which let me train a small set of extra weights and merge them into the model afterward. I also had to check what I was teaching it. The larger model sometimes contradicted the machine's own specs or reported an impossible uptime.
 
@@ -18,7 +34,9 @@ Early on I tried three small models on the cleaned-up SSH data. Qwen3-0.6B won t
 
 Some of the most productive training runs were pretty boring. The model had trouble with the statements SQL Server clients send when they first connect, and with PostgreSQL queries that specify a row limit. I added examples of both. On the same checks, r6 answered 29 of 30 SQL Server openers correctly, up from 27. On the PostgreSQL limit cases it went from 27 of 32 to 31. Training took about 96 minutes on an L40S.
 
-Keeping those gains got harder. I ran the r10 model through 100 test sessions and it passed 88. The older r9 weights paired with the r10 client passed 92. The client had learned how to recover complete rows from a partial SQL reply. That was a useful change to the Go code, but I still wanted a single model I could export, put on another box, and get the same answers from.
+The PostgreSQL transcripts also gave me a bug report I never would have written myself. In roughly 15 hours after the r6 rollout, the validator rejected 205 PostgreSQL replies. Of those, 201 were answers to the same role-count query. Run early in a replayed session, the query got a single value. After a wider table result, the model sometimes put two values in a one-column row. The scanner had asked a perfectly ordinary counting question. It was our answer that was broken. Keeping the earlier result alongside the query gave me a way to reproduce it and a reason to put multi-turn SQL examples in the next training set.
+
+I ran the r10 model through 100 test sessions and it passed 88. The older r9 weights paired with the r10 client passed 92. The client had learned how to recover complete rows from a partial SQL reply. That was a useful change to the Go code, but I still wanted a single model I could export, put on another box, and get the same answers from.
 
 ## What was actually in a training batch?
 
