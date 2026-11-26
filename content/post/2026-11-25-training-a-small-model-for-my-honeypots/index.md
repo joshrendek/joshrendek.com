@@ -85,7 +85,49 @@ The one invalid reply ran on with blank lines. Even when the JSON parsed, I stil
 
 The PostgreSQL transcripts also gave me a bug report I never would have written myself. In roughly 15 hours after the r6 rollout, the validator rejected 205 PostgreSQL replies. Of those, 201 were answers to the same role-count query. Run early in a replayed session, the query got a single value. After a wider table result, the model sometimes put two values in a one-column row. The scanner had asked a perfectly ordinary counting question. It was our answer that was broken. Keeping the earlier result alongside the query gave me a way to reproduce it and a reason to put multi-turn SQL examples in the next training set.
 
-I ran the r10 model through 100 test sessions and it passed 88. The older r9 weights paired with the r10 client passed 92. The client had learned how to recover complete rows from a partial SQL reply. That was a useful change to the Go code, but I still wanted a single model I could export, put on another box, and get the same answers from.
+## How did it do against the hosted models?
+
+I built HoneyBench because two perfectly good shells can word an error differently. What I care about is whether the reply makes sense on *this* machine. If a client asks for the hostname twice, it should get the same name twice. If it creates a table and queries it a turn later, the table should still be there.
+
+I froze 536 individual turns and 100 whole sessions for HoneyBench v2. The first version drew its turns from examples the teacher had answered cleanly. For v2 I sampled the live requests even when the teacher timed out. On an individual turn, every model gets the same recorded history. In a session, each model gets its own previous answers back. One bad reply or contradiction fails the session.
+
+Here’s how r6 and the nine hosted models did with version 3 of the scorer. For the turn score I average the four protocol pass rates. Otherwise the 346 SSH turns would swamp the 25 SQL Server turns. I excluded nine headline turns whose templates appeared in r6’s training data. The last column counts whole sessions out of the same 100 for everybody.
+
+| Model | Turn score | Sessions passed / 100 |
+| --- | ---: | ---: |
+| r6, production client | 93.2% | 88 |
+| r6, bare model | 92.9% | 81 |
+| Claude Haiku 5.5 | 82.5% | 75 |
+| GLM 5.3 Flash | 80.6% | 64 |
+| GPT-6 Luna | 80.0% | 75 |
+| Qwen3.8-27B | 79.8% | 64 |
+| DeepSeek V4 Flash | 78.7% | 75 |
+| DeepSeek V4.1 Flash (1017) | 78.3% | 66 |
+| Qwen3.8 Flash | 77.5% | 69 |
+| Nemotron 3.5 Lightning | 73.0% | 59 |
+| Claude Sonnet 5.5 | 12.1% | 2 |
+
+Both r6 runs used the same weights and llama.cpp grammar. The production client could stop a loop and recover a usable reply from partial output. That bought me seven more complete sessions. The hosted models got the JSON schema through OpenRouter. Sonnet’s row needs a footnote. Across the full run, 1,196 of its 1,550 replies came back empty with no token usage. HoneyBench counts those as provider refusals. That’s most of the story behind its score here.
+
+I saved each model’s replies so I could change a check and score them again offline. From the benchmark directory, this reproduces the r6 row with the v3 scorer. It prints 80.2% for sessions because the CLI averages the four protocol pass rates there too. Counting the passing session records gives the 88 in the table.
+
+```sh
+honeybench score -bench honeybench-v2 \
+  -predictions results-v2/r6.served.predictions.jsonl \
+  -train ../runs/r6/data/train.jsonl -out /tmp/r6-score.json
+```
+
+### Did the shell command succeed?
+
+I pulled the 350 SSH and Telnet turns where I had a recorded exit code from the teacher. On 238 of them the teacher returned zero (success). On the other 112 it returned a nonzero code (failure). Those are the reference labels for this confusion matrix. The teacher was emulating a shell too, so agreement tells me whether the two gave the visitor the same success or failure signal. I'd need a real shell to settle which one was right when they disagreed.
+
+[![Shell exit-code confusion matrix for both r6 runs and all nine hosted models. Each row splits the same 238 reference successes and 112 reference failures by the model’s returned status. All counts are in the linked CSV.](honeybench-shell-exit-matrix.png)](honeybench-shell-exit-matrix.png)
+
+DeepSeek V4 Flash and Haiku both finished 75 sessions, but they made different mistakes on these shell turns. On the 112 commands the teacher said failed, DeepSeek reported success 50 times. Haiku did that 17 times. In the other direction, Haiku reported failure on 83 commands the teacher said succeeded. DeepSeek did that 16 times. “No status” means I couldn’t read an integer exit code from the JSON reply. I kept those turns in the count.
+
+I’ve included the counts, turn-score intervals and session totals for [all 24 saved runs](honeybench-v2-results.csv), including the earlier students and the later client changes.
+
+When I got to r10, it passed 88 of those same 100 sessions. The older r9 weights paired with the r10 client passed 92. The client had learned how to recover complete rows from a partial SQL reply. That was a useful change to the Go code, but I still wanted a single model I could export, put on another box, and get the same answers from.
 
 ## What was in a training batch?
 
