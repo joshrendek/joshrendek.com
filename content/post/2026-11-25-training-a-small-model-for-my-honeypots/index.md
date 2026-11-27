@@ -94,6 +94,10 @@ With `completion_only_loss=True` the model sees the whole conversation up to and
 
 I loaded the Qwen weights in BF16 and left them frozen. `LoraConfig` adds rank-32 adapters to the linear layers (alpha 64, 5% dropout). I grouped examples by length to save on padding and used four examples per batch. After four batches the optimizer updates the adapter weights. I warmed up the learning rate to `2e-4`, used cosine decay and ran validation every 200 optimizer steps. Two epochs on the L40S took 5,732 seconds (about 96 minutes).
 
+[![Training loss logged every 20 optimizer steps and validation loss at 14 checkpoints during r6 training. Validation loss fell from 0.246 at step 200 to 0.120 at step 2,632.](r6-loss-by-step.png)](r6-loss-by-step.png)
+
+At step 200 the validation loss was 0.246. By step 1,400 it was down to 0.128. The remaining 1,232 updates got it to 0.120. That told me the adapter was getting better at predicting the tokens in held-out replies. To find out whether it could keep a SQL table straight across two queries, I had to run the model.
+
 ## Testing the file I was going to serve
 
 At the end of `train.py` I save a copy of the adapter, then merge the weights and save the tokenizer alongside them.
@@ -170,9 +174,19 @@ With the production client, r6 passed 335/346 SSH turns, 79/79 Telnet, 79/80 Pos
 | Nemotron 3.5 Lightning | 73.0% | 59 |
 | Claude Sonnet 5.5 | 12.1% | 2 |
 
+I sent the hosted models the JSON schema through OpenRouter. Sonnet came back empty with no token usage on 1,196 of 1,550 replies across the run. HoneyBench counts those as provider refusals, which explains a lot of that row.
+
+[![Whole sessions passed by r6 and nine hosted models, broken out by SSH, Telnet, PostgreSQL and SQL Server. Each cell gives the count and the number tested.](honeybench-sessions-by-protocol.png)](honeybench-sessions-by-protocol.png)
+
+Haiku, GPT-6 Luna and DeepSeek V4 Flash each passed 75 sessions. If I were picking one for a SQL Server honeypot, I'd want to know that Haiku got 8/10 there, DeepSeek got 4/10 and Luna got 0/10. On PostgreSQL, Luna got 16/20, one more than r6. There are only ten SQL Server sessions in this set, so one reply can move that column quite a bit.
+
 To compare revisions I use `paired()` in `report.go` to match turns by ID. r6 fixed nine turns that r5 failed and broke three that used to pass. The exact McNemar test uses those twelve disagreements. I got `p = 0.146` (the report needs p below 0.05 to call one better).
 
-Both r6 runs used the same weights and llama.cpp grammar. Just using the production client got me seven more complete sessions, since it can stop loops and recover a usable reply from partial output. I sent the hosted models the JSON schema through OpenRouter. Sonnet came back empty with no token usage on 1,196 of 1,550 replies across the run. HoneyBench counts those as provider refusals, which explains a lot of that row.
+Both r6 runs used the same weights and llama.cpp grammar. I matched the sessions by ID to see what took the score from 81 to 88.
+
+[![Outcomes for 100 matched r6 sessions. Both runs passed 80 and failed 11. Only the production client passed eight. Only the bare model passed one.](r6-production-client-pairs.png)](r6-production-client-pairs.png)
+
+All eight sessions the client picked up were SSH. The one it lost was PostgreSQL. The Go client can stop a loop or salvage a partial reply. I tested those behaviors together, so I can count which sessions changed without guessing which bit of Go deserves the credit.
 
 To rerun the r6 score, run this from the benchmark directory with the v3 scorer. You'll see 80.2% for sessions in the CLI. That's the average across the four protocols. If you count individual sessions in the results file you get 88 passes.
 
@@ -231,7 +245,11 @@ Before paying for another GPU I counted how far fixing the format could get me. 
 
 I tried the r6 Q4_K_M file on a Runpod A4000. At $0.174 an hour including disk I could leave it up for a 31-day month for about $129. With up to 12 requests in flight, only 8 of 36 ordinary requests finished within their three-second deadline.
 
-Turning off llama.cpp's extra RAM prompt cache helped the most. I kept the pooled HTTPS connections, the same weights and the same 12 slots. With the cache set to zero instead of 2 GiB, 28 of 36 requests finished in time. I also tried FP16 for the attention key/value cache. Sending one SQL opener at a time I got 10 of 12 back inside 500 ms. In bursts I got zero of 18.
+Turning off llama.cpp's extra RAM prompt cache helped the most. I kept the pooled HTTPS connections, the same weights and the same 12 slots. With the cache set to zero instead of 2 GiB, 28 of 36 requests finished in time. I also tried FP16 for the attention key/value cache, then replayed the same six SQL openers at different levels of concurrency.
+
+[![A4000 SQL opener trial. r6 answered 10 of 12 within the deadline one at a time, zero of 12 three at a time, and zero of 18 six at a time.](a4000-sql-deadline.png)](a4000-sql-deadline.png)
+
+The first query gets 500 ms, and the client gives the student 400 ms of that. Sending one at a time, I got 10 of 12 back from r6. Those ten took a median of 376 ms end to end. As soon as I sent three at once, r6 missed every opener in the test. A fallback reply doesn't count as a hit here. That's the part I'd watch on a busy database honeypot.
 
 I pointed production at the A4000 for a short trial on November 25. In the first five minutes or so it served 128 of 134 attempts. Median time for a reply it served was 614 ms, mostly SSH. I didn't get a single PostgreSQL reply in that sample. I still want to see what happens when there's some database traffic.
 
