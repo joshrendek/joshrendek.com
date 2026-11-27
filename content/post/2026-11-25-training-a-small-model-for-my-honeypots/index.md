@@ -56,13 +56,53 @@ cd /workspace
 python cuda/train.py --data data --out out/qwen3-0.6b --model Qwen/Qwen3-0.6B
 ```
 
-Most of the recipe lived in the defaults. The CUDA trainer loaded the base weights in BF16 and fitted rank-32 LoRA adapters on the linear layers, with alpha 64 and 5% dropout. The base weights stayed frozen. The prompt was visible to the model, but only tokens in the teacher's completion counted toward the loss. I used four examples per batch and accumulated gradients over four batches per optimizer step. The learning rate started with a warmup and followed a cosine schedule with a peak of `2e-4`.
+### Following one row through `train.py`
 
-The row count changed again at tokenization. The trainer applied Qwen's chat template before checking the 4,096-token limit. It dropped 149 overlong examples whole because cutting off the end would teach the model a partial reply. It hashed the command template to assign validation rows, so variants of the same template stayed together. The saved arguments report 21,051 rows for fitting and 469 for validation. The 2,372 holdout prompts stayed separate. Two epochs took 5,732 seconds on that L40S.
+One row in the r6 export ends with a visitor typing `nproc`. The `prompt` contains the machine profile, three earlier exchanges and that final command. The `completion` is one assistant message. Here's its entire content.
+
+```json
+{"stdout":"6\n","exit_code":0,"cwd":"/root"}
+```
+
+The first thing `main()` does with that row is measure it. In `scripts/distill/cuda/train.py`, it loads `train.jsonl` and calls `tok.apply_chat_template` on `prompt + completion`. That counts the role markers and the answer along with the conversation. If the whole thing exceeds 4,096 tokens, the filter drops the row. The closing brace of that JSON is at the very end. Cutting there would teach the model to send a reply my Go client couldn't parse. This cost me 149 of the 21,669 rows.
+
+Next, `is_valid()` decides which side of the training/validation split gets the row. Here's the function body from the r6 trainer.
+
+```python
+h = hashlib.sha256(("mlx-valid\x00" + template).encode()).digest()
+return int.from_bytes(h[:2], "big") % 100 < pct
+```
+
+With `pct=2`, buckets 0 and 1 go to validation. The template `nproc` lands in bucket 70, so all its surviving examples go into training, even when the machines give different answers. The script then keeps just the `prompt` and `completion` columns. I ended up with 21,051 training rows and 469 validation rows. The 2,372 holdout prompts lived in a different file that `train.py` never opened.
+
+The call that starts training is short because Hugging Face's TRL library owns the batch loop. I pass it the two datasets, the tokenizer (`tok`), the optimizer and batching settings (`cfg`), and the adapter configuration (`lora`).
+
+```python
+trainer = SFTTrainer(
+    model=model, args=cfg, train_dataset=train,
+    eval_dataset=valid if len(valid) else None,
+    processing_class=tok, peft_config=lora,
+)
+trainer.train()
+```
+
+With `completion_only_loss=True`, Qwen can read the profile, the earlier replies and the final `nproc`. The loss measures how much probability it gave each next token in the teacher's answer. That includes the JSON punctuation, the CPU count and the working directory. A model can learn to close the JSON reliably and still put the wrong number inside it.
+
+I loaded Qwen's base weights in BF16 and kept them frozen. `LoraConfig` attached rank-32 adapters to the linear layers, with alpha 64 and 5% dropout. The trainer grouped similar-length examples to cut down on padding. It processed four examples at a time and accumulated four batches of gradients before updating the adapters. The learning rate warmed up to `2e-4` and then followed a cosine decay. Every 200 optimizer steps it measured loss on the validation split. Two epochs took 5,732 seconds on the L40S.
 
 ## Testing the file I was going to serve
 
-The trainer saved the adapter, merged it into the base weights, and wrote the merged model and tokenizer to `out/qwen3-0.6b/merged`. The same job generated replies from the merged model, then converted and tested the file I'd serve. These commands also ran from `/workspace`.
+At the bottom of `train.py` I save the adapter by itself, then fold what it learned into the base weights. Those are two different artifacts I can come back to later.
+
+```python
+trainer.save_model(os.path.join(a.out, "adapter"))
+
+merged = trainer.model.merge_and_unload()
+merged.save_pretrained(os.path.join(a.out, "merged"))
+tok.save_pretrained(os.path.join(a.out, "merged"))
+```
+
+The rest of the pod job reads that `merged` directory to generate reference replies and build the 4-bit file. These commands also ran from `/workspace`.
 
 ```sh
 python cuda/generate.py --model out/qwen3-0.6b/merged \
@@ -91,7 +131,26 @@ I built HoneyBench because two perfectly good shells can word an error different
 
 I froze 536 individual turns and 100 whole sessions for HoneyBench v2. The first version drew its turns from examples the teacher had answered cleanly. For v2 I sampled the live requests even when the teacher timed out. On an individual turn, every model gets the same recorded history. In a session, each model gets its own previous answers back. One bad reply or contradiction fails the session.
 
-Here’s how r6 and the nine hosted models did with version 3 of the scorer. For the turn score I average the four protocol pass rates. Otherwise the 346 SSH turns would swamp the 25 SQL Server turns. I excluded nine headline turns whose templates appeared in r6’s training data. The last column counts whole sessions out of the same 100 for everybody.
+### How HoneyBench scores a reply
+
+`honeybench run` records what the model said. `honeybench score` reads those predictions back from disk. In version 3, `Score` in `internal/ai/bench/score.go` first checks that the predictions name the right benchmark hash and that their IDs and turn numbers belong to the bundle. It reads the training templates supplied with `-train` and skips matching benchmark items. That removed nine headline turns for r6. If a turn was eligible and the model timed out or its prediction was missing, it still counted as a failure.
+
+For an answered turn, `Score` passes the messages, the decoy's profile and the reply to `eval.ScoreChat`. The last user message tells it which command or query to judge. Take `nproc` again. On SSH, the shell parser checks that it can read the terminal reply. Then `verifyCPUCount` in `internal/ai/eval/facts.go` reads the number from stdout and compares it with the CPU count in the profile. On a six-CPU decoy, a well-formed reply claiming eight CPUs fails `facts.cpus`. Checks that have nothing to say about this command are marked inapplicable. The turn verdict comes down to these lines.
+
+```go
+for _, c := range r.HardFailures() {
+    out.Failed = append(out.Failed, c.Name)
+}
+out.Pass = len(out.Failed) == 0
+```
+
+SQL takes a different path through `ScoreChat`. It parses a result set and runs checks on things like the columns and the number of rows a query can return. If a recorded teacher reply is available, the scorer also measures text similarity. That number goes in its own column. A model can word an answer differently and still pass every hard check.
+
+A session adds another way to fail. The scorer rebuilds the history with the model's own earlier replies, skips inputs the service handles locally, and scores each turn the model had to answer. Then `eval.ScoreSession` compares the replies with one another. In one r6 PostgreSQL session the client sent the same `SELECT` four times in a row. It got 48 rows, then 16, 16 and 16. Every reply passed its individual checks. The only failure recorded for the whole session was `consistency.repeat`. That's a bug I'd have missed by shuffling those four turns into a test set.
+
+### Where the 93.2% comes from
+
+In `TrackScore.fill`, the code counts passes and attempts for each protocol. With the production client, r6 passed 335/346 SSH turns, 79/79 Telnet, 79/80 PostgreSQL and 17/22 SQL Server. Pool them and you get 510/527, or 96.8%. Give each of the four fractions a quarter of the score and you get **93.2%**, the number in the table. I use that average because SQL Server should still count when the SSH sensors have a busy week. The session column is a straight count of complete sessions passed out of 100.
 
 | Model | Turn score | Sessions passed / 100 |
 | --- | ---: | ---: |
@@ -107,6 +166,8 @@ Here’s how r6 and the nine hosted models did with version 3 of the scorer. For
 | Nemotron 3.5 Lightning | 73.0% | 59 |
 | Claude Sonnet 5.5 | 12.1% | 2 |
 
+When I compare two revisions, `paired()` in `report.go` lines up the headline turns by ID. Against r5, r6 fixed nine turns and broke three that r5 had passed. Those twelve disagreements are what go into the exact McNemar test. It gave me `p = 0.146`, short of the evidence I’d need to call r6 better at the report’s 0.05 threshold.
+
 Both r6 runs used the same weights and llama.cpp grammar. The production client could stop a loop and recover a usable reply from partial output. That bought me seven more complete sessions. The hosted models got the JSON schema through OpenRouter. Sonnet’s row needs a footnote. Across the full run, 1,196 of its 1,550 replies came back empty with no token usage. HoneyBench counts those as provider refusals. That’s most of the story behind its score here.
 
 I saved each model’s replies so I could change a check and score them again offline. From the benchmark directory, this reproduces the r6 row with the v3 scorer. It prints 80.2% for sessions because the CLI averages the four protocol pass rates there too. Counting the passing session records gives the 88 in the table.
@@ -119,7 +180,7 @@ honeybench score -bench honeybench-v2 \
 
 ### Did the shell command succeed?
 
-I pulled the 350 SSH and Telnet turns where I had a recorded exit code from the teacher. On 238 of them the teacher returned zero (success). On the other 112 it returned a nonzero code (failure). Those are the reference labels for this confusion matrix. The teacher was emulating a shell too, so agreement tells me whether the two gave the visitor the same success or failure signal. I'd need a real shell to settle which one was right when they disagreed.
+I pulled the 350 SSH and Telnet turns where I had a recorded exit code from the teacher. On 238 of them the teacher returned zero (success). On the other 112 it returned a nonzero code (failure). I used those as the labels for a separate confusion matrix. The 93.2% above comes from the hard checks. The teacher was emulating a shell too, so agreement tells me whether the two gave the visitor the same success or failure signal. I'd need a real shell to settle which one was right when they disagreed.
 
 [![Shell exit-code confusion matrix for both r6 runs and all nine hosted models. Each row splits the same 238 reference successes and 112 reference failures by the model’s returned status. All counts are in the linked CSV.](honeybench-shell-exit-matrix.png)](honeybench-shell-exit-matrix.png)
 
