@@ -6,9 +6,11 @@ description: "What the SSH and database sessions on threat.gg tell me about scan
 draft: true
 ---
 
-I've been working on a small model for threat.gg, a project that lets you run honeypots on your own servers. The SSH logs already tell me which IP connected and what username and password they tried. I wanted to see what they'd do once they got a shell. That gets tricky when they type a command I haven't written a response for.
+I've been running honeypots for over 12 years now. Back in July 2014 I was working on [SSH Pot](https://github.com/joshrendek/sshpot-com). A lot of the SSH clients would connect just to run `uname` and exit, so I added a check in the Go agent that sent back `Linux`. [I still have the post with the code.](/2014/07/go-lang-compare-star-ssh-dot-request-dot-type-against-a-string/)
 
-For example, over two months this summer I got 54,613 GPU checks across 24,038 SSH sessions. You could follow a client from checking the kernel and CPU to looking for a graphics card. Even when the IP changed I could group some of those sessions by their SSH client banner. Whether they wanted to mine on the box or run inference is harder to tell. [Summer SSH campaign report](https://threat.gg/blog/ssh-threat-actors-may-july-2026)
+I've always wanted to make the honeypots more interactive. Regex and pattern matching work fine for commands I know about. Once someone types a command I haven't written a response for, I'd still like the decoy to give them a sensible answer and see what they do next. That's the part I'm using a small model for in threat.gg, my project for running honeypots on your own servers.
+
+Over two months this summer I got 54,613 GPU checks across 24,038 SSH sessions. You could follow a client from checking the kernel and CPU to looking for a graphics card. Even when the IP changed I could group some of those sessions by their SSH client banner. Whether they wanted to mine on the box or run inference is harder to tell. [Summer SSH campaign report](https://threat.gg/blog/ssh-threat-actors-may-july-2026)
 
 ## What the honeypots record {#what-i-get-out-of-answering}
 
