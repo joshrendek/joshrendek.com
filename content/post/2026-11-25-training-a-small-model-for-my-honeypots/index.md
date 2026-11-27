@@ -18,8 +18,6 @@ The SSH honeypots were already collecting those sessions before I trained anythi
 
 If you open an SSH session you can see the command, the working directory, what we sent back and the exit code. For PostgreSQL I can look up a query and see the generated rows, the earlier turns and the database profile the model used. I checked a two-hour window in production and could match all 10,918 generation records to their queries. That distinction matters when I'm looking at the GPU scans. The visitor asked about a card. We're the ones who told them the box had an NVIDIA card.
 
-![How a threat.gg session joins visitor input and decoy reply history, with a separate link from an observed download command to a captured file.](session-evidence.png)
-
 I thought the hardware we advertised might explain why some bots stayed long enough to download something. In October I compared 623 sessions that issued a download command with about 48,700 that stopped. Both groups had seen much the same mix of replies to the CPU and graphics checks. I couldn't tell from that comparison why one group stuck around.
 
 Once I have a file I can search by SHA-256. A backfill turned up over 120,000 links between shell commands and downloaded files, but only 2,201 distinct samples. Pick a sample and you can see which sessions downloaded it, even if each used a different filename.
@@ -49,6 +47,10 @@ SQL had a hole in the data. When a client times out on its first statement I hav
 
 The Go evaluator runs on each source separately during `prep`. On SSH it strips shell prompts the teacher left at the end of replies and drops SCP protocol exchanges. Of 19,355 SSH training rows, 17,064 made it through cleanup and 16,436 through the quality filter. With all four protocols combined I had 21,669 rows in `data/train.jsonl` and 2,372 in `data/holdout.jsonl`.
 
+After the length check and validation split, I had 21,051 examples to train on. SSH accounted for 16,098 of them. SQL Server had the fewest. Of its 890 examples, 249 came through the session export and 641 came from generating replies offline.
+
+[![Of 21,051 fitting examples, 16,098 were SSH, 2,709 PostgreSQL, 1,354 Telnet and 890 SQL Server. Of the SQL examples, 751 PostgreSQL and 641 SQL Server examples were generated offline.](r6-training-sources.png)](r6-training-sources.png)
+
 ## The command that trained r6
 
 I copied the prepared data to a Runpod L40S. On the pod, the `train` stage ran this with the model name filled in.
@@ -66,7 +68,7 @@ Here's one SSH example. The `prompt` has the machine profile, three earlier exch
 {"stdout":"6\n","exit_code":0,"cwd":"/root"}
 ```
 
-In `scripts/distill/cuda/train.py`, `main()` loads `train.jsonl` and calls `tok.apply_chat_template` on `prompt + completion`. Count the tokens *after* applying the template so you include the role markers. I dropped all 149 examples over 4,096 tokens out of the 21,669 I started with. If you truncate at the limit you can cut the closing brace off the reply you're teaching the model to send.
+In `scripts/distill/cuda/train.py`, `main()` loads `train.jsonl` and calls `tok.apply_chat_template` on `prompt + completion`. Count the tokens *after* applying the template so you include the role markers. I dropped all 149 examples over 4,096 tokens out of the 21,669 I started with. If you truncate at the limit you can cut the closing brace off the reply you're teaching the model to send. The median example I actually trained on was 987 tokens. Only 1,260 went over 2,048.
 
 I use `is_valid()` to keep a command template on the same side of the training/validation split.
 
